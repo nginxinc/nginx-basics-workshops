@@ -1,0 +1,35 @@
+version: '3.3'
+services:
+  # NGINX webservers with nginx-demo hello page
+  nginx1:
+      hostname: nginx1
+      build: nginx-hello
+      expose:
+        - "80"
+  nginx2:
+      hostname: nginx2
+      build: nginx-hello
+      ports:
+        - "80"
+  # EDITS-START
+  # Simply Add another server like so:    
+  nginx3:
+      hostname: nginx3
+      build: nginx-hello
+      ports:
+        - "80"
+  # EDITS-END  
+  # NGINX Plus Load Balancer       
+  nginx-plus:
+      hostname: nginx-plus
+      build: nginx-plus
+      links:
+          - nginx1:nginx1
+          - nginx2:nginx2
+      volumes:
+          - ./nginx-plus/etc/nginx:/etc/nginx
+      ports:
+          - 8080:8080
+          - 80:80
+          - 443:443
+      restart: always
