@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<title>Leveraging JWT Claims for Logging and Rate Limiting</title>
+
+<xmp theme="united" style="display:none;">
+# Leveraging JWT Claims for Logging and Rate Limiting
+
+ * JWT log format: [`/log_format/log_jwt.conf)`](/log_format/log_jwt.conf)
+ * Nginx Module: [`ngx_http_auth_jwt_module`](http://nginx.org/en/docs/http/ngx_http_auth_jwt_module.html)
+
+#### Notes:
+
+After validating the JWT, NGINX Plus has access to all of the fields present in the header and the payload as variables. 
+These are accessed by prefixing `$jwt_header_` or `$jwt_claim_` to the desired field, for example, `$jwt_claim_sub` for the sub claim.
+
+We can also use `auth_jwt_claim_set` directive to set a variable to a JWT claim parameter identified by key names. 
+Name matching starts from the top level of the JSON tree. For arrays, the variable keeps a list of array elements separated by commas.
+
+This means that we can very easily proxy the information contained within the JWT to the API endpoint 
+without needing to implement JWT processing in the API itself.
+
+In the Nginx configuration below, we use a JWT Claim value, two levels deep (Attributes > dept) in a nested object "Attributes" 
+as the rate limiting key. This means we are limiting each unique `$jwt_dept` to the request rate defined by rate parameter.
+
+```nginx
+$ cat  cat /etc/nginx/api_jwt.conf
+
+##### Leveraging JWT Claims for Logging and Rate Limiting
+# use the `auth_jwt_claim_set` directive to set a variable to a JWT claim parameter identified by key names.
+# We can use claim-based variables to provide API rate limiting per API client, instead of per IP address:
+
+auth_jwt_claim_set $jwt_dept attributes dept; #  Save nested object 2 levels deep, attributes > dept in a variable
+limit_req_zone $jwt_dept zone=10rps_per_client:1m rate=10r/s; # Rate Limit - Per JWT claim 10 requests per second
+
+server {
+
+  #...
+
+  # Demostrate using JWT Claims Logging and Rate Limiting
+  location /ratelimit/ {
+      proxy_pass http://echo_http;
+
+      # JWT in "Authorization" header as a Bearer Token (Default)
+      # Using HS256 cryptographic algorithm
+      auth_jwt "My secure site";
+      auth_jwt_key_file jwk/hs256/secrets.jwk;
+
+      limit_req zone=10rps_per_client;
+
+      # we can also custom jwt logging here
+      access_log /var/log/nginx/access_jwt.log jwt;
+  }
+
+}
+```
+
+We also define the custom log format, `jwt` to include `$jwt_header_alg` and `$jwt_claim_sub'`:
+
+```nginx
+$ cat /etc/nginx/nginx.conf
+
+log_format jwt '$remote_addr - $remote_user [$time_local] "$request" '
+               '$status $body_bytes_sent "$http_referer" "$http_user_agent" '
+               '$jwt_header_alg $jwt_claim_sub';
+```
+
+## Demos
+Open two terminals: One to view the Nginx logs in realtime, and another to run commands for our demos
+
+#### 1. View Nginx logs in real time
+
+```bash
+$ docker logs -f [CONTAINER ID] #by ID
+```
+
+#### 2. Enter terminal of NGINX docker container
+
+```bash
+$ sudo docker exec -i -t [CONTAINER ID] /bin/bash  #by ID
+#or
+$ sudo docker exec -i -t [CONTAINER NAME] /bin/bash #by Name
+
+# Enter the NGINX root folder where we will run our commands:
+$ cd /etc/nginx
+```
+
+#### 3. Enable **active config: warehouse_api_simple
+```bash
+for x in /etc/nginx/api_conf.d/*.conf; do mv "$x" "${x%.conf}.conf_"; done
+mv /etc/nginx/api_conf.d/warehouse_api_jwt.conf_ /etc/nginx/api_conf.d/warehouse_api_jwt.conf
+ls /etc/nginx/api_conf.d
+nginx -t && nginx -s reload
+```
+
+To reproduce these demos, we will use prepared JWTs in text files and will insert them in our curl commands
+
+You can find the nested JWT files in the following directory:
+
+ * `jwt/hs256/nested_jwt`
+
+There are two valid tokens we can test with: `valid_token_nested_1.jwt` and `valid_token_nested_2.jwt`, each JWT
+has a unqiue `dept` value, as defined in the nested object `attributes > dept`
+
+```json
+$ cd /etc/nginx/jwt/hs256/nested_jwt
+$ cat valid_token_nested_1.jwt
+
+# The token
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjI2ODkyNDg2NTEsInN1YiI6InhhbXBsZUBleGFtcGxlLmNvbSIsImF1ZCI6Im5naW54IiwiYXR0cmlidXRlcyI6eyJuYW1lIjoiWGF2aWVyIEFtcGxlIiwicm9vbSI6IkExMjMiLCJkZXB0IjoiRGVtb25zdHJhdGlvbnMifSwiZ3JvdXBzIjpbIkFkbWluaXN0cmF0b3IiLCJGb29iYXIiLCJCYXpwdWIiXX0.weZPtC8szT-ZHZnrz2SWLorV9Mio_KjZVt33v5flBzM/
+
+# Payload data converted to json using https://jwt.io
+
+{
+    "exp": 2689248651,
+    "sub": "xample@example.com",
+    "aud": "nginx",
+    "attributes": {
+      "name": "Xavier Ample",
+      "room": "A123",
+      "dept": "Demonstrations"
+    },
+    "groups": [
+      "Administrator",
+      "Foobar",
+      "Bazpub"
+    ]
+  }
+```
+
+```json
+$ cat valid_token_nested_2.jwt
+
+# The token
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjI2ODkyNDg2NTEsInN1YiI6ImJvYmJ5QGV4YW1wbGUuY29tIiwiYXVkIjoibmdpbngiLCJhdHRyaWJ1dGVzIjp7Im5hbWUiOiJib2JieSBkaWdpdGFsIiwicm9vbSI6IkE0NTYiLCJkZXB0IjoiT3BlcmF0aW9ucyJ9LCJncm91cHMiOlsiSW50ZXJuIiwiRm9vYmFyIiwiQmF6cHViIl19.RtyIeFRHZkMZKq_qMBQlJqWqXRPhoOU5fR8WcNj3Yn0
+
+# Payload data converted to json using https://jwt.io
+
+{
+    "exp": 2689248651,
+    "sub": "bobby@example.com",
+    "aud": "nginx",
+    "attributes": {
+      "name": "bobby digital",
+      "room": "A456",
+      "dept": "Operations"
+    },
+    "groups": [
+      "Intern",
+      "Foobar",
+      "Bazpub"
+    ]
+  }
+```
+
+### Leveraging JWT Claims for Rate Limiting
+
+In this example we will use JWT claims as the rate limiting key
+
+**Step 1:** Move into folder with the nested JWT claims and cat the file for inspection
+
+```bash
+$ cd /etc/nginx/jwt/hs256/nested_jwt
+$ ls
+
+expired_token_nested.jwt  invalid_token_nested.jwt  valid_token_nested_1.jwt  valid_token_nested_2.jwt
+```
+
+**Step 2:** Run a [`vegeta`](https://github.com/tsenart/vegeta) command inserting a valid JWT (`valid_token_nested_1.jwt`) into the Authorization header as a Bearer Token.
+This command will request make 20 requests (`-rate=20`) for a second (`-duration=1s`) with the `JWT` attached in the `Authorization` header:
+
+We see that out of the `20` requests, only `50.00%` are successful i.e. `10` requests per second are successful, exactly as our
+rate limit is configured.
+
+(**Tip:** You may not see exactly `50%` or `10` requests successful reported each run, run the command mulitple times
+to see an average close to our 10 requests per second rate limit configuration) 
+
+```bash
+$ echo "GET https://localhost/ratelimit/" | vegeta attack -insecure -duration=1s -rate=20 -header="Authorization: Bearer `cat valid_token_nested_1.jwt`" | vegeta report
+
+Requests      [total, rate]            20, 21.05
+Duration      [total, attack, wait]    951.526138ms, 949.999765ms, 1.526373ms
+Latencies     [mean, 50, 95, 99, max]  1.559339ms, 1.341251ms, 1.891448ms, 1.891448ms, 4.960095ms
+Bytes In      [total, mean]            2500, 125.00
+Bytes Out     [total, mean]            0, 0.00
+Success       [ratio]                  50.00%
+Status Codes  [code:count]             200:10  429:10
+Error Set:
+429 Too Many Requests
+```
+
+### Logging JWT Claims 
+
+**Step 1:** Open a terminal on the Nginx host server and `tail` our custom access log, `access_jwt.log`, that we have defined
+in the `location` block where the rate limit has been applied
+Run a curl command inserting another valid JWT (`valid_token_nested_2.jwt`) into the Authorization header as a Bearer Token.
+This time we get a `HTTP 403` because this JWT's sub claim is `bobby@example.com` which has been revoked
+
+```bash
+$ tail -f 10 /var/log/nginx/access_jwt.log
+```
+**Step 2:** From a client machine or from another terminal session on the Nginx host server, run the `vegeta` command once
+again to generate traffic. 
+
+```bash
+$ echo "GET https://localhost/ratelimit/" | vegeta attack -insecure -duration=1s -rate=20 -header="Authorization: Bearer `cat valid_token_nested_2.jwt`" | vegeta report
+```
+**Step 3:** Back to server terminal that is viewing (`tail`) the access log, `access_jwt.log` we should see 20 requests, 10 should 
+result in `200` (success) reponses and 10 in `429` (Too Many Requests) responses:
+
+```bash
+$ tail -f 10 /var/log/nginx/access_jwt.log
+
+2020/05/01 13:23:14 [error] 661#661: *18342 limiting requests, excess: 0.550 by zone "10rps_per_client", client: 127.0.0.1, server: localhost, request: "GET /ratelimit/ HTTP/1.1", host: "localhost"
+2020/05/01 13:23:14 [error] 661#661: *18342 limiting requests, excess: 0.060 by zone "10rps_per_client", client: 127.0.0.1, server: localhost, request: "GET /ratelimit/ HTTP/1.1", host: "localhost"
+2020/05/01 13:23:14 [error] 661#661: *18342 limiting requests, excess: 0.500 by zone "10rps_per_client", client: 127.0.0.1, server: localhost, request: "GET /ratelimit/ HTTP/1.1", host: "localhost"
+2020/05/01 13:23:14 [error] 661#661: *18342 limiting requests, excess: 0.010 by zone "10rps_per_client", client: 127.0.0.1, server: localhost, request: "GET /ratelimit/ HTTP/1.1", host: "localhost"
+2020/05/01 13:23:14 [error] 661#661: *18342 limiting requests, excess: 0.510 by zone "10rps_per_client", client: 127.0.0.1, server: localhost, request: "GET /ratelimit/ HTTP/1.1", host: "localhost"
+2020/05/01 13:23:14 [error] 661#661: *18342 limiting requests, excess: 0.010 by zone "10rps_per_client", client: 127.0.0.1, server: localhost, request: "GET /ratelimit/ HTTP/1.1", host: "localhost"
+2020/05/01 13:23:14 [error] 661#661: *18342 limiting requests, excess: 0.500 by zone "10rps_per_client", client: 127.0.0.1, server: localhost, request: "GET /ratelimit/ HTTP/1.1", host: "localhost"
+2020/05/01 13:23:14 [error] 661#661: *18342 limiting requests, excess: 0.010 by zone "10rps_per_client", client: 127.0.0.1, server: localhost, request: "GET /ratelimit/ HTTP/1.1", host: "localhost"
+2020/05/01 13:23:14 [error] 661#661: *18342 limiting requests, excess: 0.480 by zone "10rps_per_client", client: 127.0.0.1, server: localhost, request: "GET /ratelimit/ HTTP/1.1", host: "localhost"
+2020/05/01 13:23:15 [error] 661#661: *18342 limiting requests, excess: 0.470 by zone "10rps_per_client", client: 127.0.0.1, server: localhost, request: "GET /ratelimit/ HTTP/1.1", host: "localhost"
+2020/05/01 13:23:15 [error] 661#661: *18342 limiting requests, excess: 0.500 by zone "10rps_per_client", client: 127.0.0.1, server: localhost, request: "GET /ratelimit/ HTTP/1.1", host: "localhost"
+2020/05/01 13:23:15 [error] 661#661: *18342 limiting requests, excess: 0.010 by zone "10rps_per_client", client: 127.0.0.1, server: localhost, request: "GET /ratelimit/ HTTP/1.1", host: "localhost"
+```
+
+
+## Links to resources
+* Nginx Module: [`Module ngx_http_proxy_module `](http://nginx.org/en/docs/http/ngx_http_proxy_module.html)
+* [Alphabetical index of variables ](http://nginx.org/en/docs/varindex.html)
+* [Authenticating API Clients with JWT and NGINX Plus - Revoking JWTs](https://www.nginx.com/blog/authenticating-api-clients-jwt-nginx-plus/)
+* [Rate Limiting with NGINX and NGINX Plus](https://www.nginx.com/blog/rate-limiting-nginx/)
+
+</xmp>
+
+<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
+</html>

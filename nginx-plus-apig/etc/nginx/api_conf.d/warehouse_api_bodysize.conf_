@@ -1,0 +1,26 @@
+# API definition
+#
+location /api/warehouse/pricing {
+    set $upstream pricing_service;
+    rewrite ^ /_warehouse last;
+}
+
+location /api/warehouse/inventory {
+    set $upstream inventory_service;
+    rewrite ^ /_warehouse last;
+}
+
+# Policy section
+#
+location = /_warehouse {
+    internal;
+    set $api_name "Warehouse";
+
+    # Policy configuration here (authentication, rate limiting, logging, more...)
+
+    client_max_body_size 16k;
+
+    proxy_pass http://$upstream$request_uri;
+}
+
+# vim: syntax=nginx

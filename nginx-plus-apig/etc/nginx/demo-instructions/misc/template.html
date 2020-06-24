@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<title>Title goes here</title>
+
+<xmp theme="united" style="display:none;">
+# Title here
+
+ * Config file: [`server_cl_connection_limit.conf`](/config/servers/server_bl_bandwidth_limit.conf)
+ * Nginx Module: [`ngx_http_core_module`](http://nginx.org/en/docs/http/ngx_http_core_module.html)
+
+#### Notes:
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore
+et dolore magna aliqua.
+
+```nginx
+location /img/ {
+    #...
+    limit_rate_after 500k;  # Sets the initial amount after which the further transmission of a response to a client will be rate limited.
+    limit_rate       56k;   # Sets bandwidth rate limit
+}
+```
+
+### Example 1
+
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum.
+
+### Example 2
+
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum.
+
+## Demo Steps
+
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum.
+
+### Example 1
+
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum.
+
+### Example 2
+
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum.
+
+**Step 1:** Run the following command to remove all resources in the cache:
+
+```bash
+# curl test from a "gold status" customer
+$ curl -o /dev/null -b "vip=gold" "http://bl.example.com/files/1mb.txt"
+
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 1024k  100 1024k    0     0  11.0M      0 --:--:-- --:--:-- --:--:-- 11.4M
+```
+
+**Step 2:** Run the following command to remove all resources in the cache:
+
+```bash
+# curl test from a "sliver status" customer
+$ curl -o /dev/null -b "vip=sliver" "http://bl.example.com/files/1mb.txt"
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                               Dload  Upload   Total   Spent    Left  Speed
+100 1024k  100 1024k    0     0   125k      0  0:00:08  0:00:08 --:--:--  117k
+
+# curl test from a "bronze status" customer
+$ curl -o /dev/null -b "vip=bronze" "http://bl.example.com/files/1mb.txt"
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                               Dload  Upload   Total   Spent    Left  Speed
+100 1024k  100 1024k    0     0  57924      0  0:00:18  0:00:18 --:--:-- 55380
+```
+
+## Links to resources
+* Config file: [`NGINX Content Caching`](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/)
+* Nginx Module: [`Module ngx_http_proxy_module `](http://nginx.org/en/docs/http/ngx_http_proxy_module.html)
+
+</xmp>
+
+<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
+</html>

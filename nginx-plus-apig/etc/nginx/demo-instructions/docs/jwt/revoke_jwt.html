@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<title>Revoking JWTs</title>
+
+<xmp theme="united" style="display:none;">
+# Revoking JWTs
+
+ * Nginx Module: [`ngx_http_auth_jwt_module`](http://nginx.org/en/docs/http/ngx_http_auth_jwt_module.html)
+
+#### Notes:
+
+From time to time it may be necessary to revoke or re‑issue an API client's JWT.
+Using simple `map` and `if` blocks, we can deny access to an API client by marking 
+its JWT as revoked until such time as the JWT's exp claim (expiration date) is reached, 
+at which point the map entry for that JWT can be safely removed.
+
+```nginx
+# Map - Check "sub" (Subject) Claim for revoked subject values
+map $jwt_claim_sub $jwt_status {
+    "bobby@example.com" "revoked";
+    default  "";
+}
+
+server {
+
+  #...
+
+  # Demostrate revoking JWT
+  location /products/ {
+
+      if ( $jwt_status = "revoked" ) {
+          return 403;
+      }
+
+      proxy_pass http://echo_http;
+
+      # JWT in "Authorization" header as a Bearer Token (Default)
+      # Using HS256 cryptographic algorithm
+      auth_jwt "My secure site";
+      auth_jwt_key_file jwk/hs256/secrets.jwk;
+
+  }
+}
+```
+#### Logic Flow
+
+The Nginx configuration above checks the JWT "sub" (Subject) Claim value in a `map` and sets
+the varible, `$jwt_status` to "revoked" if the `$jwt_claim_sub` is a listed (blacklisted)
+subkect value. In `location /products/`, the `if` block will return a `HTTP 403 forbidden`
+response when `$jwt_status = "revoked"`
+
+## Demos
+Open two terminals: One to view the Nginx logs in realtime, and another to run commands for our demos
+
+#### 1. View Nginx logs in real time
+
+```bash
+$ docker logs -f [CONTAINER ID] #by ID
+```
+
+#### 2. Enter terminal of NGINX docker container
+
+```bash
+$ sudo docker exec -i -t [CONTAINER ID] /bin/bash  #by ID
+#or
+$ sudo docker exec -i -t [CONTAINER NAME] /bin/bash #by Name
+
+# Enter the NGINX root folder where we will run our commands:
+$ cd /etc/nginx
+```
+
+#### 3. Enable **active config: warehouse_api_simple
+
+```bash
+for x in /etc/nginx/api_conf.d/*.conf; do mv "$x" "${x%.conf}.conf_"; done
+mv /etc/nginx/api_conf.d/warehouse_api_jwt.conf_ /etc/nginx/api_conf.d/warehouse_api_jwt.conf
+ls /etc/nginx/api_conf.d
+nginx -t && nginx -s reload
+```
+
+As a shortcut to reproduce this demos we use prepared JWTs in text files and will insert them in our curl commands
+
+You can find the nested JWT files in the following directory:
+
+ * `jwt/hs256/nested_jwt`
+
+There are two valid tokens we will test against: `valid_token_nested_1.jwt` and `valid_token_nested_2.jwt`, where
+`valid_token_nested_2.jwt` has been revoked, our Nginx configuration uses the subject claim `bobby@example.com` 
+to deny access:
+
+```json
+$ cd /etc/nginx/jwt/hs256/nested_jwt
+$ cat valid_token_nested_1.jwt
+
+# The Token
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjI2ODkyNDg2NTEsInN1YiI6InhhbXBsZUBleGFtcGxlLmNvbSIsImF1ZCI6Im5naW54IiwiYXR0cmlidXRlcyI6eyJuYW1lIjoiWGF2aWVyIEFtcGxlIiwicm9vbSI6IkExMjMiLCJkZXB0IjoiRGVtb25zdHJhdGlvbnMifSwiZ3JvdXBzIjpbIkFkbWluaXN0cmF0b3IiLCJGb29iYXIiLCJCYXpwdWIiXX0.weZPtC8szT-ZHZnrz2SWLorV9Mio_KjZVt33v5flBzM
+
+# Payload data converted to json using https://jwt.io
+
+{
+    "exp": 2689248651,
+    "sub": "xample@example.com",
+    "aud": "nginx",
+    "attributes": {
+      "name": "Xavier Ample",
+      "room": "A123",
+      "dept": "Demonstrations"
+    },
+    "groups": [
+      "Administrator",
+      "Foobar",
+      "Bazpub"
+    ]
+  }
+```
+
+```json
+$ cd /etc/nginx/jwt/hs256/nested_jwt
+$ cat valid_token_nested_2.jwt
+
+# The Token
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjI2ODkyNDg2NTEsInN1YiI6ImJvYmJ5QGV4YW1wbGUuY29tIiwiYXVkIjoibmdpbngiLCJhdHRyaWJ1dGVzIjp7Im5hbWUiOiJib2JieSBkaWdpdGFsIiwicm9vbSI6IkE0NTYiLCJkZXB0IjoiT3BlcmF0aW9ucyJ9LCJncm91cHMiOlsiSW50ZXJuIiwiRm9vYmFyIiwiQmF6cHViIl19.RtyIeFRHZkMZKq_qMBQlJqWqXRPhoOU5fR8WcNj3Yn0
+
+# Payload data converted to json using https://jwt.io
+
+{
+    "exp": 2689248651,
+    "sub": "bobby@example.com",
+    "aud": "nginx",
+    "attributes": {
+      "name": "bobby digital",
+      "room": "A456",
+      "dept": "Operations"
+    },
+    "groups": [
+      "Intern",
+      "Foobar",
+      "Bazpub"
+    ]
+  }
+```
+
+### Revoking JWTs
+
+In this example we will validate JWT claims by checking the JWT sub (Subject) claim value has not
+been revoked. This this example only the sub claim `bobby@example.com` is revoked
+
+**Step 1:** Move into folder with the nested JWT claims and cat the file for inspection
+
+```bash
+$ cd /etc/nginx/jwt/hs256/nested_jwt
+$ ls
+
+expired_token_nested.jwt  invalid_token_nested.jwt  valid_token_nested_1.jwt  valid_token_nested_2.jwt
+```
+
+**Step 2:** Run a curl command inserting a valid JWT (`valid_token_nested_1.jwt`) into the Authorization header as a Bearer Token.
+We get a `HTTP 200` response because this JWT's sub claim is `xample@example.com`
+
+```bash
+$ curl -k -H "Authorization: Bearer `cat valid_token_nested_1.jwt`" https://localhost/products/
+
+Thank you for requesting /products/
+```
+**Step 3:** Run a curl command inserting another valid JWT (`valid_token_nested_2.jwt`) into the Authorization header as a Bearer Token.
+This time we get a `HTTP 403` because this JWT's sub claim is `bobby@example.com` which has been revoked
+
+```bash
+$ curl -k -I -H "Authorization: Bearer `cat valid_token_nested_2.jwt`" https://localhost/admin
+
+HTTP/1.1 403 Forbidden
+Server: nginx/1.13.7
+Date: Mon, 02 Apr 2018 16:19:44 GMT
+Content-Type: application/json
+Content-Length: 169
+Connection: keep-alive
+
+curl -k -H "Authorization: Bearer `cat valid_token_nested_2.jwt`" https://localhost/admin
+{"status":403,"message":"Forbidden"}
+
+```
+
+## Links to resources
+* Nginx Module: [`Module ngx_http_proxy_module `](http://nginx.org/en/docs/http/ngx_http_proxy_module.html)
+* [Authenticating API Clients with JWT and NGINX Plus - Revoking JWTs](https://www.nginx.com/blog/authenticating-api-clients-jwt-nginx-plus/)
+
+</xmp>
+
+<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
+</html>

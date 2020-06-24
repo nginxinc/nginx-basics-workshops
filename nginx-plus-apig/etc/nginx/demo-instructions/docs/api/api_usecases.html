@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<title>API Gateway Usecases</title>
+
+<xmp theme="united" style="display:none;">
+# API Gateway Usecases
+
+## Demo setup:
+
+Open two terminals: One to view the Nginx logs in realtime, and another to run commands for our demos
+
+#### 1. View Nginx logs in real time
+
+```bash
+$ docker logs -f [CONTAINER ID] #by ID
+```
+
+#### 2. Enter terminal of NGINX docker container
+
+```bash
+$ sudo docker exec -i -t [CONTAINER ID] /bin/bash  #by ID
+#or
+$ sudo docker exec -i -t [CONTAINER NAME] /bin/bash #by Name
+```
+## Demo Instructions:
+
+### Routing - Choosing Broad vs. Precise Definition for APIs
+
+#### Broad Definitions
+
+**Enable config: `warehouse_api_simple.conf`**
+```bash
+for x in /etc/nginx/api_conf.d/*.conf; do mv "$x" "${x%.conf}.conf_"; done
+mv /etc/nginx/api_conf.d/warehouse_api_simple.conf_ /etc/nginx/api_conf.d/warehouse_api_simple.conf
+ls /etc/nginx/api_conf.d
+nginx -t && nginx -s reload
+```
+
+ 1. show simple rouing configurations in `warehouse_api_simple.conf`
+ 2. show curl response of `/api/warehouse/inventory` and `/api/warehouse/pricing`:
+
+```bash
+# inventory api
+$ curl -i -k https://localhost/api/warehouse/inventory
+
+# pricing api
+$ curl -i -k https://localhost/api/warehouse/pricing
+
+# These broad requests also work:
+$ curl -i -k https://localhost/api/warehouse/inventory
+$ curl -i -k https://localhost/api/warehouse/inventory/
+$ curl -i -k https://localhost/api/warehouse/inventory/foo
+$ curl -i -k https://localhost/api/warehouse/inventoryfoo
+$ curl -i -k https://localhost/api/warehouse/inventoryfoo/bar/
+```
+
+### Precise Definitions
+
+**Enable config: `warehouse_api_precise.conf`**
+
+```bash
+for x in /etc/nginx/api_conf.d/*.conf; do mv "$x" "${x%.conf}.conf_"; done
+mv /etc/nginx/api_conf.d/warehouse_api_precise.conf_ /etc/nginx/api_conf.d/warehouse_api_precise.conf
+ls /etc/nginx/api_conf.d
+nginx -t && nginx -s reload
+```
+
+ 1. Show simple rouing configurations in `warehouse_api_precise.conf`
+ 2. Use `curl` to show valid and invalid endpoints:
+
+    a. Valid URIs
+
+```
+# Valid URIs
+ * /api/warehouse/inventory
+ * /api/warehouse/inventory/shelf/foo
+ * /api/warehouse/inventory/shelf/foo/box/bar
+ * /api/warehouse/inventory/shelf/-/box/-
+ * /api/warehouse/pricing/baz
+```
+
+These `curl` commands result in `HTTP 200`:
+```bash
+$ curl -i -k https://localhost/api/warehouse/inventory
+$ curl -i -k https://localhost/api/warehouse/inventory/shelf/foo
+$ curl -i -k https://localhost/api/warehouse/inventory/shelf/foo/box/bar
+$ curl -i -k https://localhost/api/warehouse/inventory/shelf/-/box/-
+$ curl -i -k https://localhost/api/warehouse/pricing/baz
+```
+
+   b. Invalid URIs
+
+```
+# Invalid URIs
+
+ * /api/warehouse/inventory/
+ * /api/warehouse/inventoryfoo
+ * /api/warehouse/inventory/shelf
+ * /api/warehouse/inventory/shelf/foo/bar
+ * /api/warehouse/pricing
+ * /api/warehouse/pricing/baz/
+```
+
+These `curl` commands result in `HTTP 400`:
+```bash
+$ curl -i -k https://localhost/api/warehouse/inventory/
+$ curl -i -k https://localhost/api/warehouse/inventoryfoo
+$ curl -i -k https://localhost/api/warehouse/inventory/shelf
+$ curl -i -k https://localhost/api/warehouse/inventory/shelf/foo/bar
+$ curl -i -k https://localhost/api/warehouse/pricing
+$ curl -i -k https://localhost/api/warehouse/pricing/baz/
+```
+
+## Show custom JSON error pages
+
+Show the NGINX config defining the default MIME type response as `application/json` (by default NGINX sets it as `text/plain`):
+
+```nginx
+default_type application/json; # If no content-type then assume JSON
+```
+Show the NGINX config with JSON error pages
+`cat /etc/nginx/api_json_errors.conf`
+
+Show Curl response
+```bash
+$ curl -i https://localhost/foo -k
+
+HTTP/1.1 400 Bad Request
+Server: nginx/1.13.10
+Date: Fri, 20 Jul 2018 20:14:43 GMT
+Content-Type: application/json
+Content-Length: 39
+Connection: keep-alive
+
+{"status":400,"message":"Bad request"}
+```
+
+
+## API Key Authentication
+
+**Enable config: `warehouse_api_apikeys.conf`**
+
+```bash
+for x in /etc/nginx/api_conf.d/*.conf; do mv "$x" "${x%.conf}.conf_"; done
+mv /etc/nginx/api_conf.d/warehouse_api_apikeys.conf_ /etc/nginx/api_conf.d/warehouse_api_apikeys.conf
+ls /etc/nginx/api_conf.d
+nginx -t && nginx -s reload
+```
+
+ 1. Show API Key Authenication configured in `/etc/nginx/api_keys.conf` in the `map` block and enforced in `if` block configured in `/etc/nginx/api_gateway.conf`.
+
+`map` block sets which API clients (`$api_client_name`) are Infrastructure clients (`$is_infrastructure`):
+
+```bash
+$ cat /etc/nginx/api_keys.conf
+
+# API Clients
+ map $http_apikey $api_client_name {
+    default "";
+
+    "7B5zIqmRGXmrJTFmKa99vcit" "client_one";
+    "QzVV6y1EmQFbbxOfRCwyJs35" "client_two";
+    "mGcjH8Fv6U9y3BVF9H3Ypb9T" "client_six";
+}
+
+# Infrastructure clients
+map $api_client_name $is_infrastructure {
+    default       0;
+
+    "client_one"  1;
+    "client_six"  1;
+}
+```
+
+The `if ($is_infrastructure = 0) { #...}` checks if the varible `$is_infrastructure` is set, if not, Nginx responds with a `HTTP 403`
+
+ ```bash
+ $ cat /etc/nginx/api_conf.d/warehouse_api_apikeys.conf
+
+ # ...
+
+ location = /api/warehouse/inventory/audit {
+    if ($is_infrastructure = 0) {
+        return 403; # Forbidden (not infrastructure)
+    }
+    set $upstream inventory_service;
+    rewrite ^ /_warehouse last;
+}
+ ```
+
+ 2. demo with `curl` that only requests with API key works:
+
+```bash
+# No API key
+$ curl -i -k https://localhost/api/warehouse/pricing/item001
+{"status":401,"message":"Unauthorized"}
+
+# Invalid API key
+$ curl -H "apikey: thisIsInvalid" -i -k https://localhost/api/warehouse/pricing/item001
+{"status":403,"message":"Forbidden"}
+
+# Valid API key
+$ curl -H "apikey: 7B5zIqmRGXmrJTFmKa99vcit" -i -k https://localhost/api/warehouse/pricing/item001
+{"status": "200",...}
+```
+
+## Rate Limiting
+
+**Enable config: `warehouse_api.conf`**
+
+```bash
+for x in /etc/nginx/api_conf.d/*.conf; do mv "$x" "${x%.conf}.conf_"; done
+mv /etc/nginx/api_conf.d/warehouse_api.conf_ /etc/nginx/api_conf.d/warehouse_api.conf
+ls /etc/nginx/api_conf.d
+nginx -t && nginx -s reload
+```
+
+ 1. Show Rate limiting definitions set as `limit_req_zone` parameters in  `api_gateway.conf` and the location block in `warehouse_api.conf` where it is applied:
+
+```
+$ cat /etc/nginx/api_gateway.conf
+
+limit_req_zone $binary_remote_addr zone=client_ip_10rs:1m rate=10r/s;
+limit_req_zone $http_apikey        zone=apikey_50rs:1m   rate=50r/s;
+```
+
+```
+$ cat /etc/nginx/api_conf.d/warehouse_api.conf
+
+# ...
+
+location = /_warehouse {
+    internal;
+    set $api_name "Warehouse";
+
+    limit_req zone=client_ip_10rs;
+    #limit_req zone=apikey_50rs;
+    limit_req_status 429;
+
+    proxy_pass http://$upstream$request_uri;
+}
+```
+
+ 2. Run `siege` or `vegeta` in the container or from a remote macchine to show rate limit of 10 requests per second based on source IP address:
+
+**Caution: From my experience Siege does not run for the defined duration (`-t`) consistently, I recommend using vegeta:**
+
+ ```bash
+# siege
+$ siege -t1s -c 11 https://localhost/api/warehouse/pricing
+
+# vegeta (recommended)
+$ echo "GET https://localhost/api/warehouse/pricing" | vegeta attack -duration=1s -insecure | tee results.bin | vegeta report
+```
+
+ You should see the report showing only 10 requests result in `HTTP 200`'s per second. All Other reponses are denined, i.e `HTTP 429`:
+
+```bash
+#...
+Status Codes  [code:count]             429:240  200:10
+```
+
+ 3. You can also run `siege` or `vegeta` to show our second rate limiting rule, limit of 200 requests per sec based on API key:
+
+ a. But first you need to configure the configuration file, `/etc/nginx/api_conf.d/warehouse_api.conf` to use the other defined rate limiting rule. We can do this by commenting out `limit_req zone=client_ip_10rs;` and uncommenting `limit_reqzone=apikey_50rs;`
+
+
+```
+$ vi /etc/nginx/api_conf.d/warehouse_api.conf
+
+    ...
+    #limit_req zone=client_ip_10rs;
+    limit_req zone=apikey_50rs;
+```
+
+ b. Then reload Nginx with the new configuration: `nginx -t && nginx -s reload`
+
+ c. Now run `siege` or `vegeta` to show rate limit of 50 requests per sec based on API key. Note that not all host machine running these commands can output the sufficent load to demostrate the test:
+
+** Again, Siege might not run for the specified duration (`-t`) consistently, I recommend using vegeta:**
+
+```bash
+# siege
+$ siege -t1s -c 11 -H "apikey: 7B5zIqmRGXmrJTFmKa99vcit" https://localhost/api/warehouse/pricing
+
+# vegeta
+$ echo "GET https://localhost/api/warehouse/pricing" | vegeta attack -duration=1s -rate=250  -workers=20 -insecure  -header "apikey: 7B5zIqmRGXmrJTFmKa99vcit" | tee results.bin | vegeta report
+```
+
+
+ You should see the report showing only 200 requests result in `HTTP 200`'s per second. All Other reponses are denined, i.e `HTTP 429`:
+
+
+```bash
+#...
+Status Codes  [code:count]             429:50  200:50
+```
+
+
+## Enforcing Specific Request Methods
+
+**Enable config: `warehouse_api.conf`**
+
+```bash
+for x in /etc/nginx/api_conf.d/*.conf; do mv "$x" "${x%.conf}.conf_"; done
+mv /etc/nginx/api_conf.d/warehouse_api.conf_ /etc/nginx/api_conf.d/warehouse_api.conf
+ls /etc/nginx/api_conf.d
+nginx -t && nginx -s reload
+```
+
+With RESTful APIs, the HTTP method (or verb) is an important part of each API call and very significant to the API definition. Take the pricing service of our Warehouse API as an example:
+
+ 1. Show `warehouse_api.conf` and the `limit_except` directives limiting the allowed HTTP Methods:
+
+```
+$ cat /etc/nginx/api_conf.d/warehouse_api.conf
+#...
+ limit_except GET POST {}
+#...
+ limit_except GET {}
+```
+
+2. To see HTTP methods access controls in action, run the following commands:
+
+```bash
+# GET
+curl -k https://localhost/api/warehouse/pricing/item001
+{"status": "200",...}
+
+# DELETE
+curl -k -X DELETE https://localhost/api/warehouse/pricing/item001
+{"status":405,"message":"Method not allowed"}
+```
+
+## Controlling Request Sizes
+
+
+**Enable config: `warehouse_api_bodysize.conf`**
+
+```bash
+for x in /etc/nginx/api_conf.d/*.conf; do mv "$x" "${x%.conf}.conf_"; done
+mv /etc/nginx/api_conf.d/warehouse_api_bodysize.conf_ /etc/nginx/api_conf.d/warehouse_api_bodysize.conf
+ls /etc/nginx/api_conf.d
+nginx -t && nginx -s reload
+```
+
+Take the pricing service of our Warehouse API as an example:
+
+ 1. Show `warehouse_api_bodysize.conf` and the `client_max_body_size` directives limiting the allowed upload size:
+
+```
+$ cat /etc/nginx/api_conf.d/warehouse_api_bodysize.conf
+
+#...
+client_max_body_size 16k;
+```
+
+## Validating Request Bodies
+
+**TO DO**
+
+## Resources:
+ * [Deploying NGINX Plus as an API Gateway, Part 1](https://www.nginx.com/blog/deploying-nginx-plus-as-an-api-gateway-part-1/)
+ * [Deploying NGINX Plus as an API Gateway, Part 2: Protecting Backend Services](https://www.nginx.com/blog/deploying-nginx-plus-as-an-api-gateway-part-2-protecting-backend-services/)
+</xmp>
+
+<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
+</html>

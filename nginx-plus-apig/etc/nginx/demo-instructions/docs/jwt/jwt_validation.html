@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+<title>JWT Validation</title>
+
+<xmp theme="united" style="display:none;">
+# JWT Validation
+
+ * Nginx Module: [`ngx_http_auth_jwt_module`](http://nginx.org/en/docs/http/ngx_http_auth_jwt_module.html)
+
+### Notes:
+
+NGINX Plus supports validating JWTs directly and so Nginx functions as an excellent API gateway, providing a frontend to an API endpoint and using JWT to authenticate client applications.
+
+JSON Web Tokens (JWTs, pronounced "jots") are a compact and highly portable means of exchanging identity information. The JWT specification has been an essential underpinning of OpenID Connect, providing a single sign‑on token for the OAuth 2.0 ecosystem. JWTs can also be used as authentication credentials in their own right and are a better way to control access to web‑based APIs than traditional API keys.
+
+#### Nginx Plus supports the following cryptographic algorithms:
+
+ * `HS256`, `HS384`, `HS512` #HMAC with SHA-256,SHA-384, SHA-512)
+ * `RS256`, `RS384`, `RS512` #RSA Signature with SHA-256, SHA-384, SHA-512
+ * `ES256`, `ES384`, `ES512` #ECDSA (Elliptic Curve Digital Signature Algorithm) Signature with SHA-256, SHA-384, SHA-512
+
+ The Nginx configuration below demonstrates validation of JSON Web Token passed with a request in various. By default, JWT is passed in the Authorization header as a Bearer Token, but JWT may also be passed as a cookie or a part of a query string:
+
+```nginx
+    # Bearer Token JWT
+    # By default, JWT is passed in the "Authorization" header as a Bearer Token
+    location = /jwt/hs256 {
+        proxy_pass http://echo_http;
+        auth_jwt "Example hs256 API"; # JWT in "Authorization" header as a Bearer Token # (Default)
+        auth_jwt_key_file jwk/hs256/secrets.jwk;
+    }
+
+    # Cookie JWT
+    location ~ /jwt/hs256/cookie {
+        proxy_pass http://echo_http;
+        auth_jwt "Example hs256 API"  token=$cookie_auth_token; # JWT in cookie
+        auth_jwt_key_file jwk/hs256/secrets.jwk;
+    }
+
+    # URL query argurments JWT
+    location ~ /jwt/hs256/args {
+        proxy_pass http://echo_http;
+        auth_jwt "Example hs256 API" token=$arg_apijwt; # JWT in URL query
+        auth_jwt_key_file jwk/hs256/secrets.jwk;
+    }
+```
+
+## Demos Setup
+
+Open two terminals: One to view the Nginx logs in realtime, and another to run commands for our demos
+
+#### 1. View Nginx logs in real time
+
+```bash
+$ docker logs -f [CONTAINER ID] #by ID
+```
+
+#### 2. Enter terminal of NGINX docker container
+
+```bash
+$ sudo docker exec -i -t [CONTAINER ID] /bin/bash  #by ID
+#or
+$ sudo docker exec -i -t [CONTAINER NAME] /bin/bash #by Name
+
+# Enter the NGINX root folder where we will run our commands:
+$ cd /etc/nginx
+```
+
+#### Enable config: `warehouse_api_jwt.conf`
+
+```bash
+for x in /etc/nginx/api_conf.d/*.conf; do mv "$x" "${x%.conf}.conf_"; done
+mv /etc/nginx/api_conf.d/warehouse_api_jwt.conf_ /etc/nginx/api_conf.d/warehouse_api_jwt.conf
+ls /etc/nginx/api_conf.d
+nginx -t && nginx -s reload
+```
+
+As a shortcut to reproduce these demos we will use prepared JWTs in text files and will insert them in our `curl` commands
+
+You can find the JWT files in the following directories:
+
+ * HS256 `jwt/hs256`
+ * HS384 `jwt/hs384`
+ * HS512 `jwt/hs512`
+ * RS256 `jwt/rs256`
+ * RS384 `jwt/rs384`
+ * RS512 `jwt/rs512`
+ * ES256 `jwt/es256`
+ * ES384 `jwt/es384`
+
+You can use [jwt.io](https://jwt.io) to decode the JWT payload and inspect deails about the token, such as the `exp` field for expiry in epoch time
+
+For example, below are the **HS256 tokens**:
+
+* **token.jwt** - A valid JWT with an exp of `1545091200` (`Tuesday, December 17, 2018 12:00:00 AM`)
+
+```bash
+# Move into folder with the JWTs and cat the file for inspection
+$ cd /etc/nginx/jwt/hs256
+
+# Print the token
+$ cat token.jwt
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDUwOTEyMDAsIm5hbWUiOiJDcmVhdGUgTmV3IFVzZXIiLCJzdWIiOiJjdXNlciIsImduYW1lIjoid2hlZWwiLCJndWlkIjoiMTAiLCJmdWxsTmFtZSI6IkpvaG4gRG9lIiwidW5hbWUiOiJqZG9lIiwidWlkIjoiMjIyIiwic3VkbyI6dHJ1ZSwiZGVwdCI6IklUIiwidXJsIjoiaHR0cDovL3NlY3VyZS5leGFtcGxlLmNvbSJ9.YYQCNvzj17F726QvKoIiuRGeUBl_xAKj62Zvc9xkZb4
+```
+
+ * **valid_token.jwt** - A valid JWT with an expiry date, exp of `2689248651` (`Sunday, March 21, 2055 1:30:51 PM`)
+
+```bash
+$ cat valid_token.jwt
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjI2ODkyNDg2NTEsIm5hbWUiOiJib2JieSBkaWdpdGFsIiwic3ViIjoiY3VzZXIiLCJnbmFtZSI6IndoZWVsIiwiZ3VpZCI6IjEwIiwiZnVsbE5hbWUiOiJib2JieSBkaWdpdGFsIiwidW5hbWUiOiJiZGlnaXRhbCIsInVpZCI6IjIyMiIsInN1ZG8iOnRydWUsImRlcHQiOiJJVCIsInVybCI6Imh0dHA6Ly93d3cuZXhhbXBsZS5jb20ifQ.nYLDFywgByZsH5Lhxje0B0j3uGvvpFd0bJsGchpNAuc
+```
+
+ * **expired_token.jwt** -  A valid JWT with an expired date, exp of `1490103051` (`Tuesday, March 21, 2017 1:30:51 PM`)
+
+```bash
+$ cat expired_token.jwt
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0OTAxMDMwNTEsIm5hbWUiOiJDcmVhdGUgTmV3IFVzZXIiLCJzdWIiOiJjdXNlciIsImduYW1lIjoid2hlZWwiLCJndWlkIjoiMTAiLCJmdWxsTmFtZSI6IkpvaG4gRG9lIiwidW5hbWUiOiJqZG9lIiwidWlkIjoiMjIyIiwic3VkbyI6dHJ1ZSwiZGVwdCI6IklUIiwidXJsIjoiaHR0cDovL3d3dy5leGFtcGxlLmNvbSJ9.LBB1xjDj7P4xmrC3i1haFD4YWdkaIli3y9NDfqMESHw
+```
+
+ * **invalid_token.jwt** -  An invalid JWT
+
+```bash
+$ cat invalid_token.jwt
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjI2ODkyNDg2NTEsIm5hbWUiOiJsd2JieSBkaWdpdGFsIiwic3ViIjoiY3VzZXIiLCJnbmFtZSI6IndoZWVsIiwiZ3VpZCI6IjEwIiwiZnVsbE5hbWUiOiJib2JieSBkaWdpdGFsIiwidW5hbWUiOiJiZGlnaXRhbCIsInVsdCI6IjIyMiIsInN1ZG8iOnRydWUsImRlcHQiOiJJVCIsInVybCI6Imh0dHA6Ly93d3cuZXhhbXBsZS5jb20ifQ.nYLDFywgByZsH5Lhxje0B0j3uGvvpFd0bJsGchpNAuc
+```
+
+**Note:** When validating RSA (`RS256`, `RS384` and `RS512`) and ECDSA (`ES256` and `ES384`) asymmetric encrypted JWT using [jwt.io](https://jwt.io) you require the certificate and private key to decode and verify
+
+## Demo Instructions:
+
+Open `warehouse_api_jwt.conf` and show how we find the `jwt` in the `Authorization: Bearer` **header**, **Cookie** and *URL parameter* 
+
+```bash
+cat /etc/nginx/api_conf.d/warehouse_api_jwt.conf
+```
+
+Follow the steps below to validate a JWT with Nginx Plus. For breviety we show only show the expected output of the `HS256` token validation:
+
+### JWT (HS256)
+
+To validate `HS256` based JWTs, run the steps outlined below using `HS256` signed keys and the `HS256` test URL endpoints.
+
+#### Validate a valid JWT in Bearer Token
+
+**Step 1:** Run a curl command inserting the valid JWT (`valid_token.jwt`) into the `Authorization` header as a Bearer Token
+
+```bash
+$ curl -k -H "Authorization: Bearer `cat valid_token.jwt`" https://localhost/jwt/hs256
+
+Thank you for requesting /jwt/hs256
+```
+
+**Step 2:** To see the reponse of a expired JWT, Run a curl command inserting the expired JWT (`expired_token.jwt`) into the `Authorization` header as a Bearer Token
+
+You should get a `HTTP 401` and a error message containing `expired JWT token` should be logged in the `error.log` file
+
+```bash
+$ curl -k -H "Authorization: Bearer `cat expired_token.jwt`" https://localhost/jwt/hs256
+{"status":401,"message":"Unauthorized"}
+
+$ tail -f 10 /var/log/nginx/error.log
+
+...
+2018/03/21 15:13:23 [info] 2870894#2870894: *1935 expired JWT token, client: 159.64.72.245, server: jwt.example.com, request: "GET /jwt/hs256 HTTP/1.1", host: "jwt.example.com"
+...
+```
+
+**Step 3:** Similarly, nginx will repond with a `http 401` when attempting to validate a invalid token. Run a curl command inserting the invalid JWT (`invalid_token.jwt`) into the `Authorization` header as a Bearer Token
+
+You should get a `HTTP 401` and a error message containing `JWT HS validation failed` should be logged in the `error.log` file
+
+```bash
+$ curl -k -H "Authorization: Bearer `cat invalid_token.jwt`" https://localhost/jwt/hs256
+{"status":401,"message":"Unauthorized"}
+
+$ tail -f 10 /var/log/nginx/error.log
+
+...
+2018/03/21 16:03:43 [info] 2876917#2876917: *1994 JWT HS validation failed, client: 159.35.72.245, server: jwt.example.com, request: "GET /jwt/hs256 HTTP/1.1", host: "jwt.example.com"
+...
+```
+
+#### Validate JWT in Cookie
+
+**Step 1:** Run a curl command inserting the JWT (`valid_token.jwt`) into the `auth-token` cookie
+
+```bash
+$ curl -v -k -i -b "auth_token=`cat valid_token.jwt`" https://localhost/jwt/hs256/cookie
+
+*   Trying 159.65.72.245...
+* Connected to jwt.example.com (159.65.72.245) port 80 (#0)
+> GET /jwt/hs256/cookie HTTP/1.1
+> Host: jwt.example.com
+> User-Agent: curl/7.47.0
+> Accept: */*
+> ....#SNIPPED#....
+> Cookie: auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjI2ODkyNDg2NTEsIm5hbWUiOiJib2JieSBkaWdpdGFsIiwic3ViIjoiY3VzZXIiLCJnbmFtZSI6IndoZWVsIiwiZ3VpZCI6IjEwIiwiZnVsbE5hbWUiOiJib2JieSBkaWdpdGFsIiwidW5hbWUiOiJiZGlnaXRhbCIsInVpZCI6IjIyMiIsInN1ZG8iOnRydWUsImRlcHQiOiJJVCIsInVybCI6Imh0dHA6Ly93d3cuZXhhbXBsZS5jb20ifQ.nYLDFywgByZsH5Lhxje0B0j3uGvvpFd0bJsGchpNAuc
+>
+< HTTP/1.1 200 OK
+< Server: nginx/1.13.7
+< Date: Wed, 21 Mar 2018 16:10:29 GMT
+< Content-Type: text/plain
+< Content-Length: 43
+< Connection: keep-alive
+< X-Whom: WEB-ECHO
+<
+Thank you for requesting /jwt/hs256/cookie
+* Connection #0 to host jwt.example.com left intact
+```
+
+#### Validate JWT in a query parameter
+
+**Step 1:** Run a curl command inserting the JWT (`valid_token.jwt`) into the the query parameter value of `apijwt`in the URL
+
+```bash
+$ curl -k -i "https://localhost/jwt/hs256/args/index.html?apijwt=`cat valid_token.jwt`"
+
+HTTP/1.1 200 OK
+Server: nginx/1.13.7
+Date: Wed, 21 Mar 2018 16:00:06 GMT
+Content-Type: application/json
+Content-Length: 403
+Connection: keep-alive
+X-Whom: WEB-ECHO
+```
+
+### JWT (HS384)
+
+To validate `HS384` based JWTs, run the same steps outlined in the first example above but this time using `HS384` signed keys and the `HS384` test URL endpoints.
+
+We expect a `HTTP200` response for requests using `token.jwt` and `valid_token.jwt`, and `HTTP401` response for requests using`expired_token.jwt`, `invalid_token.jwt`.
+
+```bash
+# Directory of hs384 JWTs
+$ cd /etc/nginx/jwt/hs384
+$ ls
+expired_token.jwt  invalid_token.jwt  token.jwt  valid_token.jwt
+```
+
+#### Validate a JWT in Bearer Token
+
+```bash
+# Change the test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -k -H "Authorization: Bearer `cat valid_token.jwt`" https://localhost/jwt/hs384
+```
+
+#### Validate a JWT in Cookie
+
+```bash
+# Change the test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -v -k -i -b "auth_token=`cat valid_token.jwt`" https://localhost/jwt/hs384/cookie
+```
+
+#### Validate a JWT in a query parameter
+```
+# Change test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -k "https://localhost/jwt/hs384/args/index.html?apijwt=`cat valid_token.jwt`"
+```
+
+### JWT (HS512)
+
+To validate `HS512` based JWTs, run the same steps outlined in the first example above but this time using `HS512` signed keys and the `HS512` test URL endpoints.
+
+We expect a `HTTP200` response for requests using `token.jwt` and `valid_token.jwt`, and `HTTP401` response for requests using`expired_token.jwt`, `invalid_token.jwt`.
+
+```bash
+# Directory of hs512 JWTs
+$ cd /etc/nginx/jwt/hs512
+$ ls
+expired_token.jwt  invalid_token.jwt  token.jwt  valid_token.jwt
+```
+
+#### Validate a JWT in Bearer Token
+
+```bash
+# Change the test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -k -H "Authorization: Bearer `cat valid_token.jwt`" https://localhost/jwt/hs512
+```
+
+#### Validate a JWT in Cookie
+
+```bash
+# Change the test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -v -k -i -b "auth_token=`cat valid_token.jwt`" https://localhost/jwt/hs512/cookie
+```
+
+#### Validate a JWT in a query parameter
+```bash
+# Change test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -k "https://localhost/jwt/hs512/args/index.html?apijwt=`cat valid_token.jwt`"
+```
+
+### JWT (RS256)
+
+To validate `RS256` based JWTs, run the same steps outlined in the first example above but this time using `RS256` signed keys and the `RS256` test URL endpoints.
+
+We expect a `HTTP200` response for requests using `token.jwt` and `valid_token.jwt`, and `HTTP401` response for requests using`expired_token.jwt`, `invalid_token.jwt`.
+
+```bash
+# Directory of rs256 JWTs
+$ cd /etc/nginx/jwt/rs256
+$ ls
+expired_token.jwt  invalid_token.jwt  token.jwt  valid_token.jwt
+```
+
+#### Validate a JWT in Bearer Token
+
+```bash
+# Change the test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -k -H "Authorization: Bearer `cat valid_token.jwt`" https://localhost/jwt/rs256
+```
+
+#### Validate a JWT in Cookie
+
+```bash
+# Change the test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -v -k -i -b "auth_token=`cat valid_token.jwt`" https://localhost/jwt/rs256/cookie
+```
+
+#### Validate a JWT in a query parameter
+```bash
+# Change test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -k "https://localhost/jwt/rs256/args/index.html?apijwt=`cat valid_token.jwt`"
+```
+
+### JWT (RS384)
+
+To validate `RS384` based JWTs, run the same steps outlined in the first example above but this time using `RS384` signed keys and the `RS384` test URL endpoints.
+
+We expect a `HTTP200` response for requests using `token.jwt` and `valid_token.jwt`, and `HTTP401` response for requests using`expired_token.jwt`, `invalid_token.jwt`.
+
+```bash
+# Directory of rs384 JWTs
+$ cd /etc/nginx/jwt/rs384
+$ ls
+expired_token.jwt  invalid_token.jwt  token.jwt  valid_token.jwt
+```
+
+#### Validate a JWT in Bearer Token
+
+```bash
+# Change the test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -k -H "Authorization: Bearer `cat valid_token.jwt`" https://localhost/jwt/rs384
+```
+
+#### Validate a JWT in Cookie
+
+```bash
+# Change the test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -v -k -i -b "auth_token=`cat valid_token.jwt`" https://localhost/jwt/rs384/cookie
+```
+
+#### Validate a JWT in a query parameter
+```bash
+# Change test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -I "https://localhost/jwt/rs384/args/index.html?apijwt=`cat valid_token.jwt`"
+```
+
+### JWT (RS512)
+
+To validate `RS512` based JWTs, run the same steps outlined in the first example above but this time using `RS512` signed keys and the `RS512` test URL endpoints.
+
+We expect a `HTTP200` response for requests using `token.jwt` and `valid_token.jwt`, and `HTTP401` response for requests using`expired_token.jwt`, `invalid_token.jwt`.
+
+```bash
+# Directory of rs512 JWTs
+$ cd /etc/nginx/jwt/rs512
+$ ls
+expired_token.jwt  invalid_token.jwt  token.jwt  valid_token.jwt
+```
+
+#### Validate a JWT in Bearer Token
+
+```bash
+# Change the test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -v -k -i -b "auth_token=`cat valid_token.jwt`" https://localhost/jwt/rs512/cookie
+```
+
+#### Validate a JWT in Cookie
+
+```bash
+# Change the test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -v -k -i -b "auth_token=`cat valid_token.jwt`" https://localhost/jwt/rs512/cookie
+```
+
+#### Validate a JWT in a query parameter
+```bash
+# Change test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -I "https://localhost/jwt/rs512/args/index.html?apijwt=`cat valid_token.jwt`"
+```
+
+### JWT (ES256)
+
+To validate `ES256` based JWTs, run the same steps outlined in the first example above but this time using `ES256` signed keys and the `ES256` test URL endpoints.
+
+We expect a `HTTP200` response for requests using `token.jwt` and `valid_token.jwt`, and `HTTP401` response for requests using`expired_token.jwt`, `invalid_token.jwt`.
+
+```bash
+# Directory of es256 JWTs
+$ cd /etc/nginx/jwt/es256
+$ ls
+expired_token.jwt  invalid_token.jwt  token.jwt  valid_token.jwt
+```
+
+#### Validate a JWT in Bearer Token
+
+```bash
+# Change the test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -k -H "Authorization: Bearer `cat valid_token.jwt`" https://localhost/jwt/es256
+```
+
+#### Validate a JWT in Cookie
+
+```bash
+# Change the test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -v -k -i -b "auth_token=`cat valid_token.jwt`" https://localhost/jwt/es256/cookie
+```
+
+#### Validate a JWT in a query parameter
+```bash
+# Change test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -I "https://localhost/jwt/es256/args/index.html?apijwt=`cat valid_token.jwt`"
+```
+
+### JWT (ES384)
+
+To validate `RS512` based JWTs, run the same steps outlined in the first example above but this time using `ES384` signed keys and the `RS384` test URL endpoints.
+
+We expect a `HTTP200` response for requests using `token.jwt` and `valid_token.jwt`, and `HTTP401` response for requests using`expired_token.jwt`, `invalid_token.jwt`.
+
+```bash
+# Directory of es384 JWTs
+$ cd /etc/nginx/jwt/es384
+$ ls
+expired_token.jwt  invalid_token.jwt  token.jwt  valid_token.jwt
+```
+
+#### Validate a JWT in Bearer Token
+
+```bash
+# Change the test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -k -H "Authorization: Bearer `cat valid_token.jwt`" https://localhost/jwt/es384
+```
+
+#### Validate a JWT in Cookie
+
+```bash
+# Change the test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -v -k -i -b "auth_token=`cat valid_token.jwt`" https://localhost/jwt/es384/cookie
+```
+
+#### Validate a JWT in a query parameter
+```bash
+# Change test JWT to `expired_token.jwt`, `invalid_token.jwt`, `token.jwt` or `valid_token.jwt`
+$ curl -I "https://localhost/jwt/es384/args/index.html?apijwt=`cat valid_token.jwt`"
+```
+
+## Links to resources
+* [`Authenticating API Clients with JWT and NGINX Plus`](https://www.nginx.com/blog/authenticating-api-clients-jwt-nginx-plus/)
+* [`Authentication and Content-Based Routing with JWTs and NGINX Plus`](https://www.nginx.com/blog/authentication-content-based-routing-jwts-nginx-plus/)
+* [`Authenticating Users to Existing Applications with OpenID Connect and NGINX Plus`](https://www.nginx.com/blog/authenticating-users-existing-applications-openid-connect-nginx-plus/)
+* Nginx Module: [`Module ngx_http_auth_jwt_module`](http://nginx.org/en/docs/http/ngx_http_auth_jwt_module.html)
+
+</xmp>
+
+<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
+</html>

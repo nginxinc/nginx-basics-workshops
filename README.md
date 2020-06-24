@@ -1,16 +1,11 @@
-# NGINX SE Challenge
+# NGINX-Basics
 
 Implement NGINX Plus as an HTTP and HTTPS (SSL terminating) load balancer for two or more HTTP services
 
-See the SE Challenge Minimum and extra credit requirements below
-
-You are tasked to build from the demo environment and share the completed solution as a **Private repository** on [GitHub](https://www.github.com) or [Gitlab](https://www.gitlab.com).  
-
-Be prepared to present your demo environment and articulate the value of NGINX Plus
-
 ### Goals 
 
- * Give us an understanding of how you operate as a Solution Engineer 
+ * Provide a variety of NGINX Plus demonstrations
+ * Provide examples of NGINX configurations best practices
  * Give you a feel for what it is like to work with NGINX Plus
 
 ## The Demo environement
@@ -23,55 +18,88 @@ This demo has two components, a NGINX Plus ADC/load balancer (`nginx-plus`) and 
 
 ### Topology
 
-The base demo environement you are tasked to build from
+The base Docker Compose environment the lab is build on
 
 ```
-                                        (nginx-hello upstream: nginx1:80, nginx2:80)
-                 +---------------+                        
-                 |               |       +-----------------+
-                 |               |       |                 |
-                 |               |       |      nginx1     |
-                 |               |       |  (nginx-hello)  |
-                 |               +------->                 |
-+---------------->               |       +-----------------+
-www.example.com  |               |
-HTTP/Port 80     |               |       +-----------------+
-                 |  nginx-plus   +------->                 |
-                 | (ADC)         |       |      nginx2     |
-                 |               |       |  (nginx-hello)  |
-                 |               |       |                 |
-                 |               |       +-----------------+
-+---------------->               |
-NGINX Dashboard/ |               |      (dynamic upstream - empty)
-API              |               |       +-----------------+
-HTTP/Port 8080   |               |       |                 |
-                 |               +------->        *        |
-                 |               |       |                 |
-                 +---------------+       +-----------------+                 
-                                        
+                                             (nginx-hello upstream: nginx1:80, nginx2:80)
+                      +---------------+                        
+                      |               |       +-----------------+
++-------------------->|               |       |                 |
+www.example.com       |               +------>|      nginx1     |
+HTTP/Port 80          |               |       |  (nginx-hello)  |
+                      |               |       |                 |
+                      |               |       +-----------------+
++-------------------->|               |
+www2.example.com      |               |       +-----------------+
+HTTP-HTTPS redirect   |  nginx-plus   |       |                 |
+HTTP/Port 80          |     (ADC)     +------>|     nginx2      |                     
+                      |               |       |  (nginx-hello)  |
++-------------------->|               |       |                 |
+www2.example.com      |               |       +-----------------+
+HTTPS/Port 443        |               |             
+                      |               |       +-----------------+         
+                      |               |       |                 |
+                      |               +------>|     nginx3      | 
+                      |               |       |  (nginx-hello)  |
+                      |               |       |                 |
+                      |               |       +-----------------+
+                      |               |
+                      |               |       (dynamic upstream - empty)
++-------------------->|               |       +-----------------+         
+NGINX Dashboard/      |               |       |                 |
+API                   |               +------>|                 |
+HTTP/Port 8080        |               |       |        *        |
+                      |               |       |                 |
+                      |               |       +-----------------+
+                      +---------------+                                                                                     
 ```
 
-### File Structure
+## File Structure
 
 ```
-etc/
-└── nginx/
-    ├── conf.d/
-    │   ├── example.com.conf .......Virtual Server configuration for www.example.com
-    │   ├── upstreams.conf..........Upstream configurations
-    │   └── status_api.conf.........NGINX Plus Live Activity Monitoring available on port 8080
-    └── nginx.conf .................Main NGINX configuration file with global settings
-└── ssl/
-    └── nginx/
-    │    ├── nginx-repo.crt.........NGINX Plus repository certificate file (Use your evaluation crt file)
-    │    └── nginx-repo.key.........NGINX Plus repository key file (Use your evaluation key file)
-    ├── dhparam/
-    │    ├── 2048
-    │    │    └──nginx-repo.crt.....2048 bit DH parameters
-    │    └── 4096
-    │        └──nginx-repo.crt......4096 bit DH parameters
-    ├── example.com.crt.............Self-signed wildcard cert for *.example.com
-    └── example.com.key.............Private key for Self-signed wildcard cert for *.example.com 
+/
+├── etc/
+│    ├── nginx/
+│    │    ├── conf.d/ # ADD your HTTP/S configurations here
+│    │    │   ├── example.com.conf............HTTP www.example.com Virtual Server configuration
+│    │    │   ├── www2.example.com.conf.......HTTPS www2.example.com Virtual Server configuration
+│    │    │   ├── upstreams.conf..............Upstream configurations
+│    │    │   ├── stub_status.conf............NGINX Open Source basic status information available http://localhost/nginx_status only
+│    │    │   └── status_api.conf.............NGINX Plus Live Activity Monitoring available on port 8080 - [Source](https://gist.github.com/nginx-gists/│a51 341a11ff1cf4e94ac359b67f1c4ae)
+│    │    ├── includes
+│    │    │    ├── add_headers/ # Headers to attach to client response
+│    │    │    │   └── security.conf_ ........Recommended response headers for security
+│    │    │    ├── error_pages/ # Custom Error Pages
+│    │    │    │   ├── error_pages.conf.......NGINX configurations for custom error pages
+│    │    │    │   ├── http403.conf_ .........Example HTTP 403 custom error pages
+│    │    │    │   └── http404.conf_ .........Example HTTP 404 custom error pages
+│    │    │    ├── proxy_headers/ # Headers to attach to upstream request
+│    │    │    │   ├── keepalive.conf.........Recommended HTTP keepalives headers for performance
+│    │    │    │   └── proxy_headers.conf.....Recommended request headers for request routing and logging
+│    │    │    └── ssl # TLS Configurations examples
+│    │    │        ├── ssl_intermediate.conf..Recommended SSL configuration for General-purpose servers with a variety of clients, recommended for almost all systems
+│    │    │        ├── ssl_a+_strong.conf.....Recommended SSL configuration for Based on SSL Labs A+ (https://www.ssllabs.com/ssltest/)
+│    │    │        ├── ssl_modern.conf........Recommended SSL configuration for Modern clients: TLS 1.3 and don't need backward compatibility
+│    │    │        └── ssl_old.conf...........SSL configuration for compatiblity ith a number of very old clients, and should be used only as a last resort
+│    │    ├── stream.conf.d/ #ADD your TCP and UDP Stream configurations here
+│    │    └── nginx.conf .....................Main NGINX configuration file with global settings
+│    └── ssl/
+│          ├── nginx/ # NGINX Plus licenses
+│          │   ├── nginx-repo.crt.............NGINX Plus repository certificate file (Use your evaluation crt file)
+│          │   └── nginx-repo.key.............NGINX Plus repository key file (Use your evaluation key file)
+|          ├── dhparam/ # Diffie–Hellman (DH) key exchange files
+|          │    ├── 2048
+|          │    │    └──nginx-repo.crt........2048 bit DH parameters
+|          │    └── 4096
+|          │        └──nginx-repo.crt.........4096 bit DH parameters
+│          ├── example.com.crt................Self-signed wildcard certifcate for testing (*.example.com)
+│          └── example.com.key................Self-signed private key for testing
+└── var/
+     ├── cache/
+     │    └── nginx/ # Designated path for storing cached content
+     └── lib/
+          └── nginx/
+               └── state/ # The recommended path for storing state files on Linux distributions
 ```
 
 ## Prerequisites:
@@ -106,7 +134,7 @@ Before we can start, we need to copy our NGINX Plus repo key and certificate (`n
 
 ```bash
 # Enter working directory
-cd nginx-se-challenge
+cd nginx-basics
 
 # Make sure your Nginx Plus repo key and certificate exist here
 ls nginx-plus/etc/ssl/nginx/nginx-*
@@ -141,9 +169,9 @@ docker-compose up --force-recreate
 ```bash
 docker ps
 CONTAINER ID        IMAGE                           COMMAND                  CREATED             STATUS              PORTS                                                              NAMES
-7ed735c809b8        nginx-se-challenge_nginx-plus   "nginx -g 'daemon of…"   5 seconds ago       Up 4 seconds        0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:8080->8080/tcp   nginx-se-challenge_nginx-plus_1
-4910dca52bb7        nginx-se-challenge_nginx2       "nginx -g 'daemon of…"   6 seconds ago       Up 5 seconds        0.0.0.0:32815->80/tcp                                              nginx-se-challenge_nginx2_1
-6c9a92298116        nginx-se-challenge_nginx1       "nginx -g 'daemon of…"   6 seconds ago       Up 5 seconds        80/tcp                                                             nginx-se-challenge_nginx1_1
+7ed735c809b8        nginx-basics_nginx-plus   "nginx -g 'daemon of…"   5 seconds ago       Up 4 seconds        0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:8080->8080/tcp   nginx-basics_nginx-plus_1
+4910dca52bb7        nginx-basics_nginx2       "nginx -g 'daemon of…"   6 seconds ago       Up 5 seconds        0.0.0.0:32815->80/tcp                                              nginx-basics_nginx2_1
+6c9a92298116        nginx-basics_nginx1       "nginx -g 'daemon of…"   6 seconds ago       Up 5 seconds        80/tcp                                                             nginx-basics_nginx1_1
 ```
 
 The demo environment is ready in seconds. You can access the `nginx-hello` demo website on **HTTP / Port 80** ([`http://localhost`](http://localhost) or [http://www.example.com](http://example.com)) and the NGINX API on **HTTP / Port 8080** ([`http://localhost:8080`](http://localhost))

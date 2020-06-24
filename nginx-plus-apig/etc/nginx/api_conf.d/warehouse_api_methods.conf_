@@ -1,0 +1,42 @@
+# API definition
+#
+location /api/warehouse/pricing {
+    limit_except GET PATCH DELETE {}
+    set $upstream pricing_service;
+    rewrite ^ /_warehouse_$request_type last;
+}
+
+location /api/warehouse/inventory {
+    set $upstream inventory_service;
+    rewrite ^ /_warehouse_$request_type last;
+}
+
+# Policy section
+#
+location = /_warehouse_READ {
+    internal;
+    set $api_name "Warehouse";
+
+    auth_jwt $api_name;
+    auth_jwt_key_file /etc/nginx/jwk.json;
+
+    proxy_pass http://$upstream$request_uri;
+}
+
+location = /_warehouse_WRITE {
+    internal;
+    set $api_name "Warehouse";
+
+    # Policy configuration here (authentication, rate limiting, logging, more...)
+
+
+    auth_jwt $api_name;
+    auth_jwt_key_file /etc/nginx/jwk.json;
+    if ($jwt_claim_admin != "true") { # Write operations must have "admin":true
+        return 403; # Forbidden
+    }
+
+    proxy_pass http://$upstream$request_uri;
+}
+
+# vim: syntax=nginx

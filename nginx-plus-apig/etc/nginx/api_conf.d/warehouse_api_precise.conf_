@@ -1,0 +1,45 @@
+location = /api/warehouse/inventory { # Complete inventory
+    set $upstream inventory_service;
+    rewrite ^ /_warehouse last;
+}
+
+location ~ ^/api/warehouse/inventory/shelf/[^/]*$ { # Shelf inventory
+    set $upstream inventory_service;
+    rewrite ^ /_warehouse last;
+}
+
+location ~ ^/api/warehouse/inventory/shelf/[^/]*/box/[^/]*$ { # Box on shelf
+    set $upstream inventory_service;
+    rewrite ^ /_warehouse last;
+}
+
+location ~ ^/api/warehouse/pricing/[^/]*$ { # Price for specific item
+    set $upstream pricing_service;
+    rewrite ^ /_warehouse last;
+}
+
+# Policy section
+#
+location = /_warehouse {
+    internal;
+    set $api_name "Warehouse";
+
+    # Policy configuration here (authentication, rate limiting, logging, more...)
+
+    proxy_pass http://$upstream$request_uri;
+}
+
+# Valid URIs
+# /api/warehouse/inventory
+# /api/warehouse/inventory/shelf/foo
+# /api/warehouse/inventory/shelf/foo/box/bar
+# /api/warehouse/inventory/shelf/-/box/-
+# /api/warehouse/pricing/baz
+
+# Invalid URIs
+# /api/warehouse/inventory/
+# /api/warehouse/inventoryfoo
+# /api/warehouse/inventory/shelf
+# /api/warehouse/inventory/shelf/foo/bar
+
+# vim: syntax=nginx

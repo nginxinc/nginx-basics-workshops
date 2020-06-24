@@ -76,7 +76,7 @@ server {
         
         # Including best-practice headers are bonus points
         include includes/proxy_headers/proxy_headers.conf;
-        include includes/proxy_headers/keep_alive.conf;
+        include includes/proxy_headers/keepalive.conf;
         
         # HTTP proxy to the upstream
         proxy_pass http://nginx_hello;

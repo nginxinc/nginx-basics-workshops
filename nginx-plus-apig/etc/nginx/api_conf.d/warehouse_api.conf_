@@ -1,0 +1,34 @@
+# API definition
+#
+location /api/warehouse/pricing {
+    limit_except GET PATCH {
+        deny all;
+    }
+    set $upstream pricing_service;
+    rewrite ^ /_warehouse last;
+}
+
+location /api/warehouse/inventory {
+    limit_except GET {
+        deny all;
+    }
+    set $upstream inventory_service;
+    rewrite ^ /_warehouse last;
+}
+
+# Policy section
+#
+location = /_warehouse {
+    internal;
+    set $api_name "Warehouse";
+
+    # Policy configuration here (authentication, rate limiting, logging, more...)
+
+    limit_req zone=client_ip_10rs;
+    #limit_req zone=apikey_50rs;
+    limit_req_status 429;
+
+    proxy_pass http://$upstream$request_uri;
+}
+
+# vim: syntax=nginx

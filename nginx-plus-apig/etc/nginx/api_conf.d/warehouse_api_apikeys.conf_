@@ -1,0 +1,44 @@
+# API definition
+#
+location /api/warehouse/pricing {
+    limit_except GET PATCH {
+        deny all;
+    }
+    set $upstream pricing_service;
+    rewrite ^ /_warehouse last;
+}
+location /api/warehouse/inventory {
+    limit_except GET {
+        deny all;
+    }
+    set $upstream inventory_service;
+    rewrite ^(.*)$ /_warehouse$1 last;
+}
+
+location = /api/warehouse/inventory/audit {
+    if ($is_infrastructure = 0) {
+        return 403; # Forbidden (not infrastructure)
+    }
+    set $upstream inventory_service;
+    rewrite ^ /_warehouse last;
+}
+
+# Policy section
+#
+location = /_warehouse {
+    internal;
+    set $api_name "Warehouse";
+
+    # Policy configuration here (authentication, rate limiting, logging, more...)
+
+    if ($http_apikey = "") {
+        return 401; # Unauthorized (please authenticate)
+    }
+    if ($api_client_name = "") {
+        return 403; # Forbidden (invalid API key)
+    }
+
+    proxy_pass http://$upstream$request_uri;
+}
+
+# vim: syntax=nginx

@@ -1,0 +1,133 @@
+    # Admin only Access: Administrator group only
+    location = /admin {
+        if ( $isAdmin = 0 ) {
+            return 403; # Forbidden
+        }
+        proxy_pass http://inventory_service;
+
+        # JWT in "Authorization" header as a Bearer Token (Default)
+        # Using HS256 cryptographic algorithm
+        auth_jwt "My secure site";
+        auth_jwt_key_file jwk/hs256/secrets.jwk;
+
+        # We can also pass Values in the JWT
+        proxy_set_header X-RealName $jwt_real_name; # Pass real name as header
+        proxy_set_header X-Subject  $jwt_claim_sub; # L1 claims set automatically
+    }
+
+    # Demostrate revoking JWT
+    location /products/ {
+
+        if ( $jwt_status = "revoked" ) {
+            return 403;
+        }
+
+        proxy_pass http://inventory_service;
+
+        # JWT in "Authorization" header as a Bearer Token (Default)
+        # Using HS256 cryptographic algorithm
+        auth_jwt "My secure site";
+        auth_jwt_key_file jwk/hs256/secrets.jwk;
+
+    }
+
+
+    # Demostrate using JWT Claims Logging and Rate Limiting
+    location /ratelimit/ {
+        proxy_pass http://inventory_service;
+
+        # JWT in "Authorization" header as a Bearer Token (Default)
+        # Using HS256 cryptographic algorithm
+        auth_jwt "My secure site";
+        auth_jwt_key_file jwk/hs256/secrets.jwk;
+
+        limit_req zone=10rps_per_client;
+        limit_req_status 429;
+
+        # we can also custom jwt logging here
+        access_log /var/log/nginx/access_jwt.log jwt;
+    }
+
+    ##
+    # JWT Validation
+    # location ~* /jwt/?(hs256|hs384|hs512|rs256|rs384|rs512|es256|es384|es512)$
+    # location ~* /jwt/(hs256|hs384|hs512|rs256|rs384|rs512|es256|es384|es512)/cookie
+    # location ~* /jwt/(hs256|hs384|hs512|rs256|rs384|rs512|es256|es384|es512)/args
+    ##
+
+    # https://www.nginx.com/blog/authenticating-api-clients-jwt-nginx-plus/
+    # https://www.nginx.com/blog/authentication-content-based-routing-jwts-nginx-plus/
+    # http://nginx.org/en/docs/http/ngx_http_auth_jwt_module.html
+    # http://nginx.org/en/docs/http/ngx_http_core_module.html#location
+
+
+    # Our folder structure is logically organized so that we can use regex captures to direct request
+    # i.e:
+    # JWT (HS256) - request url is `/jwt/hs256` and jwk file is `jwk/hs256/secrets.jwk`
+    # JWT (HS384) - request url is `/jwt/hs384` and jwk file is `jwk/hs384/secrets.jwk`
+    # JWT (HS512) - request url is `/jwt/hs512` and jwk file is `jwk/hs512/secrets.jwk`
+    # JWT (RS256) - request url is `/jwt/rs256` and jwk file is `jwk/rs256/secrets.jwk`
+    # JWT (RS384) - request url is `/jwt/rs384` and jwk file is `jwk/rs384/secrets.jwk`
+    # JWT (RS512) - request url is `/jwt/rs512` and jwk file is `jwk/rs512/secrets.jwk`
+    # JWT (EC256) - request url is `/jwt/ec256` and jwk file is `jwk/ec256/secrets.jwk`
+    # JWT (EC384) - request url is `/jwt/ec384` and jwk file is `jwk/ec384/secrets.jwk`
+    # JWT (EC512) - request url is `/jwt/ec512` and jwk file is `jwk/ec512/secrets.jwk`
+
+    # The configuration below simplifies our configuration using regex location matches and capture
+    # groups to avoid repeating location blocks
+    #
+    # We eliminates writing out the location blocks multiple times for each cryptographic algorithm
+    # we will be testing by using regex location matches and captures. It the equivalent of writing
+    # out the following location blocks for each cryptographic algorithm:
+    #
+    #   # Bearer Token JWT
+    #     # By default, JWT is passed in the "Authorization" header as a Bearer Token
+    #     location = /jwt/hs256 {
+    #         proxy_pass http://inventory_service;
+    #         auth_jwt "Example hs256 API"; # JWT in "Authorization" header as a Bearer Token # (Default)
+    #         auth_jwt_key_file jwk/hs256/secrets.jwk;
+    #     }
+
+    #     # Cookie JWT
+    #     location ~ /jwt/hs256/cookie {
+    #         proxy_pass http://inventory_service;
+    #         auth_jwt "Example hs256 API"  token=$cookie_auth_token; # JWT in cookie
+    #         auth_jwt_key_file jwk/hs256/secrets.jwk;
+    #     }
+
+    #     # URL query argurments JWT
+    #     location ~ /jwt/hs256/args {
+    #         proxy_pass http://inventory_service;
+    #         auth_jwt "Example hs256 API" token=$arg_apijwt; # JWT in URL query
+    #         auth_jwt_key_file jwk/hs256/secrets.jwk;
+    #     }
+
+    #
+    # Bearer Token JWT
+    #
+
+    # By default, JWT is passed in the "Authorization" header as a Bearer Token
+    location ~* /jwt/?(hs256|hs384|hs512|rs256|rs384|rs512|es256|es384|es512)$ {
+        proxy_pass http://inventory_service;
+        auth_jwt "Example $1 API"; # JWT in "Authorization" header as a Bearer Token # (Default)
+        auth_jwt_key_file jwk/$1/secrets.jwk;
+    }
+
+    #
+    # Cookie JWT
+    #
+
+    location ~* /jwt/(hs256|hs384|hs512|rs256|rs384|rs512|es256|es384|es512)/cookie {
+        proxy_pass http://inventory_service;
+        auth_jwt "Example $1 API"  token=$cookie_auth_token; # JWT in cookie
+        auth_jwt_key_file jwk/$1/secrets.jwk;
+    }
+
+    #
+    # URL query arguments JWT
+    #
+    location ~* /jwt/(hs256|hs384|hs512|rs256|rs384|rs512|es256|es384|es512)/args {
+        proxy_pass http://inventory_service;
+        auth_jwt "Example $1 API" token=$arg_apijwt; # JWT in URL query
+        auth_jwt_key_file jwk/$1/secrets.jwk;
+    }

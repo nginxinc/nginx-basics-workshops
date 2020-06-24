@@ -1,0 +1,29 @@
+# Rewrite rules
+#
+rewrite ^/api/warehouse/inventory/item/price/(.*)  /api/warehouse/pricing/$1;
+
+# API definition
+#
+location /api/warehouse/inventory {
+    set $upstream inventory_service;
+    rewrite ^(.*)$ /_warehouse$1 last;
+}
+
+location /api/warehouse/pricing {
+    set $upstream pricing_service;
+    rewrite ^(.*)$ /_warehouse$1 last;
+}
+
+# Policy section
+#
+location /_warehouse {
+    internal;
+    set $api_name "Warehouse";
+
+    # Policy configuration here (authentication, rate limiting, logging, more...)
+
+    rewrite ^/_warehouse/(.*)$ /$1 break; # Remove /_warehouse prefix
+    proxy_pass http://$upstream;          # Proxy the rewritten URI
+}
+
+# vim: syntax=nginx

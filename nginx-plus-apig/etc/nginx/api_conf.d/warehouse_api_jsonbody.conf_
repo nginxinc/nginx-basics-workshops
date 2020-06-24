@@ -1,0 +1,29 @@
+# API definition
+#
+location /api/warehouse/pricing {
+    set $upstream pricing_service;
+    rewrite ^ /_warehouse last;
+}
+
+location /api/warehouse/inventory {
+    set $upstream inventory_service;
+    rewrite ^ /_warehouse last;
+}
+
+# Policy section
+#
+location = /_warehouse {
+    internal;
+    set $api_name "Warehouse";
+
+    # Policy configuration here (authentication, rate limiting, logging, more...)
+
+    mirror /_NULL;                    # Create a copy of the request to capture request body
+    client_body_in_single_buffer on;  # Minimize memory copy operations on request body
+    client_body_buffer_size      16k; # Largest body to keep in memory (before writing to file)
+    client_max_body_size         16k;
+
+    proxy_pass http://$validated$request_uri;
+}
+
+# vim: syntax=nginx

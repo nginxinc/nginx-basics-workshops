@@ -4,11 +4,17 @@ services:
   nginx1:
       hostname: nginx1
       build: nginx-hello
+      volumes:
+        - ./nginx-hello/etc/nginx:/etc/nginx
+        - ./nginx-hello/usr/share/nginx/html:/usr/share/nginx/html
       expose:
         - "80"
   nginx2:
       hostname: nginx2
       build: nginx-hello
+      volumes:
+        - ./nginx-hello/etc/nginx:/etc/nginx
+        - ./nginx-hello/usr/share/nginx/html:/usr/share/nginx/html
       ports:
         - "80"
   # EDITS-START
@@ -16,6 +22,9 @@ services:
   nginx3:
       hostname: nginx3
       build: nginx-hello
+      volumes:
+        - ./nginx-hello/etc/nginx:/etc/nginx
+        - ./nginx-hello/usr/share/nginx/html:/usr/share/nginx/html
       ports:
         - "80"
   # EDITS-END  
@@ -26,6 +35,7 @@ services:
       links:
           - nginx1:nginx1
           - nginx2:nginx2
+          - nginx3:nginx3
       volumes:
           - ./nginx-plus/etc/nginx:/etc/nginx
       ports:
