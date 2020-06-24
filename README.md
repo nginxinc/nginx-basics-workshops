@@ -10,11 +10,11 @@ Implement NGINX Plus as an HTTP and HTTPS (SSL terminating) load balancer for tw
 
 ## The Demo environement
 
-This demo has two components, a NGINX Plus ADC/load balancer (`nginx-plus`) and webservers (`nginx1` and `nginx2`):
+This demo has three containers, a NGINX Plus ADC/load balancer, `nginx-plus`, and webservers, `nginx1`, `nginx2` and `nginx3`:
 
- * **NGINX Plus** `(R21)` based on centos 7. [NGINX Plus Documentation](https://docs.nginx.com/nginx/), and [resources](https://www.nginx.com/resources/) and [blog](https://www.nginx.com/blog/) is your best source of information for technical help. Detailed examples are found on the internet too!
+ * **NGINX Plus** `(Latest)` based on ubuntu 18.04 (and a sample centos 7 Dockerfile is provided). [NGINX Plus Documentation](https://docs.nginx.com/nginx/), and [resources](https://www.nginx.com/resources/) and [blog](https://www.nginx.com/blog/) is your best source of information for technical help. Detailed examples are found on the internet too!
 
- * [**nginx-hello**](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello). A NGINX webserver that serves a simple page containing its hostname, IP address and port as wells as the request URI and the local time of the webserver.
+ * **NGINX OSS** `(Latest)` is based on [**nginx-hello**](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello). A NGINX webserver that serves a simple page containing its hostname, IP address and port as wells as the request URI and the local time of the webserver.
 
 ### Topology
 
