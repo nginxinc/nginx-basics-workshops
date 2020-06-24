@@ -1,6 +1,6 @@
-# Monitoring and Logging​
+# NGINX Plus API Live Monitoring
 
-## Intro
+## Introduction
 
 The [NGINX Plus API](https://www.nginx.com/products/nginx/live-activity-monitoring/) supports other features in addition to live activity monitoring, including dynamic configuration of upstream server groups (replacing the separate Upstream Conf module originally used for that purpose) and key‑value stores. The NGINX Plus dashboard was updated to use the API in NGINX Plus R14.
 
@@ -24,7 +24,7 @@ curl -s https://demo.nginx.com/api/6/nginx/ | jq
 
 {
   "version": "1.19.0",
-  "build": "nginx-plus-r22",V
+  "build": "nginx-plus-r22",
   "address": "206.251.255.64",
   "generation": 42,
   "load_timestamp": "2020-06-23T10:00:01.090Z",
@@ -209,5 +209,3 @@ curl -s https://demo.nginx.com/api/6/ssl/ | jq
 }
 
 ```
-
-## Task 2

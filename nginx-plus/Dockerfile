@@ -11,7 +11,7 @@ COPY etc/ssl/nginx/nginx-repo.key /etc/ssl/nginx/nginx-repo.key
 RUN chmod 644 /etc/ssl/nginx/* \
     # Install prerequisite packages and vim for editing:
     && apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -qq -y install --no-install-recommends apt-transport-https lsb-release ca-certificates wget dnsutils gnupg vim-tiny \
+    DEBIAN_FRONTEND=noninteractive apt-get -qq -y install --no-install-recommends apt-transport-https lsb-release ca-certificates wget dnsutils gnupg vim-tiny jq \
     # Install NGINX Plus from repo (https://cs.nginx.com/repo_setup)
     && wget http://nginx.org/keys/nginx_signing.key && apt-key add nginx_signing.key \
     && printf "deb https://plus-pkgs.nginx.com/ubuntu `lsb_release -cs` nginx-plus\n" | tee /etc/apt/sources.list.d/nginx-plus.list \
@@ -71,11 +71,8 @@ RUN chmod 644 /etc/ssl/nginx/* \
     && mkdir -p /var/lib/nginx/state \
     && chown -R nginx /var/lib/nginx/state \
     # COPY var/lib/nginx/state/servers.conf /var/lib/nginx/state/servers.conf
-    && touch /var/lib/nginx/state/servers.conf \
-    # Required for this demo: COPY over any of your SSL certs for HTTPS servers
-    && mkdir -p /etc/ssl/dhparam/2048 \
-    && mkdir -p /etc/ssl/dhparam/4096
-
+    && touch /var/lib/nginx/state/servers.conf
+    
 # Copy certificate files and dhparams
 COPY etc/ssl /etc/ssl
 

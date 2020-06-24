@@ -1,6 +1,6 @@
 # Module Title
 
-## Intro
+## Introduction
 
 ## Task 1
 

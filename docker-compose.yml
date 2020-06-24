@@ -1,16 +1,16 @@
 version: '3.3'
 services:
   # NGINX webservers with nginx-demo hello page
-  nginx1:
-      hostname: nginx1
+  web1:
+      hostname: web1
       build: nginx-hello
       volumes:
         - ./nginx-hello/etc/nginx:/etc/nginx
         - ./nginx-hello/usr/share/nginx/html:/usr/share/nginx/html
       expose:
         - "80"
-  nginx2:
-      hostname: nginx2
+  web2:
+      hostname: web2
       build: nginx-hello
       volumes:
         - ./nginx-hello/etc/nginx:/etc/nginx
@@ -19,8 +19,8 @@ services:
         - "80"
   # EDITS-START
   # Simply Add another server like so:    
-  nginx3:
-      hostname: nginx3
+  web3:
+      hostname: web3
       build: nginx-hello
       volumes:
         - ./nginx-hello/etc/nginx:/etc/nginx
@@ -33,9 +33,9 @@ services:
       hostname: nginx-plus
       build: nginx-plus
       links:
-          - nginx1:nginx1
-          - nginx2:nginx2
-          - nginx3:nginx3
+          - web1:web1
+          - web2:web2
+          - web3:web3
       volumes:
           - ./nginx-plus/etc/nginx:/etc/nginx
       ports:
