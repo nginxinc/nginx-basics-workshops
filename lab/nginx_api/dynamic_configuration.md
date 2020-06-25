@@ -2,17 +2,23 @@
 
 ## Introduction
 
-With NGINX Plus, configuration of upstream servers in a server group can be modified on-the-fly without reloading the servers and NGINX configuration. This is useful for:
+This module will explain how to use the NGINX Plus API to dynamicly configure NGINX upstreams groups
 
-* Autoscaling, when you need to add more servers
-* Maintenance, when you need to remove a server, specify a backup server, or take a server down temporarily
-* Quick setup, when you need to change upstream server settings such as server weight, active connections, slow start, failure timeouts.
-* Monitoring, when you get the state of the server or server group with one command
+With NGINX Plus, configuration of upstream servers in a server group can be modified on-the-fly without reloading the 
+NGINX servers and its configuration files. This is useful for:
 
+* **Autoscaling**, when you need to add more servers
+* **Maintenance**, when you need to remove a server, specify a backup server, or take a server down temporarily
+* **Quick setup**, when you need to change upstream server settings such as server weight, active connections, slow start, 
+  failure timeouts.
+* **Monitoring**, when you get the state of the server or server group with one command
 
-All these changes are made with the NGINX Plus REST API interface with API commands. By default changes made with the API are only stored only in the shared memory zone and so the changes are discarded when the NGINX Plus configuration file is reloaded. 
+All these changes are made with the NGINX Plus REST API interface with API commands. By default changes made with the 
+API are only stored only in the shared memory zone and so the changes are discarded when the NGINX Plus configuration 
+file is reloaded. 
 
-In this Module we will configure upstream servers and upstream server groups dynamically (on-the-fly) with the NGINX Plus REST API and use the `state` directive so on-the-fly configurations persistent through NGINX reloads. 
+In this Module we will configure upstream servers and upstream server groups dynamically (on-the-fly) with the NGINX 
+Plus REST API and use the `state` directive so on-the-fly configurations persistent through NGINX reloads. 
 
 
 
@@ -20,8 +26,11 @@ In this Module we will configure upstream servers and upstream server groups dyn
 
 1. Inspect the upstream server group called `dynamic` has been defined in `upstreams.conf`
 
- * The `zone` directive configures a zone in the shared memory and sets the zone name and size. The configuration of the server group is kept in this zone, so all worker processes use the same configuration. In our example, the `zone` is also  named `dynamic` and is 64k megabyte in size.
- * The `state` directive configures Persistence of Dynamic Configuration by writing the state information to a file that persists during a reload. The recommended path for Linux distributions is `/var/lib/nginx/state/`
+ * The `zone` directive configures a zone in the shared memory and sets the zone name and size. The configuration of the 
+   server group is kept in this zone, so all worker processes use the same configuration. In our example, the `zone` is 
+   also  named `dynamic` and is 64k megabyte in size.
+ * The `state` directive configures Persistence of Dynamic Configuration by writing the state information to a file that 
+   persists during a reload. The recommended path for Linux distributions is `/var/lib/nginx/state/`
 
 
 ```nginx
@@ -258,4 +267,4 @@ nginx -s reload
 
 # Lastly, list out servers in our upstream, `dynamic`
 curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
-``` 
+```

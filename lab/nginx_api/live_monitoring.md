@@ -2,7 +2,10 @@
 
 ## Introduction
 
-The [NGINX Plus API](https://www.nginx.com/products/nginx/live-activity-monitoring/) supports other features in addition to live activity monitoring, including dynamic configuration of upstream server groups (replacing the separate Upstream Conf module originally used for that purpose) and key‑value stores. The NGINX Plus dashboard was updated to use the API in NGINX Plus R14.
+This module will explain how to use the NGINX Plus API to read live monitoring metrics on NGINX Plus
+
+The [NGINX Plus API](https://www.nginx.com/products/nginx/live-activity-monitoring/) supports other features in addition 
+to live activity monitoring, including dynamic configuration of upstream server groups and key‑value stores. 
 
 Live examples:​
  * A [sample configuration](https://gist.github.com/nginx-gists/a51341a11ff1cf4e94ac359b67f1c4ae) file for the NGINX Plus API
@@ -13,9 +16,11 @@ Live examples:​
 
 ## Task 1: Explore the Live Activity Monitoring JSON Feed​ from demo.nginx.com
 
-When you access the API, NGINX Plus returns a JSON‑formatted document containing the current statistics. You can request complete statistics at `/api/[api-version]/`, where `[api-version]` is the version number of the NGINX Plus API. 
+When you access the API, NGINX Plus returns a JSON‑formatted document containing the current statistics. You can request 
+complete statistics at `/api/[api-version]/`, where `[api-version]` is the version number of the NGINX Plus API. 
 
-Lets look at the Live Activity Monitoring JSON Feed​ in detail. Drill down to obtain subsets of the data or single data points, at specific API endpoints, and Parse JSON data using `jq` and `curl` from command line:
+Lets look at the Live Activity Monitoring JSON Feed​ in detail. Drill down to obtain subsets of the data or single data 
+points, at specific API endpoints, and Parse JSON data using `jq` and `curl` from command line:
 
 1. `/api/api-version/nginx/` – Basic version, uptime, and identification information​
 
@@ -149,7 +154,8 @@ curl -s https://demo.nginx.com/api/6/http/caches/ | jq
 }
 ```
 
-5. `/api/api-version/stream/upstreams/` – Request and response counts, response time, health‑check status, and uptime statistics per server in each TCP/UDP upstream group
+5. `/api/api-version/stream/upstreams/` – Request and response counts, response time, health‑check status, and uptime 
+   statistics per server in each TCP/UDP upstream group
 
 ```bash
 curl -s https://demo.nginx.com/api/6/stream/upstreams/ | jq
@@ -197,7 +203,7 @@ curl -s https://demo.nginx.com/api/6/stream/upstreams/ | jq
 
 ```
 
-6. `/api/api-version/ssl/` – SSL/TLS statistics
+1. `/api/api-version/ssl/` – SSL/TLS statistics
 
 ```bash
 curl -s https://demo.nginx.com/api/6/ssl/ | jq
@@ -207,5 +213,4 @@ curl -s https://demo.nginx.com/api/6/ssl/ | jq
   "handshakes_failed": 70687,
   "session_reuses": 122210
 }
-
 ```

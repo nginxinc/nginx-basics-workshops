@@ -10,11 +10,16 @@ Implement NGINX Plus as an HTTP and HTTPS (SSL terminating) load balancer for tw
 
 ## The Demo environement
 
-This demo has three containers, a NGINX Plus ADC/load balancer, `nginx-plus`, and webservers, `nginx1`, `nginx2` and `nginx3`:
+This demo has it own lab guide and will run three docker containers: a NGINX Plus ADC/load balancer, `nginx-plus`, and 
+webservers, `nginx1`, `nginx2` and `nginx3`:
 
- * **NGINX Plus** `(Latest)` based on ubuntu 18.04 (and a sample centos 7 Dockerfile is provided). [NGINX Plus Documentation](https://docs.nginx.com/nginx/), and [resources](https://www.nginx.com/resources/) and [blog](https://www.nginx.com/blog/) is your best source of information for technical help. Detailed examples are found on the internet too!
-
- * **NGINX OSS** `(Latest)` is based on [**nginx-hello**](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello). A NGINX webserver that serves a simple page containing its hostname, IP address and port as wells as the request URI and the local time of the webserver.
+ * **NGINX Plus** `(Latest)` based on ubuntu 18.04 (and a sample centos 7 Dockerfile is provided). 
+ * **NGINX OSS** `(Latest)` is based on [**nginx-hello**](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello). 
+   NGINX webservers that serves a simple pages containing its hostname, IP address and port as wells as the request URI 
+   and the local time of the webserver.
+ * `lab` folder containing lab guide. Note: [NGINX Plus Documentation](https://docs.nginx.com/nginx/), [resources](https://www.nginx.com/resources/) 
+   and [blog](https://www.nginx.com/blog/) are your best source of information for addtional technical information. 
+   There are many detailed examples found on the internet too!
 
 ### Topology
 
@@ -73,6 +78,11 @@ HTTP/Port 8080        |               |       |        *        |
 │    │    │    │   ├── error_pages.conf.......NGINX configurations for custom error pages
 │    │    │    │   ├── http403.conf_ .........Example HTTP 403 custom error pages
 │    │    │    │   └── http404.conf_ .........Example HTTP 404 custom error pages
+│    │    │    ├── log_formats/ # Custom extended log formats
+│    │    │    │   ├── ext_log_formats.conf...Example custom log formats
+│    │    │    │   └── json_log_formats.conf..Example JSON custom log formats
+│    │    │    ├── proxy_cache/ # Proxy cache configurations
+│    │    │    │   └── image_cache.conf_ .....Example proxy cache configurations for static web content e.g. Images
 │    │    │    ├── proxy_headers/ # Headers to attach to upstream request
 │    │    │    │   ├── keepalive.conf.........Recommended HTTP keepalives headers for performance
 │    │    │    │   └── proxy_headers.conf.....Recommended request headers for request routing and logging
@@ -81,7 +91,7 @@ HTTP/Port 8080        |               |       |        *        |
 │    │    │        ├── ssl_a+_strong.conf.....Recommended SSL configuration for Based on SSL Labs A+ (https://www.ssllabs.com/ssltest/)
 │    │    │        ├── ssl_modern.conf........Recommended SSL configuration for Modern clients: TLS 1.3 and don't need backward compatibility
 │    │    │        └── ssl_old.conf...........SSL configuration for compatiblity ith a number of very old clients, and should be used only as a last resort
-│    │    ├── stream.conf.d/ #ADD your TCP and UDP Stream configurations here
+│    │    ├── stream.conf.d/ # TODO: ADD your TCP and UDP Stream configurations here
 │    │    └── nginx.conf .....................Main NGINX configuration file with global settings
 │    └── ssl/
 │          ├── nginx/ # NGINX Plus licenses
@@ -113,8 +123,8 @@ HTTP/Port 8080        |               |       |        *        |
 For example on Linux/Unix/MacOS the host file is `/etc/hosts`
 
 ```bash
-# NGINX Plus SE challenge demo (local docker host)
-127.0.0.1 www.example.com www2.example.com
+# NGINX Plus demo system (local docker host)
+127.0.0.1 example.com www.example.com www2.example.com nginx-plus-1
 ```
 
 > **Note:**
@@ -128,7 +138,7 @@ Provided the Prerequisites have been met before running the stpes below, this is
 
 ### Build the demo
 
-In this demo we will have a one NGINX Plus ADC/load balancer (`nginx-plus`) and two NGINX OSS webserver (`nginx1` and `nginx2`)
+In this demo we will have a one NGINX Plus ADC/load balancer (`nginx-plus`) and three NGINX OSS webserver (`web1`, `web2` and `web3`)
 
 Before we can start, we need to copy our NGINX Plus repo key and certificate (`nginx-repo.key` and `nginx-repo.crt`) into the directory, `nginx-plus/etc/ssl/nginx/`, then build our stack:
 
@@ -168,64 +178,15 @@ docker-compose up --force-recreate
 
 ```bash
 docker ps
-CONTAINER ID        IMAGE                           COMMAND                  CREATED             STATUS              PORTS                                                              NAMES
-7ed735c809b8        nginx-basics_nginx-plus   "nginx -g 'daemon of…"   5 seconds ago       Up 4 seconds        0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:8080->8080/tcp   nginx-basics_nginx-plus_1
-4910dca52bb7        nginx-basics_nginx2       "nginx -g 'daemon of…"   6 seconds ago       Up 5 seconds        0.0.0.0:32815->80/tcp                                              nginx-basics_nginx2_1
-6c9a92298116        nginx-basics_nginx1       "nginx -g 'daemon of…"   6 seconds ago       Up 5 seconds        80/tcp                                                             nginx-basics_nginx1_1
+CONTAINER ID        IMAGE                     COMMAND                  CREATED             STATUS              PORTS                                                              NAMES
+628c0023a2f1        nginx-basics_nginx-plus   "nginx -g 'daemon of…"   3 hours ago         Up 3 hours          0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:8080->8080/tcp   nginx-basics_nginx-plus_1
+1098430ff17e        nginx-basics_web1         "/docker-entrypoint.…"   3 hours ago         Up 3 hours          80/tcp                                                             nginx-basics_web1_1
+d93186c51110        nginx-basics_web2         "/docker-entrypoint.…"   3 hours ago         Up 3 hours          0.0.0.0:1052->80/tcp                                               nginx-basics_web2_1
+0543c12c0613        nginx-basics_web3         "/docker-entrypoint.…"   3 hours ago         Up 3 hours          0.0.0.0:1053->80/tcp                                               nginx-basics_web3_
 ```
 
-The demo environment is ready in seconds. You can access the `nginx-hello` demo website on **HTTP / Port 80** ([`http://localhost`](http://localhost) or [http://www.example.com](http://example.com)) and the NGINX API on **HTTP / Port 8080** ([`http://localhost:8080`](http://localhost))
+The demo environment is ready in seconds. You can access the `nginx-hello` demo website on **HTTP / Port 80** 
+([`http://localhost`](http://localhost) or [http://www.example.com](http://example.com)) and on **HTTPS / Port 443**
+([https://www2.example.com](http://example.com)). 
 
-You should also be able to access the `nginx-hello` demo, expecting the host header `www2.example.com`, over **HTTPS / Port 443** (i.e. [`https://www2.example.com`](https://www2.example.com))
-
-> If any of the three expected containers are not running, or you **suspect the environement is broken**:
-> **STOP** and contact your NGINX contact for help :-)
-
-## The SE Challenge 
-
-### Technical Requirements 
-
-See the Minimum requirements and Extra Credit requirements below. 
-
-Cloning your repository and typing “docker-compose up” should be only steps to get your demo environement up and running
-
-#### The following is the provided base setup:
-
-* Three Nodes in total: one NGINX load balancer, two HTTP services running [nginx-hello](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello) 
-* A HTTP Service for `www.example.com`
-* A Upstream group named `nginx_hello` containing two webservers, `nginx1` and `nginx2` 
-* Client traffic for `www.example.com` and default HTTP port 80 traffic is load balanced using the default load balancing algorithm, round-robin, across the two [nginx-hello](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello) HTTP services 
-* A empty upstream group named `dynamic` 
-* [NGINX Plus Live Activity Monitoring](https://www.nginx.com/products/nginx/live-activity-monitoring/) on port 8080
-
-#### Minimum requirements
-
-As you complete the tasks think about:
- * How did you arrive at your solution? (troubleshooting process, challenges, resources used, etc.)
- * Can you articulate what is happening to a techical and non-techical audience?
- * What value does the following feature provide? and what use-cases would benefit from these capabilites?
-
-The following is minimum addtions to be configured:
-
-* HTTPS service for `www2.example.com` traffic over Port 443 (You can use the self-signed certificates provided). Configure NGINX PLus SSL termination on the load balancer and proxy upstream servers over HTTP, i.e. `Client --HTTPS--> NGINX (SSL termination) --HTTP--> webserver`
-    * What are some TLS Best practices that should be considered here?
-* HTTP to HTTPS redirect service for `www2.example.com`, i.e. `Client --HTTP--> NGINX (redirect) --HTTPS--> NGINX (SSL termination) --HTTP--> webserver`
-* Enable [keepalive connections](https://www.nginx.com/blog/http-keepalives-and-web-performance/) to upstream servers. 
-    * How would you test and confirm this has been enabled?
-
-#### Extra Credits  
-
-Enable any of the following features on the NGINX Plus load balancer for extra credits:
-
-* Enable a Active HTTP Health Check: Periodically check the health of upstream servers by sending a custom health‑check requests to each server and verifying the correct response. e.g. check for a `HTTP 200` response and `content type: text/html`
-* Enable a HTTP load balancing algorithm methods **other than the default**, round-robin  
-* Provide the [`curl`](https://ec.haxx.se/http-cheatsheet.html) (or similar tool) command to add and remove server from the NGINX upstream named `dynamic` via the NGINX API. 
-* Create a `HTTP 301` URL redirect for `/old-url` to `/new-url`
-* Enable Proxy caching for **image files only**. Use the Cache folder provisioned on `/var/cache/nginx`, i.e. set `proxy_cache_path` to `/var/cache/nginx`. Validate the test image http://www.example.com/smile.png is cached on NGINX
-* Enable any Session persistence method to routes all requests in a given use session to the same upstream server
-* Provide the command to execute a the NGINX command on the a running container, e.g.  `nginx -t` to check nginx config file and `nginx -s reload` to Reload the configuration file
-* Add another web server instance in the `docker-compose.yml` file, using the same [nginx-hello](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello), with the hostname, `nginx3`, and add the new server to the upstream group, `nginx_hello`
-
-## Q&A 
-
-* **This does not need to be done in a vacuum**.  You can always ask questions at any step along the way.  Clarity is important so you will not be penalized for asking any questions.
+The NGINX API is available on **HTTP / Port 8080** ([`http://localhost:8080`](http://localhost)) or [http://www.example.com:8080](http://example.com:8080))

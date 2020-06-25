@@ -5,6 +5,11 @@
 In this module, we will explain how to configure a basic [Proxy Cache](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/) 
 use-case and demonstrate how to troubleshoot and purge objects from the Cache using the [Cache Purge API](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/#purge)
 
+One of the most popular use cases for NGINX Plus is as a content cache. The NGINX content cache sits in between a client 
+and an "Origin server", commonly deployed as a reverse proxy or load balancer in an application stack to both to 
+accelerate local origin servers and to create edge servers for content delivery networks (CDNs). Caching can reduce the 
+load on your origin servers by a huge factor, depending on the cacheability of your content and the profile of user traffic.
+
 **References:** 
  * [NGINX Content Caching](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/#purge)
  * [NGINX caching Guide](https://www.nginx.com/blog/nginx-caching-guide/)

@@ -9,6 +9,7 @@ services:
         - ./nginx-hello/usr/share/nginx/html:/usr/share/nginx/html
       expose:
         - "80"
+        - "90"
   web2:
       hostname: web2
       build: nginx-hello
@@ -17,8 +18,7 @@ services:
         - ./nginx-hello/usr/share/nginx/html:/usr/share/nginx/html
       ports:
         - "80"
-  # EDITS-START
-  # Simply Add another server like so:    
+        - "90"
   web3:
       hostname: web3
       build: nginx-hello
@@ -27,7 +27,7 @@ services:
         - ./nginx-hello/usr/share/nginx/html:/usr/share/nginx/html
       ports:
         - "80"
-  # EDITS-END  
+        - "90"
   # NGINX Plus Load Balancer       
   nginx-plus:
       hostname: nginx-plus
