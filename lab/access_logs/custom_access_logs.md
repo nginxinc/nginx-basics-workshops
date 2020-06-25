@@ -2,13 +2,19 @@
 
 ## Introduction
 
-Nginx's logging facility is highly customizable and allows you to add default and custom (variables)[http://nginx.org/en/docs/varindex.html] into your logs for purposes of verbose debugging, troubleshooting or analysis of what unfolds within your applications served by NGINX
+In this module, we will explain how to configure Server specific 
+[Access log](http://nginx.org/en/docs/http/ngx_http_log_module.html#access_log) and [Error logs](http://nginx.org/en/docs/ngx_core_module.html#error_log) using custom log formats
 
-In this module, we will explain how to configure Server specific access and error logs using custom log formats
+Nginx's logging facility is highly customizable and allows you to add custom  (variables)[http://nginx.org/en/docs/varindex.html] 
+into your logs for purposes of verbose debugging, troubleshooting or analysis of what unfolds within your applications served by NGINX
+
+**References:** 
+ * [Configuring Logging](https://docs.nginx.com/nginx/admin-guide/monitoring/logging)
 
 ## Task 1: Enable virtual server specifc Error and Access logs for www.example.com
 
-A best practice is to set up individual log files for each of your virtual servers in order to reduce the size of each log file, this makes troubleshooting easier and log rotation less frequent.
+A best practice is to set up individual log files for each of your virtual servers in order to reduce the size of each 
+log file, this makes troubleshooting easier and log rotation less frequent.
 
 1. Uncomment the lines enabling server specific logging for www.example.com virtual server:
 
@@ -35,7 +41,8 @@ nginx -t && nginx -s reload
 tail -f /var/log/nginx/www.example.com.log
 ```
 
-5. Run some traffic to [`http://www.example.com`](http://www.example.com) From a web browser or using curl `curl http://www.example.com`
+5. Run some traffic to [`http://www.example.com`](http://www.example.com) From a web browser or using curl 
+   `curl http://www.example.com`
 
 6. We now can see our custom access log written to file
 
@@ -49,9 +56,11 @@ remote_addr="172.18.0.1", [time_local=24/Jun/2020:16:10:31 +0000], request="GET 
 
 ## Task 2: Enable JSON format Access logs for www2.example.com
 
-We can also configure NGINX to write logs in JSON format. This may be a requirement or preference for popular log collectors and log servers.
+We can also configure NGINX to write logs in JSON format. This may be a requirement or preference for popular log 
+collectors and log servers.
 
-We can use `escape=json` parameter that sets JSON valid character escaping. You need to have all non-word characters in JSON escaped with unicode style like this: `\uNNNN`. This is how our current nginx JSON log_format looks like:
+We can use `escape=json` parameter that sets JSON valid character escaping. You need to have all non-word characters in 
+JSON escaped with unicode style like this: `\uNNNN`. This is how our current nginx JSON log_format looks like:
 
 
 1. Uncomment the lines enabling server specific logging for www.example.com virtual server:
@@ -79,7 +88,8 @@ nginx -t && nginx -s reload
 tail -f /var/log/nginx/www2.example.com.log
 ```
 
-5. Run some traffic to [`https://www2.example.com`](https://www2.example.com) From a web browser or using curl `curl -k https://www2.example.com`
+5. Run some traffic to [`https://www2.example.com`](https://www2.example.com) From a web browser or using curl 
+   `curl -k https://www2.example.com`
 
 6. We now can see our custom access log written to file
 

@@ -11,7 +11,7 @@ COPY etc/ssl/nginx/nginx-repo.key /etc/ssl/nginx/nginx-repo.key
 RUN chmod 644 /etc/ssl/nginx/* \
     # Install prerequisite packages and vim for editing:
     && apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -qq -y install --no-install-recommends apt-transport-https lsb-release ca-certificates wget dnsutils gnupg vim-tiny jq \
+    DEBIAN_FRONTEND=noninteractive apt-get -qq -y install --no-install-recommends apt-transport-https lsb-release ca-certificates wget dnsutils gnupg vim-tiny jq curl \
     # Install NGINX Plus from repo (https://cs.nginx.com/repo_setup)
     && wget http://nginx.org/keys/nginx_signing.key && apt-key add nginx_signing.key \
     && printf "deb https://plus-pkgs.nginx.com/ubuntu `lsb_release -cs` nginx-plus\n" | tee /etc/apt/sources.list.d/nginx-plus.list \
@@ -29,9 +29,11 @@ RUN chmod 644 /etc/ssl/nginx/* \
     ## encrypted session dynamic module
     # && DEBIAN_FRONTEND=noninteractive apt-get -qq -y install --no-install-recommends nginx-plus-module-encrypted-session \
     ## GeoIP dynamic modules
+    # MaxMind GeoLite Legacy databases are currently discontinued, 
+    # MaxMind GeoIP2 or Geolite2 databases and NGINX Plus GeoIP2 module should be used instead.
     # && DEBIAN_FRONTEND=noninteractive apt-get -qq -y install --no-install-recommends nginx-plus-module-geoip \
     ## GeoIP2 dynamic modules
-    # && DEBIAN_FRONTEND=noninteractive apt-get -qq -y install --no-install-recommends nginx-plus-module-geoip2 \
+    && DEBIAN_FRONTEND=noninteractive apt-get -qq -y install --no-install-recommends nginx-plus-module-geoip2 \
     ## headers-more dynamic module
     # && DEBIAN_FRONTEND=noninteractive apt-get -qq -y install --no-install-recommends nginx-plus-module-headers-more \
     ## image filter dynamic module

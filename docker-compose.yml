@@ -37,7 +37,9 @@ services:
           - web2:web2
           - web3:web3
       volumes:
-          - ./nginx-plus/etc/nginx:/etc/nginx
+          - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d
+          - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
+          - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
       ports:
           - 8080:8080
           - 80:80
