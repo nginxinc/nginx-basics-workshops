@@ -2,8 +2,9 @@
 
 ## Introduction
 
-In this module, we will explain how to configure a basic [Proxy Cache](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/) 
-use-case and demonstrate how to troubleshoot and purge objects from the Cache using the [Cache Purge API](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/#purge)
+This module will explain how to configure a basic [Proxy Cache](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/) use-case,
+visualization of cache status on the live activity monitoring dashboard, and demonstrate how to troubleshoot and purge 
+objects from the Cache using the [Cache Purge API](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/#purge)
 
 One of the most popular use cases for NGINX Plus is as a content cache. The NGINX content cache sits in between a client 
 and an "Origin server", commonly deployed as a reverse proxy or load balancer in an application stack to both to 
@@ -132,7 +133,54 @@ Accept-Ranges: bytes
 ![google chrome inspector](media/2020-06-24_11-27.png)
 
 
-## Task 2: Restricting Access to the Purge Command and using Cache purge API
+## Task 2   
+
+1. In a Web Browser, we can visualize cache status on the live activity monitoring dashboard: Navigate to out NGINX Plus dashboard on
+   [www.example.com:8080](http://www.example.com:8080) > **Caches**. 
+
+   The Cache Hit Ratio shown for the zone, `image_cache` will increase as we repeatedly request cached content.
+
+2. On another tab in your Web Browser, navigate to [www.example.com/img/test.html](http://www.example.com/img/test.html) 
+   to load images served from the NGINX cache. Hit the Web Browser's refresh button multiple times to simulate multiple
+   requests
+
+![test html page with images](media/2020-06-25_11-26.png)
+
+3. Alternatively you can copy, paste and execute the `curl` commands below multiple times in your terminal
+
+```bash
+# Copy and paste these lines into your terminal multiple times
+curl -s -I http://www.example.com/img/500x500.gif | grep "X-Cache-Status:"
+curl -s -I http://www.example.com/img/500x500.jpg | grep "X-Cache-Status:"
+curl -s -I http://www.example.com/img/500x500.webp | grep "X-Cache-Status:"
+curl -s -I http://www.example.com/img/1000x1000.gif | grep "X-Cache-Status:"
+curl -s -I http://www.example.com/img/1000x1000.jpg | grep "X-Cache-Status:"
+curl -s -I http://www.example.com/img/1000x1000.png | grep "X-Cache-Status:"
+curl -s -I http://www.example.com/img/1000x1000.webp | grep "X-Cache-Status:"
+curl -s -I http://www.example.com/img/picture.gif | grep "X-Cache-Status:"
+curl -s -I http://www.example.com/img/picture.jpg | grep "X-Cache-Status:"
+curl -s -I http://www.example.com/img/picture.png | grep "X-Cache-Status:"
+curl -s -I http://www.example.com/img/picture.webp | grep "X-Cache-Status:"
+
+X-Cache-Status: HIT
+X-Cache-Status: HIT
+X-Cache-Status: HIT
+X-Cache-Status: HIT
+X-Cache-Status: HIT
+X-Cache-Status: HIT
+X-Cache-Status: HIT
+X-Cache-Status: HIT
+X-Cache-Status: HIT
+X-Cache-Status: HIT
+X-Cache-Status: HIT
+```
+
+4. You will see the Cache Hit Ratio increase as most of your requests are now served from the NGINX cache, eliminating the
+   the need for requests to your Origin Servers
+
+   ![cache hit ratio](media/2020-06-25_14-53.png)
+
+## Task 3: Restricting Access to the Purge Command and using Cache purge API
 
 1. Inspect `proxy_cache_global.conf` again, and find the `geo` and `map` blocks that identifies requests that use the
    HTTP `PURGE` method and deletes objects in the cache matching those URLs.
