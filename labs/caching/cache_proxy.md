@@ -308,7 +308,8 @@ curl -I -X PURGE -D – "http://www.example.com/img/*"
 curl -I -X PURGE -D – "http://www.example.com/*
 ```
 
-6. Now we can do a wildcard cache purge
+7. Lets confirm wildcard cache purge has evicted all out cached images.The next request for these images should serve the
+   image from the Origin Servers, as it is not available in the NGINX cache yet.
 
 
 ```bash
