@@ -2,7 +2,7 @@
 
 ## Introduction
 
-NGINX's logging facility is highly customizable and allows you to add custom (variables)[http://nginx.org/en/docs/varindex.html] 
+NGINX's logging facility is highly customizable and allows you to add custom [variables](http://nginx.org/en/docs/varindex.html)
 into your logs for purposes of verbose debugging, troubleshooting or analysis of what unfolds within your applications served by NGINX
 
 **References:** 

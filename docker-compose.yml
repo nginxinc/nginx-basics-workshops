@@ -28,6 +28,15 @@ services:
       ports:
         - "80"
         - "90"
+  # Lab Guide
+  docs:
+      hostname: docs
+      build: docs
+      volumes:
+        - ./docs/labs:/usr/share/nginx/html/labs
+        - ./docs/misc/lab_guide.conf:/etc/nginx/conf.d/lab_guide.conf
+      ports:
+        - 9000:9000
   # NGINX Plus Load Balancer       
   nginx-plus:
       hostname: nginx-plus
