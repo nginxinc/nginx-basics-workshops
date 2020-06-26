@@ -8,6 +8,13 @@ What problem does this solution solve?
 
 Provide links to docs or NGINX and NGINX Plus directives used here
 
+## Learning Objectives 
+
+By the end of the lab you will be able to: 
+ * this
+ * that
+ * finally this
+
 ## Task 1
 
 1. inspect relevant conf files
