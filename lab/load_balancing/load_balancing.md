@@ -70,7 +70,7 @@ ls -al
 
 ## Exercise 2: Inspect the nginx configuration and rewrite logs
 
-1. Once again, inspec the `nginx.conf` file. Note the following:
+1. Once again, inspect the `nginx.conf` file. Note the following:
 
  * `include /etc/nginx/conf.d/*.conf` statement for inclusion of further NGINX Plus configuration files.
  * Note the commented out `# TCP/UDP proxy and load balancing block` This is an example of using the “stream” context 
@@ -83,6 +83,32 @@ ls -al
  * `location /`, that will match all or any uri 
  * `proxy_pass http://nginx_hello`, to proxy request to the upstream group labeled `nginx_hello` (defined in `upstreams.conf`) 
  * `rewrite_log on` directive, and the `"301 MOVED PERMANENTLY"` line . This allows for logging all rewrites to the error log. 
+
+
+```nginx
+# www.example.com HTTP
+server {
+    listen 80 default_server;
+    server_name www.example.com "";
+
+    location / {
+        
+        proxy_pass http://nginx_hello;
+    }
+
+    # Enabling rewrite logging is bonus points
+    # Enables logging of ngx_http_rewrite_module module directives 
+    # processing results into the error_log at the notice level
+    rewrite_log on;
+    
+    # 301 MOVED PERMANENTLY
+    location = /old-url { return 301 new-url; } 
+
+    # etc..
+
+}
+
+```
 
 5. Open another Terminal in VSCode by selecting the **split terminal** icon on the right.
    Alternatively, if you want to open a SSH session in putty, you can open another terminal into the `nginx-plus-1` host. 
@@ -172,5 +198,5 @@ server {
    You should see something similar to the web page below 
    Reload the page several times and ensure that the `Server Name:` changes from `web1`, to `web2` and `web3` in a load 
    balancing fashion. 
-   
+
 ![NGINX hello test page](media/2020-06-26_13-04.png)
