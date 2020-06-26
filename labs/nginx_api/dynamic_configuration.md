@@ -1,4 +1,4 @@
-# NGINX Plus API Dynamic Configuration of Upstreams
+# NGINX Plus API Dynamic Configuration
 
 ## Introduction
 

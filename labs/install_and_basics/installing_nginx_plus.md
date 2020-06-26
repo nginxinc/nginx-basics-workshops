@@ -23,6 +23,7 @@ By the end of the lab you will be able to:
  * Install NGINX Plus 
  * Install NGINX Plus Dynamic Module – GeoIP2 
  * Verify Installation 
+ * Invoke NGINX and common options from from the command line
 
 ## Exercise 1: Instal NGINX Plus 
 
@@ -132,3 +133,53 @@ root      5541  4062  0 19:35 pts/1    00:00:00 grep --color=auto nginx
    [http://nginx-plus-3](http://nginx-plus-3)
 
 ![NGINX default page](media/2020-06-26_12-33.png)
+
+
+## Exercise 2: NGINX Plus command line basics
+
+In this exercise, you will review configure NGINX Plus as a basic load balancer and test/verify configured functionality.   
+
+1. In the `WORKSPACE` folder found on the desktop, open `NGINX-PLUS-31code-workspace` in Visual Studio Code (VSCode)
+
+![Select workspace](media/2020-06-26_12-41.png)
+
+You will now be able to both run NGINX commands and edit NGINX Plus configuration files via the VS Code Console and 
+terminal. SSH access via Putty is also available as a terminal option. 
+
+![VCCode](media/2020-06-26_12-42.png)
+
+2. In the TERMINAL window, run the follow NGINX commands: 
+
+```bash
+#  Print help for command-line parameters.
+nginx -h 
+# Test the configuration file: nginx checks the configuration for correct syntax, 
+# and then tries to open files referred in the configuration.
+nginx -t 
+# same as -t, but additionally dump configuration files to standard output
+nginx -T 
+# print nginx version
+nginx -v
+# print nginx version, compiler version, and configure parameters.
+nginx -V 
+send a signal to the master process. The argument signal can be one of:
+# stop — shut down quickly
+# quit — shut down gracefully
+# reload — reload configuration, start the new worker process with a new
+#          configuration, gracefully shut down old worker processes.
+# reopen — reopen log files
+nginx -s reload 
+```
+
+## Exercise 3: Inspect NGINX Plus modules
+
+1. Select the `nginx.conf` file in the VSCode Explorer section. 
+
+ * Note the `“# Load Modules”` entry in the main context. 
+
+2. In the terminal window run the following commands to see which Dynamic modules are installed: 
+
+```bash
+cd /etc/nginx/modules  
+ls -al 
+```

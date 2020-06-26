@@ -1,4 +1,4 @@
-# Custom Access Log Formats
+# Custom Access Logs
 
 ## Introduction
 

@@ -15,61 +15,12 @@ load‑balanced server groups without a server restart, and additional metrics.
 
 By the end of the lab you will be able to: 
 
- * Invoke NGINX and common options from from the command line
  * Enable NGINX Plus as an HTTP load balancer 
  * Enable NGINX Plus as an HTTPS load balancer 
  * TLS Best practices 
 
-## Exercise 1: NGINX Plus command line basics
 
-In this exercise, you will review configure NGINX Plus as a basic load balancer and test/verify configured functionality.   
-
-1. In the `WORKSPACE` folder found on the desktop, open `NGINX-PLUS-31code-workspace` in Visual Studio Code (VSCode)
-
-![Select workspace](media/2020-06-26_12-41.png)
-
-You will now be able to both run NGINX commands and edit NGINX Plus configuration files via the VS Code Console and 
-terminal. SSH access via Putty is also available as a terminal option. 
-
-![VCCode](media/2020-06-26_12-42.png)
-
-2. In the TERMINAL window, run the follow NGINX commands: 
-
-```bash
-#  Print help for command-line parameters.
-nginx -h 
-# Test the configuration file: nginx checks the configuration for correct syntax, 
-# and then tries to open files referred in the configuration.
-nginx -t 
-# same as -t, but additionally dump configuration files to standard output
-nginx -T 
-# print nginx version
-nginx -v
-# print nginx version, compiler version, and configure parameters.
-nginx -V 
-send a signal to the master process. The argument signal can be one of:
-# stop — shut down quickly
-# quit — shut down gracefully
-# reload — reload configuration, start the new worker process with a new
-#          configuration, gracefully shut down old worker processes.
-# reopen — reopen log files
-nginx -s reload 
-```
-
-## Exercise 2: Inspect NGINX Plus modules
-
-1. Select the `nginx.conf` file in the VSCode Explorer section. 
-
- * Note the `“# Load Modules”` entry in the main context. 
-
-2. In the terminal window run the following commands to see which Dynamic modules are installed: 
-
-```bash
-cd /etc/nginx/modules  
-ls -al 
-```
-
-## Exercise 3: Inspect the nginx configuration and rewrite logs
+## Exercise 1: Inspect the NGINX configuration and rewrite logs
 
 1. Once again, inspect the `nginx.conf` file. Note the following:
 
@@ -133,7 +84,7 @@ curl http://localhost/old-url
 
 Note the entry in the `www.example.com_error.log` printed in the first terminal
 
-## Exercise 4: HTTP Load Balancing
+## Exercise 2: HTTP Load Balancing
 
 1. In the VS ode Explorer select the `upstreams.conf` file. Observe the following configuration entries to the 
    `upstream nginx_hello` block: 
@@ -163,7 +114,7 @@ upstream nginx_hello {
 
 ![NGINX hello test page](media/2020-06-26_13-04.png)
 
-## Exercise 5: HTTPS Load Balancing
+## Exercise 3: HTTPS Load Balancing
 
 1. In VSCode Explorer open `www2.example.conf` and observe the following configuration entries: 
 
