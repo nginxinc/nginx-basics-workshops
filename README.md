@@ -220,7 +220,7 @@ ssh -p $PORT $USER@$HOST "sudo chown -R nginx:nginx /etc/nginx"
 
 ![UDF ssh info](docs/lab/intro/media/2020-06-26_11-53.png)
 
-2. `scp` the NGINX web server configuration: 
+4. `scp` the NGINX web server configuration: 
 
 ```bash
 # Set variables
@@ -244,5 +244,15 @@ scp -r -P $PORT nginx-hello/usr/share/nginx/html $USER@$HOST:/var/tmp/nginx-new-
 scp -r -P $PORT docs/labs $USER@$HOST:/var/tmp/nginx-new-html 
 ssh -p $PORT $USER@$HOST "sudo rsync -Prtv --delete /var/tmp/nginx-new-html/* /usr/share/nginx/html"
 # Sync to other Web servers (if you have others configured with nginx-sync.sh)
+# Note: If there is a incorrect host in /root/.ssh/known_hosts, you may need to 
+# run the nginx-sync.sh command on the server, not remotely:
 ssh -p $PORT $USER@$HOST "sudo nginx-sync.sh"
+```
+
+Example `nginx-sync.conf` on the web server:
+
+```bash
+NODES="web2 web3"
+CONFPATHS="/etc/nginx /etc/ssl /usr/share/nginx/html"
+#EXCLUDE="default.conf"
 ```
