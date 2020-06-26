@@ -50,7 +50,8 @@ nginx -V
 send a signal to the master process. The argument signal can be one of:
 # stop — shut down quickly
 # quit — shut down gracefully
-# reload — reload configuration, start the new worker process with a new configuration, gracefully shut down old worker processes.
+# reload — reload configuration, start the new worker process with a new
+#          configuration, gracefully shut down old worker processes.
 # reopen — reopen log files
 nginx -s reload 
 ```
