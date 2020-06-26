@@ -69,7 +69,7 @@ cd /etc/nginx/modules
 ls -al 
 ```
 
-## Exercise 2: Inspect the nginx configuration and rewrite logs
+## Exercise 3: Inspect the nginx configuration and rewrite logs
 
 1. Once again, inspect the `nginx.conf` file. Note the following:
 
@@ -133,7 +133,7 @@ curl http://localhost/old-url
 
 Note the entry in the `www.example.com_error.log` printed in the first terminal
 
-## Exercise 3: HTTP Load Balancing
+## Exercise 4: HTTP Load Balancing
 
 1. In the VS ode Explorer select the `upstreams.conf` file. Observe the following configuration entries to the 
    `upstream nginx_hello` block: 
@@ -163,7 +163,7 @@ upstream nginx_hello {
 
 ![NGINX hello test page](media/2020-06-26_13-04.png)
 
-## Exercise 4: HTTPS Load Balancing
+## Exercise 5: HTTPS Load Balancing
 
 1. In VSCode Explorer open `www2.example.conf` and observe the following configuration entries: 
 
