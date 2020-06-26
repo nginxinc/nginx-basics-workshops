@@ -10,16 +10,22 @@ Implement NGINX Plus as an HTTP and HTTPS (SSL terminating) load balancer for tw
 
 ## The Demo environement
 
-This demo has it own lab guide and will run three docker containers: a NGINX Plus ADC/load balancer, `nginx-plus`, and 
+This demo requires four docker containers for the NGINX demos: a NGINX Plus ADC/load balancer, `nginx-plus`, and 
 webservers, `nginx1`, `nginx2` and `nginx3`:
+
+An addtional container is used for the lab guide and is available on port 9000 
+
+Details of the containers:
 
  * **NGINX Plus** `(Latest)` based on ubuntu 18.04 (and a sample centos 7 Dockerfile is provided). 
  * **NGINX OSS** `(Latest)` is based on [**nginx-hello**](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello). 
    NGINX webservers that serves a simple pages containing its hostname, IP address and port as wells as the request URI 
    and the local time of the webserver.
- * `lab` folder containing lab guide. Note: [NGINX Plus Documentation](https://docs.nginx.com/nginx/), [resources](https://www.nginx.com/resources/) 
-   and [blog](https://www.nginx.com/blog/) are your best source of information for addtional technical information. 
-   There are many detailed examples found on the internet too!
+ * **Lab Guide** can be read from the [`docs/labs` folder](docs/labs/README.md) or in a web browser on [port 9000](http://localhost:9000). 
+
+**Note:**[NGINX Plus Documentation](https://docs.nginx.com/nginx/), [resources](https://www.nginx.com/resources/) 
+and [blog](https://www.nginx.com/blog/) are your best source of information for addtional technical information. There 
+are many detailed examples found on the internet too!
 
 ### Topology
 
@@ -56,7 +62,16 @@ API                   |               +------>|                 |
 HTTP/Port 8080        |               |       |        *        |
                       |               |       |                 |
                       |               |       +-----------------+
-                      +---------------+                                                                                     
+                      +---------------+                                                                                    
+
+                                              +-----------------+         
+                                              |                 |
+                                              |      docs       |
++-------------------------------------------->|   (lab guide)   |
+LAB GUIDE                                     |                 |
+HTTP/PORT 90                                  |                 |
+                                              +-----------------+
+
 ```
 
 ## File Structure
@@ -194,9 +209,11 @@ The NGINX API is available on **HTTP / Port 8080** ([`http://localhost:8080`](ht
 
 #### Upload to UDF
 
+This demo system can also be ported to UDF
+
 1. Get the UDF Address (URL and Port) for the target NGINX Plus Load Balancer Instance
 
-![UDF ssh info](docs/lab/intro/media/2020-06-25_15-29.png)
+![UDF ssh info](docs/labs/intro/media/2020-06-25_15-29.png)
 
 2. `scp` the NGINX Plus Load Balancer configurations: 
 
@@ -218,7 +235,7 @@ ssh -p $PORT $USER@$HOST "sudo chown -R nginx:nginx /etc/nginx"
 
 3. Get the UDF Address (URL and Port) for the target Web Server NGINX Instance
 
-![UDF ssh info](docs/lab/intro/media/2020-06-26_11-53.png)
+![UDF ssh info](docs/labs/intro/media/2020-06-26_11-53.png)
 
 4. `scp` the NGINX web server configuration: 
 
