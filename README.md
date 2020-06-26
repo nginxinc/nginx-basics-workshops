@@ -190,3 +190,54 @@ The demo environment is ready in seconds. You can access the `nginx-hello` demo 
 ([https://www2.example.com](http://example.com)). 
 
 The NGINX API is available on **HTTP / Port 8080** ([`http://localhost:8080`](http://localhost)) or [http://www.example.com:8080](http://example.com:8080))
+
+
+#### Upload to UDF
+
+1. Get the UDF Address (URL and Port) for the target NGINX Plus Load Balancer Instance
+
+![UDF ssh info](lab/Intro/media/2020-06-25_15-29.png)
+
+2. `scp` the NGINX Plus Load Balancer configurations: 
+
+```bash
+# Enter working directory
+cd nginx-basics
+# Set variables
+USER=ubuntu
+HOST=bb56acb6-d774-4bed-b783-005a491b274b.access.udf.f5.com
+PORT=47000
+DATE_WITH_TIME=`date "+%Y%m%d-%H%M%S"`
+# Push local nginx plus config to remote server while making backup first
+ssh -p $PORT $USER@$HOST "sudo cp -r /etc/nginx /var/tmp/nginx-$DATE_WITH_TIME"
+ssh -p $PORT $USER@$HOST "sudo rm -rf /var/tmp/nginx-new"
+scp -r -P $PORT nginx-plus/etc/nginx $USER@$HOST:/var/tmp/nginx-new 
+ssh -p $PORT $USER@$HOST "sudo rsync -Prtv --exclude modules/ --delete /var/tmp/nginx-new/* /etc/nginx"
+ssh -p $PORT $USER@$HOST "sudo chown -R nginx:nginx /etc/nginx"
+```
+
+3. Get the UDF Address (URL and Port) for the target Web Server NGINX Instance
+
+![UDF ssh info](lab/Intro/media/2020-06-26_11-53.png)
+
+2. `scp` the NGINX web server configurations: 
+
+# Set variables
+USER=ubuntu
+HOST=bb56acb6-d774-4bed-b783-005a491b274b.access.udf.f5.com
+PORT=47001
+DATE_WITH_TIME=`date "+%Y%m%d-%H%M%S"`
+# Push local nginx web server config to remote server while making backup first
+ssh -p $PORT $USER@$HOST "sudo cp -r /etc/nginx /var/tmp/nginx-$DATE_WITH_TIME"
+ssh -p $PORT $USER@$HOST "sudo rm -rf /var/tmp/nginx-new"
+scp -r -P $PORT nginx-hello/etc/nginx $USER@$HOST:/var/tmp/nginx-new 
+ssh -p $PORT $USER@$HOST "sudo rsync -Prtv --exclude modules/ --delete /var/tmp/nginx-new/* /etc/nginx"
+ssh -p $PORT $USER@$HOST "sudo chown -R nginx:nginx /etc/nginx"
+# Push local web contentto remote server while making backup first
+ssh -p $PORT $USER@$HOST "sudo cp -r /usr/share/nginx/html /var/tmp/nginx-html-$DATE_WITH_TIME"
+ssh -p $PORT $USER@$HOST "sudo rm -rf /var/tmp/nginx-new-html"
+scp -r -P $PORT nginx-hello/usr/share/nginx/html $USER@$HOST:/var/tmp/nginx-new-html 
+ssh -p $PORT $USER@$HOST "sudo rsync -Prtv --delete /var/tmp/nginx-new-html/* /usr/share/nginx/html"
+# Sync to other Web servers (if you have others configured with nginx-sync.sh)
+ssh -p $PORT $USER@$HOST "sudo nginx-sync.sh"
+```
