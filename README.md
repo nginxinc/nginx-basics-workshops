@@ -220,8 +220,9 @@ ssh -p $PORT $USER@$HOST "sudo chown -R nginx:nginx /etc/nginx"
 
 ![UDF ssh info](lab/Intro/media/2020-06-26_11-53.png)
 
-2. `scp` the NGINX web server configurations: 
+2. `scp` the NGINX web server configuration: 
 
+```bash
 # Set variables
 USER=ubuntu
 HOST=bb56acb6-d774-4bed-b783-005a491b274b.access.udf.f5.com
