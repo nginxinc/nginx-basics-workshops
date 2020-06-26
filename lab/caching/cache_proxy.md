@@ -2,20 +2,25 @@
 
 ## Introduction
 
-This module will explain how to configure a basic [Proxy Cache](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/) use-case,
-visualization of cache status on the live activity monitoring dashboard, and demonstrate how to troubleshoot and purge 
-objects from the Cache using the [Cache Purge API](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/#purge)
-
 One of the most popular use cases for NGINX Plus is as a content cache. The NGINX content cache sits in between a client 
 and an "Origin server", commonly deployed as a reverse proxy or load balancer in an application stack to both to 
 accelerate local origin servers and to create edge servers for content delivery networks (CDNs). Caching can reduce the 
 load on your origin servers by a huge factor, depending on the cacheability of your content and the profile of user traffic.
 
 **References:** 
- * [NGINX Content Caching](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/#purge)
+ * [NGINX Content Caching](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching)
  * [NGINX caching Guide](https://www.nginx.com/blog/nginx-caching-guide/)
 
-## Task 1: Cache proxy for web content
+## Learning Objectives 
+
+By the end of the lab you will be able to: 
+
+ * Configure a basic Proxy Cache
+ * Visualize cache status on the live activity monitoring dashboard
+ * Add a custom HTTP header to upstream cache status
+ * Purge cached objects using the Cache Purge API
+
+## Exercise 1: Cache proxy for web content
 
 1. Inspect `proxy_cache_global.conf` and inspect the proxy caches configured on NGINX
 
@@ -136,7 +141,7 @@ Accept-Ranges: bytes
 ![google chrome inspector](media/2020-06-24_11-27.png)
 
 
-## Task 2   
+## Exercise 2: Visualize cache status on the live activity monitoring dashboard
 
 1. In a Web Browser, we can visualize cache status on the live activity monitoring dashboard: Navigate to out NGINX Plus dashboard on
    [www.example.com:8080](http://www.example.com:8080) > **Caches**. 
@@ -183,7 +188,7 @@ X-Cache-Status: HIT
 
    ![cache hit ratio](media/2020-06-25_14-53.png)
 
-## Task 3: Restricting Access to the Purge Command and using Cache purge API
+## Exercise 3: Restricting Access to the Purge Command and using Cache purge API
 
 1. Inspect `proxy_cache_global.conf` again, and find the `geo` and `map` blocks that identifies requests that use the
    HTTP `PURGE` method and deletes objects in the cache matching those URLs.

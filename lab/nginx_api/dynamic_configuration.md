@@ -2,16 +2,14 @@
 
 ## Introduction
 
-This module will explain how to use the NGINX Plus API to dynamicly configure NGINX upstreams groups
-
-With NGINX Plus, configuration of upstream servers in a server group can be modified on-the-fly without reloading the 
+NGINX Plus enables configuration of upstream servers in a server group to be modified on-the-fly without reloading the 
 NGINX servers and its configuration files. This is useful for:
 
-* **Autoscaling**, when you need to add more servers
-* **Maintenance**, when you need to remove a server, specify a backup server, or take a server down temporarily
-* **Quick setup**, when you need to change upstream server settings such as server weight, active connections, slow start, 
-  failure timeouts.
-* **Monitoring**, when you get the state of the server or server group with one command
+ * **Autoscaling**, when you need to add more servers
+ * **Maintenance**, when you need to remove a server, specify a backup server, or take a server down temporarily
+ * **Quick setup**, when you need to change upstream server settings such as server weight, active connections, slow start, 
+   failure timeouts.
+ * **Monitoring**, when you get the state of the server or server group with one command
 
 All these changes are made with the NGINX Plus REST API interface with API commands. By default changes made with the 
 API are only stored only in the shared memory zone and so the changes are discarded when the NGINX Plus configuration 
@@ -20,9 +18,15 @@ file is reloaded.
 In this Module we will configure upstream servers and upstream server groups dynamically (on-the-fly) with the NGINX 
 Plus REST API and use the `state` directive so on-the-fly configurations persistent through NGINX reloads. 
 
+## Learning Objectives 
+
+By the end of the lab you will be able to: 
+
+ * Use the NGINX Plus API to dynamicly configure NGINX upstreams groups
+ * Persist dyanmic reconfigurations using a `state` file
 
 
-## Task 1: 
+## Exercise 1: Dynamic Configuration of an Upstream using the NGINX API
 
 1. Inspect the upstream server group called `dynamic` has been defined in `upstreams.conf`
 

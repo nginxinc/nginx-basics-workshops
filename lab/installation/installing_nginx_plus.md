@@ -24,7 +24,7 @@ By the end of the lab you will be able to:
  * Install NGINX Plus Dynamic Module – GeoIP2 
  * Verify Installation 
 
-## Exercise 1: 
+## Exercise 1: Instal NGINX Plus 
 
 1. In the `WORKSPACE` folder found on the desktop, open `NGINX-PLUS-3.code-workspace` in Visual Studio Code (VSCode)
 

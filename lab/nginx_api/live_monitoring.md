@@ -2,8 +2,6 @@
 
 ## Introduction
 
-This module will explain how to use the NGINX Plus API to read live monitoring metrics on NGINX Plus
-
 The [NGINX Plus API](https://www.nginx.com/products/nginx/live-activity-monitoring/) supports other features in addition 
 to live activity monitoring, including dynamic configuration of upstream server groups and key‑value stores. 
 
@@ -14,7 +12,14 @@ Live examples:​
  * Swagger-UI: [demo.nginx.com/swagger-ui](https://demo.nginx.com/swagger-ui/)
  * API YAML: [demo.nginx.com/swagger-ui](https://demo.nginx.com/swagger-ui/nginx_api.yaml)
 
-## Task 1: Explore the Live Activity Monitoring JSON Feed​ from demo.nginx.com
+## Learning Objectives 
+
+By the end of the lab you will be able to: 
+
+ * Use [demo.nginx.com](https://demo.nginx.com) for demo purposes
+ * Use the NGINX Plus API to read live monitoring metrics on NGINX Plus
+
+## Exercise 1: Explore the Live Activity Monitoring JSON Feed​ from demo.nginx.com
 
 When you access the API, NGINX Plus returns a JSON‑formatted document containing the current statistics. You can request 
 complete statistics at `/api/[api-version]/`, where `[api-version]` is the version number of the NGINX Plus API. 

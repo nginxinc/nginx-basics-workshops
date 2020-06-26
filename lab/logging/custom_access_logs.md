@@ -1,22 +1,21 @@
-#  Custom Access Log Formats
+# Custom Access Log Formats
 
 ## Introduction
-
-This module will explain how to configure Server specific [Access log](http://nginx.org/en/docs/http/ngx_http_log_module.html#access_log) 
-and [Error logs](http://nginx.org/en/docs/ngx_core_module.html#error_log) using custom log formats
 
 NGINX's logging facility is highly customizable and allows you to add custom (variables)[http://nginx.org/en/docs/varindex.html] 
 into your logs for purposes of verbose debugging, troubleshooting or analysis of what unfolds within your applications served by NGINX
 
-**Note:** Although not covered in this lab, NGINX also has the ability to send logs to an external syslog system using the syslog
-system's log collector agent on the local NGINX linux system or using the [`syslog:`](https://docs.nginx.com/nginx/admin-guide/monitoring/logging/#syslog)
-prefix in error_log and access_log directives. Syslog messages can be sent to a `server=` which can be a domain name, an 
-IP address, or a UNIX-domain socket path. 
-
 **References:** 
  * [Configuring Logging](https://docs.nginx.com/nginx/admin-guide/monitoring/logging)
 
-## Task 1: Enable virtual server specifc Error and Access logs for www.example.com
+## Learning Objectives 
+
+By the end of the lab you will be able to: 
+
+ * Configure [Access log](http://nginx.org/en/docs/http/ngx_http_log_module.html#access_log) using custom log formats
+ * Configure Server specific Access logs and Error Logs
+
+## Exercise 1: Enable virtual server specifc Error and Access logs for www.example.com
 
 A best practice is to set up individual log files for each of your virtual servers in order to reduce the size of each 
 log file, this makes troubleshooting easier and log rotation less frequent.
@@ -73,7 +72,7 @@ upstream_status="200", upstream_connect_time="0.000", upstream_header_time="0.00
 upstream_response_length="7225", upstream_cache_status="-", http_range="-", slice_range="-
 ```
 
-## Task 2: Enable JSON format Access logs for www2.example.com
+## Exercise 2: Enable JSON format Access logs for www2.example.com
 
 We can also configure NGINX to write logs in JSON format. This may be a requirement or preference for popular log 
 collectors and log servers.
