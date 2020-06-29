@@ -15,13 +15,13 @@ By the end of the lab you will be able to:
  * that
  * finally this
 
-## Task 1
+## Exercise 1
 
 1. inspect relevant conf files
 2. steps a-z to reproduce a result
 3. inspect the result in detail
 4. clean up or reset state if needed
 
-## Task 2
+## Exercise 2
 
 Same again

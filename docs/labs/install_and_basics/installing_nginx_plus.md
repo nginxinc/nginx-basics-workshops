@@ -15,23 +15,30 @@ For Sizing guidance for Deploying NGINX Plus, see [Sizing Guide for Deploying NG
 
 **References:** 
  * [Installing NGINX Plus](https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-plus/)
+ * [GeoIP2 Module](https://docs.nginx.com/nginx/admin-guide/dynamic-modules/geoip2/)
 
 ## Learning Objectives 
 
 By the end of the lab you will be able to: 
 
  * Install NGINX Plus 
- * Install NGINX Plus Dynamic Module – GeoIP2 
+ * Install NGINX Plus Dynamic Module – GeoIP2
  * Verify Installation 
  * Invoke NGINX and common options from from the command line
 
-## Exercise 1: Instal NGINX Plus 
+## Exercise 1: Install NGINX Plus 
 
 1. In the `WORKSPACE` folder found on the desktop, open `NGINX-PLUS-3.code-workspace` in Visual Studio Code (VSCode)
 
 ![Select workspace](media/2020-06-26_12-26.png)
 
-2. In the VS Code Terminal window, execute the following NGINX Plus installation process
+2. In the VSCode, open a a **terminal window**, using `View > Terminal menu` command. You will now be able to both run 
+   NGINX commands and edit NGINX Plus configuration files via the VSCode Console and terminal. (SSH access via Putty is 
+   also available as a SSH remote terminal access option.)
+
+3. In the terminal run the following commands to install NGINX Plus 
+
+![Open new terminal](media/2020-06-29_15-32.png)
 
 ![Terminal inside VSCode](media/2020-06-26_12-27.png)
 
@@ -40,8 +47,12 @@ By the end of the lab you will be able to:
 whoami
 root
 
-# Run installation commands
+# Move to the /root directory and check nginx-repo cert and key are here
 cd /root 
+ls
+nginx-repo.crt  nginx-repo.key
+
+# Run installation commands
 mkdir -p /etc/ssl/nginx 
 cp nginx-repo.* /etc/ssl/nginx 
 wget http://nginx.org/keys/nginx_signing.key && sudo apt-key add nginx_signing.key 
@@ -139,16 +150,18 @@ root      5541  4062  0 19:35 pts/1    00:00:00 grep --color=auto nginx
 
 In this exercise, you will review configure NGINX Plus as a basic load balancer and test/verify configured functionality.   
 
-1. In the `WORKSPACE` folder found on the desktop, open `NGINX-PLUS-31code-workspace` in Visual Studio Code (VSCode)
+1. If you have closed VSCode, once again, open `NGINX-PLUS-3code-workspace` found in the he `WORKSPACE` folder, on the desktop,
+   in VSCode
 
-![Select workspace](media/2020-06-26_12-41.png)
+![Select workspace](media/2020-06-26_12-26.png)
 
-You will now be able to both run NGINX commands and edit NGINX Plus configuration files via the VS Code Console and 
-terminal. SSH access via Putty is also available as a terminal option. 
+![VCCode](media/2020-06-26_12-27.png)
 
-![VCCode](media/2020-06-26_12-42.png)
+2. In the VSCode, open a a **terminal window**, using `View > Terminal menu` command. You will now be able to both run 
+   NGINX commands and edit NGINX Plus configuration files via the VSCode Console and terminal. (SSH access via Putty is 
+   also available as a SSH remote terminal access option.)
 
-2. In the TERMINAL window, run the follow NGINX commands: 
+3. In the terminal run the following NGINX commands
 
 ```bash
 #  Print help for command-line parameters.
