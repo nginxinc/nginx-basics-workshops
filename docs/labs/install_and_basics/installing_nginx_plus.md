@@ -22,7 +22,7 @@ For Sizing guidance for Deploying NGINX Plus, see [Sizing Guide for Deploying NG
 By the end of the lab you will be able to: 
 
  * Install NGINX Plus 
- * Install NGINX Plus Dynamic Module – GeoIP2
+ * Install a NGINX Plus Dynamic Module
  * Verify Installation 
  * Invoke NGINX and common options from from the command line
 
@@ -186,11 +186,35 @@ nginx -s reload
 
 ## Exercise 3: Inspect NGINX Plus modules
 
-1. Select the `nginx.conf` file in the VSCode Explorer section. 
+Now at NGINX Plus is installed, browse to the NGINX configuration root, `/etc/nginx`
 
- * Note the `“# Load Modules”` entry in the main context. 
+1. `File > Open Folder...`
 
-2. In the terminal window run the following commands to see which Dynamic modules are installed: 
+[open folder](media/2020-06-29_15-47.png)
+
+2. Enter `/etc/nginx` in the open folder menu
+
+[browser to NGINX config root](media/2020-06-29_15-49.png)
+
+3. Select the `nginx.conf` file in the VSCode Explorer section. 
+
+4. To enable the 3rd-party GeoIP2 dynamic modules for NGINX Plus that have been installed, add the following to 
+   `/etc/nginx/nginx.conf` and reload nginx: 
+
+```nginx
+    load_module modules/ngx_http_geoip2_module.so; 
+    load_module modules/ngx_stream_geoip2_module.so; 
+```
+
+[load modules](media/2020-06-29_15-51.png)
+
+5. In the terminal window run the following commands to reload nginx:
+
+```bash
+nginx -t && nginx -s reload
+```
+
+6. See which Dynamic modules are installed: 
 
 ```bash
 cd /etc/nginx/modules  

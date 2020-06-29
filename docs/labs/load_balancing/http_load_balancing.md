@@ -22,13 +22,25 @@ By the end of the lab you will be able to:
 
 ## Exercise 1: Inspect the NGINX configuration and rewrite logs
 
-1. Once again, inspect the `nginx.conf` file. Note the following:
+1. In the `WORKSPACE` folder found on the desktop, open `NGINX-PLUS-1.code-workspace` in Visual Studio Code (VSCode)
+
+![Select workspace](media/2020-06-29_15-55.png)
+
+2. In the VSCode, open a a **terminal window**, using `View > Terminal menu` command. You will now be able to both run 
+   NGINX commands and edit NGINX Plus configuration files via the VSCode Console and terminal. (SSH access via Putty is 
+   also available as a SSH remote terminal access option.)
+
+[terminal inside vscode](media/2020-06-29_16-02_1.png)
+
+3. Now inspect the `nginx.conf` file. Note the following:
 
  * `include /etc/nginx/conf.d/*.conf` statement for inclusion of further NGINX Plus configuration files.
  * Note the commented out `# TCP/UDP proxy and load balancing block` This is an example of using the “stream” context 
    for TCP and UDP load balancing. 
-  
-2. Select the `example.com.conf` file in the VSCode Explorer section. Specifically note the following entries in the 
+
+[nginx.conf screenshot](media/2020-06-29_16-02.png)
+
+2. Select the `etc/nginx/conf.d/example.com.conf` file in the VSCode Explorer section. Note the following entries in the 
    server block: 
 
  * `server_name www.example.com “"`, that will match `www.example.com`
@@ -42,6 +54,10 @@ By the end of the lab you will be able to:
 server {
     listen 80 default_server;
     server_name www.example.com "";
+
+    # Server specific logging
+    access_log  /var/log/nginx/www.example.com.log  main_cache; 
+    error_log   /var/log/nginx/www.example.com_error.log notice; 
 
     location / {
         
@@ -79,7 +95,7 @@ tail -f www.example.com_error.log
  b. In the other terminal shell, run the following `curl` command: 
  
 ```bash
-curl http://localhost/old-url 
+curl -I -L http://localhost/old-url
 ```
 
 Note the entry in the `www.example.com_error.log` printed in the first terminal
@@ -96,9 +112,9 @@ upstream nginx_hello {
     least_time header; #header|last_byte 
 
     zone nginx_hello 64k;
-    server web1:80;
-    server web2:80;
-    server web3:80; 
+    server 10.1.1.5:80;
+    server 10.1.1.6:80;
+    server 10.1.1.7:80;
 
     # keep alive connections
     keepalive 32;

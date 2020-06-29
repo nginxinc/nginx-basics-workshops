@@ -27,7 +27,7 @@ log file, this makes troubleshooting easier and log rotation less frequent.
 
     # Server specific logging
     access_log  /var/log/nginx/www.example.com.log  main_cache; 
-    error_log   /var/log/nginx/www.example.com_error.log error; 
+    error_log   /var/log/nginx/www.example.com_error.log notice; 
 ```
 
 2. You can see the custom log format defined as json_ext in `/etc/nginx/includes/log_formats/ext_log_formats.conf`

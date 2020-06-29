@@ -73,14 +73,14 @@ curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
 5.  Lets now add a two servers, `web1:80` and `web2:80` to the `dynamic` upstream group using the API
 
 ```bash
-# Add web1:80:
+# Add web1:80 / 10.1.1.5:80:
 curl -s -X \
 POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
 -H 'Content-Type: text/json; charset=utf-8' \
 -d @- <<'EOF'
 
 {
-  "server": "web1:80",
+  "server": "10.1.1.5:80",
   "weight": 1,
   "max_conns": 0,
   "max_fails": 1,
@@ -92,14 +92,14 @@ POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
 }
 EOF
 
-# Add web2:80:
+# Add web2:80 / 10.1.1.6:80:
 curl -s -X \
 POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
 -H 'Content-Type: text/json; charset=utf-8' \
 -d @- <<'EOF'
 
 {
-  "server": "web2:80",
+  "server": "10.1.1.6:80",
   "weight": 1,
   "max_conns": 0,
   "max_fails": 1,
@@ -115,14 +115,14 @@ EOF
 1.  Lets now mark a server as down, `web3:80` to the `dynamic` upstream group using the API
 
 ```bash
-# Add web3:80:
+# Add web3:80 / 10.1.1.7:80
 curl -s -X \
 POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
 -H 'Content-Type: text/json; charset=utf-8' \
 -d @- <<'EOF'
 
 {
-  "server": "web3:80",
+  "server": "10.1.1.7:80",
   "weight": 1,
   "max_conns": 0,
   "max_fails": 1,
@@ -143,7 +143,7 @@ curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
 [
   {
     "id": 0,
-    "server": "web1:80",
+    "server": "10.1.1.5:80",
     "weight": 1,
     "max_conns": 0,
     "max_fails": 1,
@@ -155,7 +155,7 @@ curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
   },
   {
     "id": 1,
-    "server": "web1:80",
+    "server": "10.1.1.6:80",
     "weight": 1,
     "max_conns": 0,
     "max_fails": 1,
@@ -167,7 +167,7 @@ curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
   },
   {
     "id": 2,
-    "server": "web3:80",
+    "server": "10.1.1.7:80",
     "weight": 1,
     "max_conns": 0,
     "max_fails": 1,
@@ -186,9 +186,9 @@ curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
 ```bash
 cat /var/lib/nginx/state/servers.conf
 
-server web1:80 resolve;
-server web1:80 resolve;
-server web3:80 resolve down;
+server 10.1.1.5:80 resolve;
+server 10.1.1.6:80 resolve;
+server 10.1.1.7:80 resolve down;
 ```
 
 9. It is possible to also remove a server from the upstream group:
@@ -199,7 +199,7 @@ curl -X DELETE -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers/
 [
   {
     "id": 1,
-    "server": "web1:80",
+    "server": "10.1.1.6:80",
     "weight": 1,
     "max_conns": 0,
     "max_fails": 1,
@@ -211,7 +211,7 @@ curl -X DELETE -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers/
   },
   {
     "id": 2,
-    "server": "web3:80",
+    "server": "10.1.1.7:80",
     "weight": 1,
     "max_conns": 0,
     "max_fails": 1,
@@ -225,15 +225,15 @@ curl -X DELETE -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers/
 
 ```
 
-10. To add our down server back to rotation and accept live traffic we need to set `down: true` (Note the correct ID):
+10. To add our down server back to rotation and accept live traffic we need to set `down: false` (Note the correct ID):
 
 ```bash
-# Find the ID of the backup server to '"backup": false', i.e. live
+# Find the ID of the down server i.e '"down": true', i.e. live
 curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq '.[]  | select(.down==true)'
 
 {
   "id": 2,
-  "server": "web3:80",
+  "server": "10.1.1.7:80",
   "weight": 1,
   "max_conns": 0,
   "max_fails": 1,
@@ -247,7 +247,7 @@ curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq '.[] 
 ```
 
 ```bash
-# Set server to '"backup": false', i.e. live
+# Set server to '"down": false', i.e. live
 curl -X PATCH -d '{ "down": false }' -s 'http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers/2'
 ```
 
@@ -263,8 +263,8 @@ curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
 # inspect the state of out state file:
 cat /var/lib/nginx/state/servers.conf
 
-server web1:80 resolve;
-server web3:80 resolve;
+server 10.1.1.6:80 resolve;
+server 10.1.1.7:80 resolve;
 
 # Reload NGINX
 nginx -s reload
