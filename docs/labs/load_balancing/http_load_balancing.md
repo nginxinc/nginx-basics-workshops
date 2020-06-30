@@ -30,7 +30,7 @@ By the end of the lab you will be able to:
    NGINX commands and edit NGINX Plus configuration files via the VSCode Console and terminal. (SSH access via Putty is 
    also available as a SSH remote terminal access option.)
 
-[terminal inside vscode](media/2020-06-29_16-02_1.png)
+![terminal inside vscode](media/2020-06-29_16-02_1.png)
 
 3. Now inspect the `nginx.conf` file. Note the following:
 

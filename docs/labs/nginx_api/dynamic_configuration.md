@@ -28,11 +28,21 @@ By the end of the lab you will be able to:
 
 ## Exercise 1: Dynamic Configuration of an Upstream using the NGINX API
 
-1. Inspect the upstream server group called `dynamic` has been defined in `upstreams.conf`
+1. In the `WORKSPACE` folder found on the desktop, open `NGINX-PLUS-1` in Visual Studio Code (VSCode)
+
+![Select workspace](media/2020-06-29_15-55.png)
+
+2. In the VSCode, open a a **terminal window**, using `View > Terminal menu` command. You will now be able to both run 
+   NGINX commands and edit NGINX Plus configuration files via the VSCode Console and terminal. (SSH access via Putty is 
+   also available as a SSH remote terminal access option.)
+
+![terminal inside vscode](media/2020-06-29_16-02_1.png)
+
+3. Now inspect the `/etc/nginx/conf.d/upstreams.conf` file. Note the following:
 
  * The `zone` directive configures a zone in the shared memory and sets the zone name and size. The configuration of the 
    server group is kept in this zone, so all worker processes use the same configuration. In our example, the `zone` is 
-   also  named `dynamic` and is 64k megabyte in size.
+   also  named `dynamic` and is `64k` megabyte in size.
  * The `state` directive configures Persistence of Dynamic Configuration by writing the state information to a file that 
    persists during a reload. The recommended path for Linux distributions is `/var/lib/nginx/state/`
 
@@ -52,17 +62,27 @@ upstream dynamic {
 }
 ```
 
-2. On the NGINX plus instance, confirm that the state file is at a empty state
+4. In the Terminal window, on the NGINX plus instance, ensure that the `state` file is at a empty state for this demo.
+   Delete the file (if exists), then create an empty file:
 
 ```bash
-cat /var/lib/nginx/state/servers.conf
+rm /var/lib/nginx/state/servers.conf
+rm: cannot remove '/var/lib/nginx/state/servers.conf': No such file or directory
 ```
 
-3. On the NGINX dashboard, the upstream, `dynamic`, should be empty:
+Then run:
+
+```bash
+touch /var/lib/nginx/state/servers.conf
+```
+
+5. In a Web Browser, open the NGINX dashboard on [[http://www/](http://www.example.com:8080/dashboard.htm)](http://www.example.com:8080/dashboard.html).
+   There is a bookmark in the Chrome Web Browser. Navigate to `HTTP Upstreams`, and note that the `dynamic` is empty:
 
 ![nginx plus dashboard showing the empty dynamic upstream](media/2020-06-23_16-26.png)
 
-4. We can also confirm the empty state of our upstream, `dynamic`, using our API
+6. In the Terminal window, we can also confirm the empty state of our upstream, `dynamic`, using our a `curl` command to
+   retrieve this information from the NGINX API
 
 ```bash
 curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
@@ -70,10 +90,10 @@ curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
 []
 ```
 
-5.  Lets now add a two servers, `web1:80` and `web2:80` to the `dynamic` upstream group using the API
+7.  Lets now add a two servers, `web1` (`10.1.1.5:80`) and `web2` (`10.1.1.6:80`) to the `dynamic` upstream group using the API
 
 ```bash
-# Add web1:80 / 10.1.1.5:80:
+# Add web1 - 10.1.1.5:80
 curl -s -X \
 POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
 -H 'Content-Type: text/json; charset=utf-8' \
@@ -92,7 +112,7 @@ POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
 }
 EOF
 
-# Add web2:80 / 10.1.1.6:80:
+# Add web2 - 10.1.1.6:80
 curl -s -X \
 POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
 -H 'Content-Type: text/json; charset=utf-8' \
@@ -112,10 +132,14 @@ POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
 EOF
 ```
 
-1.  Lets now mark a server as down, `web3:80` to the `dynamic` upstream group using the API
+![add web1](media/2020-06-29_21-52.png)
+
+![add web2](media/2020-06-29_21-54.png)
+
+8. Lets now add `web3` (`10.1.1.7:80`), **marked as down**, to the `dynamic` upstream group using the API
 
 ```bash
-# Add web3:80 / 10.1.1.7:80
+# Add web3 - 10.1.1.7:80
 curl -s -X \
 POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
 -H 'Content-Type: text/json; charset=utf-8' \
@@ -135,11 +159,12 @@ POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
 EOF
 ```
 
-7. Once again list out the servers in our upstream, `dynamic`, and view the changes made
+![add web3](media/2020-06-29_21-56.png)
 
-```bash
+9. Once again list out the servers in our upstream, `dynamic`, and view the changes made
+
+```json
 curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
-
 [
   {
     "id": 0,
@@ -174,11 +199,10 @@ curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
     "fail_timeout": "10s",
     "slow_start": "10s",
     "route": "",
-    "backup": false,
+    "backup": true,
     "down": true
   }
 ]
-
 ```
 
 8. We can also confirm that the state file has been updated:
@@ -186,16 +210,17 @@ curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
 ```bash
 cat /var/lib/nginx/state/servers.conf
 
-server 10.1.1.5:80 resolve;
-server 10.1.1.6:80 resolve;
-server 10.1.1.7:80 resolve down;
+cat /var/lib/nginx/state/servers.conf
+
+server 10.1.1.5:80;
+server 10.1.1.6:80;
+server 10.1.1.7:80 slow_start=10s backup down;
 ```
 
 9. It is possible to also remove a server from the upstream group:
 
 ```bash
 curl -X DELETE -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers/0 | jq
-
 [
   {
     "id": 1,
@@ -218,14 +243,16 @@ curl -X DELETE -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers/
     "fail_timeout": "10s",
     "slow_start": "10s",
     "route": "",
-    "backup": false,
+    "backup": true,
     "down": true
   }
 ]
-
 ```
 
-10. To add our down server back to rotation and accept live traffic we need to set `down: false` (Note the correct ID):
+![remove server](media/2020-06-29_21-58.png)
+
+10. To modify our `down` server back to rotation and accept live traffic, we need to change the server parameter from
+    `down: true` to `down: false`. We first must find the server ID:
 
 ```bash
 # Find the ID of the down server i.e '"down": true', i.e. live
@@ -238,37 +265,73 @@ curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq '.[] 
   "max_conns": 0,
   "max_fails": 1,
   "fail_timeout": "10s",
-  "slow_start": "0s",
+  "slow_start": "10s",
   "route": "",
-  "backup": false,
+  "backup": true,
   "down": true
 }
 
 ```
 
+11. Now that we have identified the server id, (e.g. `"id: 2"`) we can modify the `down` parameter:
+
 ```bash
 # Set server to '"down": false', i.e. live
 curl -X PATCH -d '{ "down": false }' -s 'http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers/2'
+
+{"id":2,"server":"10.1.1.7:80","weight":1,"max_conns":0,"max_fails":1,"fail_timeout":"10s","slow_start":"10s","route":"","backup":true,"down":false}
 ```
 
-11.  Once again, list out servers in our upstream, `dynamic`
+12. Once again, list out servers in our upstream, `dynamic`
 
 ```bash
 curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
 ```
 
-12. Lets reload NGINX and check that changes made using the API has persisted
+![server list](media/2020-06-29_22-02.png)
+
+13. We can check the that the `state` file are making our upstream changes persistent by reloading NGINX and checking the
+    dashboard and API
 
 ```bash
 # inspect the state of out state file:
 cat /var/lib/nginx/state/servers.conf
 
-server 10.1.1.6:80 resolve;
-server 10.1.1.7:80 resolve;
+server 10.1.1.6:80;
+server 10.1.1.7:80 slow_start=10s backup;
 
 # Reload NGINX
 nginx -s reload
+```
 
-# Lastly, list out servers in our upstream, `dynamic`
-curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
+**Note:** After a NGINX reload, the server `id` is reset to start at `0`:
+
+```bash
+# Lastly, list out servers in our upstream, `dynamic` 
+curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq[
+  {
+    "id": 0,
+    "server": "10.1.1.6:80",
+    "weight": 1,
+    "max_conns": 0,
+    "max_fails": 1,
+    "fail_timeout": "10s",
+    "slow_start": "0s",
+    "route": "",
+    "backup": false,
+    "down": false
+  },
+  {
+    "id": 1,
+    "server": "10.1.1.7:80",
+    "weight": 1,
+    "max_conns": 0,
+    "max_fails": 1,
+    "fail_timeout": "10s",
+    "slow_start": "10s",
+    "route": "",
+    "backup": true,
+    "down": false
+  }
+]
 ```

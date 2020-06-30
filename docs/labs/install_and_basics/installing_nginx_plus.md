@@ -28,19 +28,27 @@ By the end of the lab you will be able to:
 
 ## Exercise 1: Install NGINX Plus 
 
-1. In the `WORKSPACE` folder found on the desktop, open `NGINX-PLUS-3.code-workspace` in Visual Studio Code (VSCode)
+1. In the `WORKSPACE` folder found on the desktop, open `NGINX-PLUS-3.code-workspace` in Visual      Studio Code (VSCode)
+   
+   If are prompted **Are you sure you want to continue?**, select **continue**
 
-![Select workspace](media/2020-06-26_12-26.png)
+
+![Select workspace](media/2020-06-29_20-56.png)
+
+
+![prompt](media/2020-06-29_20-57.png)
 
 2. In the VSCode, open a a **terminal window**, using `View > Terminal menu` command. You will now be able to both run 
    NGINX commands and edit NGINX Plus configuration files via the VSCode Console and terminal. (SSH access via Putty is 
    also available as a SSH remote terminal access option.)
 
-3. In the terminal run the following commands to install NGINX Plus 
 
-![Open new terminal](media/2020-06-29_15-32.png)
+![Open new terminal](media/2020-06-29_21-01.png)
 
 ![Terminal inside VSCode](media/2020-06-26_12-27.png)
+
+
+3. In the terminal run the following commands to install NGINX Plus 
 
 ```bash
 # Confirm you are root
@@ -60,19 +68,19 @@ apt-get install apt-transport-https lsb-release ca-certificates
 printf "deb https://plus-pkgs.nginx.com/ubuntu `lsb_release -cs` nginx-plus\n" | sudo tee /etc/apt/sources.list.d/nginx-plus.list 
 wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90nginx 
 apt-get update 
-apt-get install nginx-plus 
+apt-get -y install nginx-plus 
 ```
 
-3. Verify the version of NGINX Plus that was installed: 
+4. Verify the version of NGINX Plus that was installed: 
 
 ```bash
 nginx -v 
 ```
 
-4. Install the NGINX Plus GeoIP2 Dynamic Module
+5. Install the NGINX Plus GeoIP2 Dynamic Module
 
 ```bash
-apt-get install nginx-plus-module-geoip2 
+apt-get -y install nginx-plus-module-geoip2 
 
 Reading package lists... Done 
 Building dependency tree        
@@ -124,13 +132,13 @@ Processing triggers for man-db (2.8.3-2ubuntu0.1) ...
 Processing triggers for libc-bin (2.27-3ubuntu1) ... 
 ```
 
-5. Start NGINX Plus
+6. Start NGINX Plus
  
 ```bash
 systemctl start nginx 
 ```
 
-6.  Verify that NGINX Plus has started
+7.  Verify that NGINX Plus has started
 
 ```
 ps -eaf | grep nginx 
@@ -140,20 +148,20 @@ nginx     5534  5532  0 19:35 ?        00:00:00 nginx: worker process
 root      5541  4062  0 19:35 pts/1    00:00:00 grep --color=auto nginx 
 ```
 
-7. Test the NGINX Plus instance in your browser. Open **Google Chrome** from your Desktop and enter the following URL, 
-   [http://nginx-plus-3](http://nginx-plus-3)
+8. Test the NGINX Plus instance in your browser. Open **Google Chrome** from your Desktop and enter the following URL, 
+   [http://nginx-plus-3](http://nginx-plus-3). You should see the NGINX default page:
 
 ![NGINX default page](media/2020-06-26_12-33.png)
 
 
 ## Exercise 2: NGINX Plus command line basics
 
-In this exercise, you will review configure NGINX Plus as a basic load balancer and test/verify configured functionality.   
+In this exercise, we will review configure NGINX Plus as a basic load balancer and test/verify configured functionality.   
 
 1. If you have closed VSCode, once again, open `NGINX-PLUS-3code-workspace` found in the he `WORKSPACE` folder, on the desktop,
    in VSCode
 
-![Select workspace](media/2020-06-26_12-26.png)
+![Select workspace](media/2020-06-29_20-56.png)
 
 ![VCCode](media/2020-06-26_12-27.png)
 
@@ -190,29 +198,34 @@ Now at NGINX Plus is installed, browse to the NGINX configuration root, `/etc/ng
 
 1. `File > Open Folder...`
 
-[open folder](media/2020-06-29_15-47.png)
+![open folder](media/2020-06-29_15-47.png)
 
 2. Enter `/etc/nginx` in the open folder menu
 
-[browser to NGINX config root](media/2020-06-29_15-49.png)
+![open /etc/nginx](media/2020-06-29_21-07.png)
 
 3. Select the `nginx.conf` file in the VSCode Explorer section. 
 
-4. To enable the 3rd-party GeoIP2 dynamic modules for NGINX Plus that have been installed, add the following to 
-   `/etc/nginx/nginx.conf` and reload nginx: 
+4. To enable the 3rd-party GeoIP2 dynamic modules for NGINX Plus that have been installed, add the following lines to 
+   `/etc/nginx/nginx.conf` in the **main context** and **reload nginx**: 
 
 ```nginx
-    load_module modules/ngx_http_geoip2_module.so; 
-    load_module modules/ngx_stream_geoip2_module.so; 
+# load modules
+load_module modules/ngx_http_geoip2_module.so; 
+load_module modules/ngx_stream_geoip2_module.so;
 ```
 
-[load modules](media/2020-06-29_15-51.png)
+For example it may look like this:
 
-5. In the terminal window run the following commands to reload nginx:
+![load modules](media/2020-06-29_21-11.png)
+
+5. In the terminal window using `View > Terminal menu` command, and in the terminal, run the following commands to reload nginx:
 
 ```bash
 nginx -t && nginx -s reload
 ```
+
+![reload nginx](media/2020-06-29_21-13.png)
 
 6. See which Dynamic modules are installed: 
 
