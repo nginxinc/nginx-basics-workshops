@@ -32,7 +32,7 @@ By the end of the lab you will be able to:
 
 ![terminal inside vscode](media/2020-06-29_16-02_1.png)
 
-3. Now inspect the `nginx.conf` file. Note the following:
+3. Now inspect `/etc/nginx/nginx.conf`. Note the following:
 
  * `include /etc/nginx/conf.d/*.conf` statement for inclusion of further NGINX Plus configuration files.
  * Note the commented out `# TCP/UDP proxy and load balancing block` This is an example of using the “stream” context 
@@ -40,7 +40,7 @@ By the end of the lab you will be able to:
 
 [nginx.conf screenshot](media/2020-06-29_16-02.png)
 
-2. Select the `etc/nginx/conf.d/example.com.conf` file in the VSCode Explorer section. Note the following entries in the 
+4. Select the `etc/nginx/conf.d/example.com.conf` file in the VSCode Explorer section. Note the following entries in the 
    server block: 
 
  * `server_name www.example.com “"`, that will match `www.example.com`
