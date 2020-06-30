@@ -73,7 +73,7 @@ By the end of the lab you will be able to:
    nginx -v 
    ```
 
-   5. Install the NGINX Plus GeoIP2 Dynamic Module
+5. Install the NGINX Plus GeoIP2 Dynamic Module
 
    ```bash
    apt-get -y install nginx-plus-module-geoip2 
@@ -128,15 +128,15 @@ By the end of the lab you will be able to:
    Processing triggers for libc-bin (2.27-3ubuntu1) ... 
    ```
 
-   6. Start NGINX Plus
+6. Start NGINX Plus
    
    ```bash
    systemctl start nginx 
    ```
 
-   7.  Verify that NGINX Plus has started
+7.  Verify that NGINX Plus has started
 
-   ```
+   ```bash
    ps -eaf | grep nginx 
 
    root      5532     1  0 19:35 ?        00:00:00 nginx: master process /usr/sbin/nginx -c /etc/nginx/nginx.conf 
@@ -144,8 +144,8 @@ By the end of the lab you will be able to:
    root      5541  4062  0 19:35 pts/1    00:00:00 grep --color=auto nginx 
    ```
 
-   8. Test the NGINX Plus instance in your browser. Open **Google Chrome** from your Desktop and enter the following URL, 
-      [http://nginx-plus-3](http://nginx-plus-3). You should see the NGINX default page:
+8. Test the NGINX Plus instance in your browser. Open **Google Chrome** from your Desktop and enter the following URL, 
+   [http://nginx-plus-3](http://nginx-plus-3). You should see the NGINX default page:
 
    ![NGINX default page](media/2020-06-26_12-33.png)
 

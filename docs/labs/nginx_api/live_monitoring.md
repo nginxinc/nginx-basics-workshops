@@ -36,40 +36,39 @@ points, at specific API endpoints, and Parse JSON data using `jq` and `curl` fro
 2. In the Terminal Window, using `curl` and `jq` for JSON formatting, make a request to the API endpoint, `/api/api-version/nginx/`
    to retrieve basic version, uptime, and identification information​
 
-  ```json
-  curl -s https://demo.nginx.com/api/6/nginx/ | jq
+    ```bash
+    curl -s https://demo.nginx.com/api/6/nginx/ | jq
 
-  {
-    "version": "1.19.0",
-    "build": "nginx-plus-r22",
-    "address": "206.251.255.64",
-    "generation": 55,
-    "load_timestamp": "2020-06-30T03:00:00.120Z",
-    "timestamp": "2020-06-30T04:09:57.399Z",
-    "pid": 24706,
-    "ppid": 61031
-  }
-
-  ```
+    {
+      "version": "1.19.0",
+      "build": "nginx-plus-r22",
+      "address": "206.251.255.64",
+      "generation": 55,
+      "load_timestamp": "2020-06-30T03:00:00.120Z",
+      "timestamp": "2020-06-30T04:09:57.399Z",
+      "pid": 24706,
+      "ppid": 61031
+    }
+    ```
 
 3. Using `curl` and `jq`, make a request to the API endpoint, `/api/api-version/connections/` to retrieve total active 
    and idle connections​
 
-  ```json
-  curl -s https://demo.nginx.com/api/6/connections/ | jq
+    ```bash
+    curl -s https://demo.nginx.com/api/6/connections/ | jq
 
-  {
-    "accepted": 32284461,
-    "dropped": 0,
-    "active": 1,
-    "idle": 55
-  }
-  ```
+    {
+      "accepted": 32284461,
+      "dropped": 0,
+      "active": 1,
+      "idle": 55
+    }
+    ```
 
 4. Using `curl` and `jq`, make a request to the API endpoint, `/api/api-version/http/server_zones/` to retrieve request 
    and response counts for each HTTP status zone​
 
-  ```json
+  ```bash
   curl -s https://demo.nginx.com/api/6/http/server_zones/ | jq
 
   {
@@ -219,7 +218,6 @@ points, at specific API endpoints, and Parse JSON data using `jq` and `curl` fro
           "connections": 9250,       
           
           # Trimmed..
-
   ```
 
 7. Using `curl` and `jq`, make a request to the API endpoint, `/api/api-version/ssl/` to retrieve SSL/TLS statistics

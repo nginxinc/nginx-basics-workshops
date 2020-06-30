@@ -87,7 +87,7 @@ log file, this makes troubleshooting easier and log rotation less frequent.
    VSCode by selecting the **split terminal** icon on the right and run a `curl` command:
 
    ```bash 
-      `curl http://www.example.com`
+   curl http://www.example.com
    ```
 
    ![curl inside terminal](media/2020-06-29_21-29.png)
@@ -112,18 +112,17 @@ log file, this makes troubleshooting easier and log rotation less frequent.
 1. Inspect the `/etc/nginx/conf.d/www2.example.com.conf` file. Note the specific `access_log` and `error_log ` definitions
    in the server block. Access and Error logs are written into their own files:
 
-
    ```nginx
    # /etc/nginx/conf.d/www2.example.com.conf 
 
-      # Server specific logging
-      access_log  /var/log/nginx/www2.example.com.log  json_ext; 
-      error_log   /var/log/nginx/www2.example.com_error.log error; 
+   # Server specific logging
+   access_log  /var/log/nginx/www2.example.com.log  json_ext; 
+   error_log   /var/log/nginx/www2.example.com_error.log error; 
    ```
 
 2. You can see the custom log format defined as `json_ext` in `/etc/nginx/includes/log_formats/json_log_formats.conf`
 
-   ```json
+   ```nginx
    log_format json_ext escape=json
    '{'
          '"proxy_protocol_addr": "$proxy_protocol_addr",'
@@ -163,7 +162,7 @@ log file, this makes troubleshooting easier and log rotation less frequent.
    curl -k https://www2.example.com
    ```
 
-   **We are using a self-signed certificate and you may safely ignore the security error for this website**
+   **Note:** We are using a self-signed certificate and you may safely ignore the security error for this website
 
    ![web browser www2.example.com](media/2020-06-29_21-36.png)
 
@@ -178,7 +177,7 @@ log file, this makes troubleshooting easier and log rotation less frequent.
 6. Alternatively we can `tail` and pipe the log output into `jq` for fancy JSON formating. In the Terminal window, Exit 
    the current `tail` command with a `Ctrl+C` and run another `tail` command:
 
-   ```json
+   ```bash
    # Or piping into jq for fancy JSON formating 
    tail -f /var/log/nginx/www2.example.com.log | jq '.'
    {

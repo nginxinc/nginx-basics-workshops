@@ -38,7 +38,7 @@ By the end of the lab you will be able to:
     * Note the commented out `# TCP/UDP proxy and load balancing block` This is an example of using the “stream” context 
       for TCP and UDP load balancing. 
 
-[nginx.conf screenshot](media/2020-06-29_16-02.png)
+   ![nginx.conf screenshot](media/2020-06-29_16-02.png)
 
 4. Select the `etc/nginx/conf.d/example.com.conf` file in the VSCode Explorer section. Note the following entries in the 
    server block: 
