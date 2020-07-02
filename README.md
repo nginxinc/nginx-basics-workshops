@@ -21,7 +21,7 @@ Details of the containers:
  * **NGINX OSS** `(Latest)` is based on [**nginx-hello**](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello). 
    NGINX webservers that serves a simple pages containing its hostname, IP address and port as wells as the request URI 
    and the local time of the webserver.
- * **Lab Guide** can be read from the [`docs/labs` folder](docs/labs/README.md) or in a web browser on [port 9000](http://localhost:9000). 
+ * **Lab Guide** can be read from the [`docs/labs` folder](docs/labs/README.md) or in a web browser on [http://localhost:9000](http://localhost:9000). 
 
 **Note:**[NGINX Plus Documentation](https://docs.nginx.com/nginx/), [resources](https://www.nginx.com/resources/) 
 and [blog](https://www.nginx.com/blog/) are your best source of information for addtional technical information. There 
@@ -194,10 +194,11 @@ docker-compose up --force-recreate
 ```bash
 docker ps
 CONTAINER ID        IMAGE                     COMMAND                  CREATED             STATUS              PORTS                                                              NAMES
-628c0023a2f1        nginx-basics_nginx-plus   "nginx -g 'daemon of…"   3 hours ago         Up 3 hours          0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:8080->8080/tcp   nginx-basics_nginx-plus_1
-1098430ff17e        nginx-basics_web1         "/docker-entrypoint.…"   3 hours ago         Up 3 hours          80/tcp                                                             nginx-basics_web1_1
-d93186c51110        nginx-basics_web2         "/docker-entrypoint.…"   3 hours ago         Up 3 hours          0.0.0.0:1052->80/tcp                                               nginx-basics_web2_1
-0543c12c0613        nginx-basics_web3         "/docker-entrypoint.…"   3 hours ago         Up 3 hours          0.0.0.0:1053->80/tcp                                               nginx-basics_web3_
+791ccac223ac        nginx-basics_nginx-plus   "nginx -g 'daemon of…"   5 seconds ago       Up 4 seconds        0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:8080->8080/tcp   nginx-basics_nginx-plus_1
+eacbc5630b4b        nginx-basics_docs         "/docker-entrypoint.…"   6 seconds ago       Up 5 seconds        80/tcp, 0.0.0.0:9000->9000/tcp                                     nginx-basics_docs_1
+9ae4b20dd15e        nginx-basics_web1         "/docker-entrypoint.…"   6 seconds ago       Up 5 seconds        80/tcp, 90/tcp                                                     nginx-basics_web1_1
+8de6c4e7b672        nginx-basics_web2         "/docker-entrypoint.…"   6 seconds ago       Up 5 seconds        0.0.0.0:1119->80/tcp, 0.0.0.0:1118->90/tcp                         nginx-basics_web2_1
+0a31be1a3f13        nginx-basics_web3         "/docker-entrypoint.…"   6 seconds ago       Up 5 seconds        0.0.0.0:1121->80/tcp, 0.0.0.0:1120->90/tcp                         nginx-basics_web3_1
 ```
 
 The demo environment is ready in seconds. You can access the `nginx-hello` demo website on **HTTP / Port 80** 
@@ -206,6 +207,7 @@ The demo environment is ready in seconds. You can access the `nginx-hello` demo 
 
 The NGINX API is available on **HTTP / Port 8080** ([`http://localhost:8080`](http://localhost)) or [http://www.example.com:8080](http://example.com:8080))
 
+The lab guide is available on [http://localhost:9000](http://localhost:9000). 
 
 #### Upload to UDF
 

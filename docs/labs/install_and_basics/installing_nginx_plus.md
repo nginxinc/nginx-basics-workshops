@@ -75,58 +75,58 @@ By the end of the lab you will be able to:
 
 5. Install the NGINX Plus GeoIP2 Dynamic Module
 
-   ```bash
-   apt-get -y install nginx-plus-module-geoip2 
+      ```bash
+      apt-get -y install nginx-plus-module-geoip2 
 
-   Reading package lists... Done 
-   Building dependency tree        
-   Reading state information... Done 
+      Reading package lists... Done 
+      Building dependency tree        
+      Reading state information... Done 
 
-   The following additional packages will be installed: 
+      The following additional packages will be installed: 
 
-   libmaxminddb0 
+      libmaxminddb0 
 
-   Suggested packages: 
+      Suggested packages: 
 
-   mmdb-bin 
+      mmdb-bin 
 
-   The following NEW packages will be installed: 
+      The following NEW packages will be installed: 
 
-   libmaxminddb0 nginx-plus-module-geoip2 
+      libmaxminddb0 nginx-plus-module-geoip2 
 
-   0 upgraded, 2 newly installed, 0 to remove and 9 not upgraded. 
-   Need to get 37.6 kB of archives. 
-   After this operation, 138 kB of additional disk space will be used. 
-   Do you want to continue? [Y/n] Y 
-   Get:1 http://us-west-2.ec2.archive.ubuntu.com/ubuntu bionic/universe amd64 libmaxminddb0 amd64 1.3.1-1 [25.6 kB] 
-   Get:2 https://plus-pkgs.nginx.com/ubuntu bionic/nginx-plus amd64 nginx-plus-module-geoip2 amd64 22+3.3-1~bionic [12.0 kB] 
-   Fetched 37.6 kB in 1s (54.7 kB/s)                      
-   Selecting previously unselected package libmaxminddb0:amd64. 
-   (Reading database ... 56711 files and directories currently installed.) 
-   Preparing to unpack .../libmaxminddb0_1.3.1-1_amd64.deb ... 
-   Unpacking libmaxminddb0:amd64 (1.3.1-1) ... 
-   Selecting previously unselected package nginx-plus-module-geoip2. 
-   Preparing to unpack .../nginx-plus-module-geoip2_22+3.3-1~bionic_amd64.deb ... 
-   Unpacking nginx-plus-module-geoip2 (22+3.3-1~bionic) ... 
-   Setting up libmaxminddb0:amd64 (1.3.1-1) ... 
-   Setting up nginx-plus-module-geoip2 (22+3.3-1~bionic) ... 
+      0 upgraded, 2 newly installed, 0 to remove and 9 not upgraded. 
+      Need to get 37.6 kB of archives. 
+      After this operation, 138 kB of additional disk space will be used. 
+      Do you want to continue? [Y/n] Y 
+      Get:1 http://us-west-2.ec2.archive.ubuntu.com/ubuntu bionic/universe amd64 libmaxminddb0 amd64 1.3.1-1 [25.6 kB] 
+      Get:2 https://plus-pkgs.nginx.com/ubuntu bionic/nginx-plus amd64 nginx-plus-module-geoip2 amd64 22+3.3-1~bionic [12.0 kB] 
+      Fetched 37.6 kB in 1s (54.7 kB/s)                      
+      Selecting previously unselected package libmaxminddb0:amd64. 
+      (Reading database ... 56711 files and directories currently installed.) 
+      Preparing to unpack .../libmaxminddb0_1.3.1-1_amd64.deb ... 
+      Unpacking libmaxminddb0:amd64 (1.3.1-1) ... 
+      Selecting previously unselected package nginx-plus-module-geoip2. 
+      Preparing to unpack .../nginx-plus-module-geoip2_22+3.3-1~bionic_amd64.deb ... 
+      Unpacking nginx-plus-module-geoip2 (22+3.3-1~bionic) ... 
+      Setting up libmaxminddb0:amd64 (1.3.1-1) ... 
+      Setting up nginx-plus-module-geoip2 (22+3.3-1~bionic) 
+      ```
+   Notice in the end of the output the instructions to enabling the module via the NGINX config.
+   We will do this later:
+   
+      ```bash
+      The 3rd-party GeoIP2 dynamic modules for NGINX Plus have been installed. 
+      To enable these modules, add the following to /etc/nginx/nginx.conf 
+      and reload nginx: 
 
-   ---------------------------------------------------------------------- 
+         load_module modules/ngx_http_geoip2_module.so; 
+         load_module modules/ngx_stream_geoip2_module.so; 
 
-   The 3rd-party GeoIP2 dynamic modules for NGINX Plus have been installed. 
-   To enable these modules, add the following to /etc/nginx/nginx.conf 
-   and reload nginx: 
-
-      load_module modules/ngx_http_geoip2_module.so; 
-      load_module modules/ngx_stream_geoip2_module.so; 
-
-   Please refer to the module documentation for further details: 
-   https://github.com/leev/ngx_http_geoip2_module 
-
-   ---------------------------------------------------------------------- 
-   Processing triggers for man-db (2.8.3-2ubuntu0.1) ... 
-   Processing triggers for libc-bin (2.27-3ubuntu1) ... 
-   ```
+      Please refer to the module documentation for further details: 
+      https://github.com/leev/ngx_http_geoip2_module 
+      Processing triggers for man-db (2.8.3-2ubuntu0.1) ... 
+      Processing triggers for libc-bin (2.27-3ubuntu1) ... 
+      ```
 
 6. Start NGINX Plus
    

@@ -36,7 +36,7 @@ By the end of the lab you will be able to:
    NGINX commands and edit NGINX Plus configuration files via the VSCode Console and terminal. (SSH access via Putty is 
    also available as a SSH remote terminal access option.)
 
-  ![terminal inside vscode](media/2020-06-29_16-02_1.png)
+    ![terminal inside vscode](media/2020-06-29_16-02_1.png)
 
 3. Now inspect the `/etc/nginx/conf.d/upstreams.conf` file. Note the following:
 
@@ -46,20 +46,19 @@ By the end of the lab you will be able to:
     * The `state` directive configures Persistence of Dynamic Configuration by writing the state information to a file that 
       persists during a reload. The recommended path for Linux distributions is `/var/lib/nginx/state/`
 
+      ```nginx
+      # /etc/nginx/conf.d/upstream.conf 
 
-    ```nginx
-    # /etc/nginx/conf.d/upstream.conf 
+      upstream dynamic {
+          # Specify a file that keeps the state of the dynamically configurable group:
+          state /var/lib/nginx/state/servers.conf;
 
-    upstream dynamic {
-        # Specify a file that keeps the state of the dynamically configurable group:
-        state /var/lib/nginx/state/servers.conf;
+          zone dynamic 64k;
 
-        zone dynamic 64k;
-
-        # Including keep alive connections are bonus points
-        keepalive 32;
-    }
-    ```
+          # Including keep alive connections are bonus points
+          keepalive 32;
+      }
+      ```
 
 4. In the Terminal window, on the NGINX plus instance, ensure that the `state` file is at a empty state for this demo.
    Delete the file (if exists), then create an empty file:
@@ -96,9 +95,7 @@ By the end of the lab you will be able to:
     curl -s -X \
     POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
     -H 'Content-Type: text/json; charset=utf-8' \
-    -d @- <<'EOF'
-
-    {
+    -d '{
       "server": "10.1.1.5:80",
       "weight": 1,
       "max_conns": 0,
@@ -108,16 +105,13 @@ By the end of the lab you will be able to:
       "route": "",
       "backup": false,
       "down": false
-    }
-    EOF
+    }'
 
     # Add web2 - 10.1.1.6:80
     curl -s -X \
     POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
     -H 'Content-Type: text/json; charset=utf-8' \
-    -d @- <<'EOF'
-
-    {
+    -d '{
       "server": "10.1.1.6:80",
       "weight": 1,
       "max_conns": 0,
@@ -127,8 +121,7 @@ By the end of the lab you will be able to:
       "route": "",
       "backup": false,
       "down": false
-    }
-    EOF
+    }'
     ```
 
     ![add web1](media/2020-06-29_21-52.png)
@@ -142,9 +135,7 @@ By the end of the lab you will be able to:
     curl -s -X \
     POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
     -H 'Content-Type: text/json; charset=utf-8' \
-    -d @- <<'EOF'
-
-    {
+    -d '{
       "server": "10.1.1.7:80",
       "weight": 1,
       "max_conns": 0,
@@ -154,8 +145,7 @@ By the end of the lab you will be able to:
       "route": "",
       "backup": true,
       "down": true
-    }
-    EOF
+    }'
     ```                   
 
     ![add web3](media/2020-06-29_21-56.png)
@@ -307,7 +297,8 @@ By the end of the lab you will be able to:
 
     ```bash
     # Lastly, list out servers in our upstream, `dynamic` 
-    curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq[
+    curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
+    
       {
         "id": 0,
         "server": "10.1.1.6:80",

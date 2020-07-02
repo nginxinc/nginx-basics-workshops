@@ -171,54 +171,53 @@ points, at specific API endpoints, and Parse JSON data using `jq` and `curl` fro
 
   ```
 
-6. Using `curl` and `jq`, make a request to the API endpoint, `/api/api-version/stream/upstreams/` to retrieve request 
+6. Using `curl` and `jq`, make a request to the API endpoint, `/api/api-version/stream/upstreams/` to retrieve request
    and response counts, response time, health‑check status, and uptime statistics per server in each TCP/UDP upstream group
 
-  ```bash
-  curl -s https://demo.nginx.com/api/6/stream/upstreams/ | jq
+    ```bash
+    curl -s https://demo.nginx.com/api/6/stream/upstreams/ | jq
 
-
-  {                                                                                                                                                           
-    "postgresql_backends": {                                                                                                                                  
-      "peers": [                                                                                                                                              
-        {                                                                                                                                                     
-          "id": 0,                                                                                                                                            
-          "server": "10.0.0.2:15432",                                                                                                                         
-          "name": "10.0.0.2:15432",                                                                                                                           
-          "backup": false,                                                                                                                                    
-          "weight": 1,                                                                                                                                        
-          "state": "up",                                                                                                                                      
-          "active": 0,                                                                                                                                        
-          "max_conns": 42,                                                                                                                                    
-          "connections": 9250,                                                                                                                                
-          "connect_time": 1,                                                                                                                                  
-          "first_byte_time": 1,                                                                                                                               
-          "response_time": 1,                                                                                                                                 
-          "sent": 952750,                                                                                                                                     
-          "received": 1850000,                                                                                                                                
-          "fails": 0,                                                                                                                                         
-          "unavail": 0,                                                                                                                                       
-          "health_checks": {                                                                                                                                  
-            "checks": 5564,                                                                                                                                   
-            "fails": 0,                                                                                                                                       
-            "unhealthy": 0,                                                                                                                                   
-            "last_passed": true                                                                                                                               
-          },                                                                                                                                                  
-          "downtime": 0,                                                                                                                                      
-          "selected": "2020-06-23T17:43:55Z"                                                                                                                  
-        },                                                                                                                                                    
-        {                                                                                                                                                     
-          "id": 1,                                                                                                                                            
-          "server": "10.0.0.2:15433",                                                                                                                         
-          "name": "10.0.0.2:15433",                                                                                                                           
-          "backup": false,                                                                                                                                    
-          "weight": 1,                                                                                                                                        
-          "state": "up",                                                                                                                                      
-          "active": 0,                                                                                                                                        
-          "connections": 9250,       
-          
-          # Trimmed..
-  ```
+    {                                                                                                                                                           
+      "postgresql_backends": {                                                                                                                                  
+        "peers": [                                                                                                                                              
+          {                                                                                                                                                     
+            "id": 0,                                                                                                                                            
+            "server": "10.0.0.2:15432",                                                                                                                         
+            "name": "10.0.0.2:15432",                                                                                                                           
+            "backup": false,                                                                                                                                    
+            "weight": 1,                                                                                                                                        
+            "state": "up",                                                                                                                                      
+            "active": 0,                                                                                                                                        
+            "max_conns": 42,                                                                                                                                    
+            "connections": 9250,                                                                                                                                
+            "connect_time": 1,                                                                                                                                  
+            "first_byte_time": 1,                                                                                                                               
+            "response_time": 1,                                                                                                                                 
+            "sent": 952750,                                                                                                                                     
+            "received": 1850000,                                                                                                                                
+            "fails": 0,                                                                                                                                         
+            "unavail": 0,                                                                                                                                       
+            "health_checks": {                                                                                                                                  
+              "checks": 5564,                                                                                                                                   
+              "fails": 0,                                                                                                                                       
+              "unhealthy": 0,                                                                                                                                   
+              "last_passed": true                                                                                                                               
+            },                                                                                                                                                  
+            "downtime": 0,                                                                                                                                      
+            "selected": "2020-06-23T17:43:55Z"                                                                                                                  
+          },                                                                                                                                                    
+          {                                                                                                                                                     
+            "id": 1,                                                                                                                                            
+            "server": "10.0.0.2:15433",                                                                                                                         
+            "name": "10.0.0.2:15433",                                                                                                                           
+            "backup": false,                                                                                                                                    
+            "weight": 1,                                                                                                                                        
+            "state": "up",                                                                                                                                      
+            "active": 0,                                                                                                                                        
+            "connections": 9250,       
+            
+            # Trimmed..
+    ```
 
 7. Using `curl` and `jq`, make a request to the API endpoint, `/api/api-version/ssl/` to retrieve SSL/TLS statistics
 
