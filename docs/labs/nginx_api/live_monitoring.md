@@ -37,7 +37,7 @@ points, at specific API endpoints, and Parse JSON data using `jq` and `curl` fro
    to retrieve basic version, uptime, and identification information​
 
     ```bash
-    curl -s https://demo.nginx.com/api/6/nginx/ | jq
+    $> curl -s https://demo.nginx.com/api/6/nginx/ | jq
 
     {
       "version": "1.19.0",
@@ -55,7 +55,7 @@ points, at specific API endpoints, and Parse JSON data using `jq` and `curl` fro
    and idle connections​
 
     ```bash
-    curl -s https://demo.nginx.com/api/6/connections/ | jq
+    $> curl -s https://demo.nginx.com/api/6/connections/ | jq
 
     {
       "accepted": 32284461,
@@ -69,7 +69,7 @@ points, at specific API endpoints, and Parse JSON data using `jq` and `curl` fro
    and response counts for each HTTP status zone​
 
   ```bash
-  curl -s https://demo.nginx.com/api/6/http/server_zones/ | jq
+  $> curl -s https://demo.nginx.com/api/6/http/server_zones/ | jq
 
   {
     "hg.nginx.org": {
@@ -125,7 +125,7 @@ points, at specific API endpoints, and Parse JSON data using `jq` and `curl` fro
   for each named cache zone
 
   ```bash
-  curl -s https://demo.nginx.com/api/6/http/caches/ | jq
+  $> curl -s https://demo.nginx.com/api/6/http/caches/ | jq
 
   {
     "http_cache": {
@@ -175,7 +175,7 @@ points, at specific API endpoints, and Parse JSON data using `jq` and `curl` fro
    and response counts, response time, health‑check status, and uptime statistics per server in each TCP/UDP upstream group
 
     ```bash
-    curl -s https://demo.nginx.com/api/6/stream/upstreams/ | jq
+    $> curl -s https://demo.nginx.com/api/6/stream/upstreams/ | jq
 
     {                                                                                                                                                           
       "postgresql_backends": {                                                                                                                                  
@@ -222,7 +222,7 @@ points, at specific API endpoints, and Parse JSON data using `jq` and `curl` fro
 7. Using `curl` and `jq`, make a request to the API endpoint, `/api/api-version/ssl/` to retrieve SSL/TLS statistics
 
   ```bash
-  curl -s https://demo.nginx.com/api/6/ssl/ | jq
+  $> curl -s https://demo.nginx.com/api/6/ssl/ | jq
 
   {
     "handshakes": 784975,

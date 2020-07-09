@@ -80,14 +80,14 @@ log file, this makes troubleshooting easier and log rotation less frequent.
 6. On the terminal, on the NGINX Plus server, use `tail` to output the access logs for`www.example.com` as they are written:
 
    ```bash
-   tail -f /var/log/nginx/www.example.com.log
+   $> tail -f /var/log/nginx/www.example.com.log
    ```
 
 7. Run some traffic to [`http://www.example.com`](http://www.example.com) From a web browser, open another Terminal in 
    VSCode by selecting the **split terminal** icon on the right and run a `curl` command:
 
    ```bash 
-   curl http://www.example.com
+   $> curl http://www.example.com
    ```
 
    ![curl inside terminal](media/2020-06-29_21-29.png)
@@ -95,7 +95,7 @@ log file, this makes troubleshooting easier and log rotation less frequent.
 8. We now can see our custom access log written to file
 
    ```bash
-   tail -f /var/log/nginx/www.example.com.log
+   $> tail -f /var/log/nginx/www.example.com.log
 
    remote_addr="127.0.0.1", [time_local=30/Jun/2020:03:28:55 +0000], request="GET / HTTP/1.1", status="200", http_referer="-", body_bytes_sent="7221", gzip_ratio="-", http_user_agent="curl/7.58.0", http_x_forwarded_for="-", Host="www.example.com", sn="www.example.com", request_time=0.001, request_length="79", upstream_address="10.1.1.5:80", upstream_status="200", upstream_connect_time="0.000", upstream_header_time="0.000", upstream_response_time="0.000", upstream_response_length="7221", upstream_cache_status="MISS", http_range="-", slice_range="-" 
    ```
@@ -152,14 +152,14 @@ log file, this makes troubleshooting easier and log rotation less frequent.
    are written:
 
    ```bash
-   tail -f /var/log/nginx/www2.example.com.log
+   $> tail -f /var/log/nginx/www2.example.com.log
    ```
 
 4. Run some traffic to [`https://www2.example.com`](http://www.example.com) From a web browser, open another Terminal in 
    VSCode by selecting the **split terminal** icon on the right and run a `curl` command:
 
    ```bash 
-   curl -k https://www2.example.com
+   $> curl -k https://www2.example.com
    ```
 
    **Note:** We are using a self-signed certificate and you may safely ignore the security error for this website
@@ -169,7 +169,7 @@ log file, this makes troubleshooting easier and log rotation less frequent.
 5. In the Terminal window, We now can see our custom access log written to file
 
    ```bash
-   tail -f /var/log/nginx/www2.example.com.log
+   $> tail -f /var/log/nginx/www2.example.com.log
 
    {"proxy_protocol_addr": "","remote_user": "","remote_addr": "10.1.1.9","time_local": "30/Jun/2020:03:38:20 +0000","request" : "GET / HTTP/1.1","status": "200","body_bytes_sent": "7221","http_referer": "","http_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36","http_x_forwarded_for": "","proxy_add_x_forwarded_for": "10.1.1.9","host": "host","server_name": "www2.example.com","request_length" : "548","request_time" : "0.001","proxy_host": "nginx_hello","upstream_addr": "10.1.1.6:80","upstream_response_length": "7221","upstream_response_time": "0.000","upstream_status": "200"}
    ```
@@ -179,7 +179,7 @@ log file, this makes troubleshooting easier and log rotation less frequent.
 
    ```bash
    # Or piping into jq for fancy JSON formating 
-   tail -f /var/log/nginx/www2.example.com.log | jq '.'
+   $> tail -f /var/log/nginx/www2.example.com.log | jq '.'
    {
    "proxy_protocol_addr": "",
    "remote_user": "",

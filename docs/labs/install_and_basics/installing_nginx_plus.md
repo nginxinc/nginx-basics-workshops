@@ -48,35 +48,36 @@ By the end of the lab you will be able to:
 
    ```bash
    # Confirm you are root
-   whoami
+   $> whoami
    root
 
    # Move to the /root directory and check nginx-repo cert and key are here
-   cd /root 
-   ls
+   $> cd /root 
+   $> ls
    nginx-repo.crt  nginx-repo.key
 
    # Run installation commands
-   mkdir -p /etc/ssl/nginx 
-   cp nginx-repo.* /etc/ssl/nginx 
-   wget http://nginx.org/keys/nginx_signing.key && sudo apt-key add nginx_signing.key 
-   apt-get install apt-transport-https lsb-release ca-certificates 
-   printf "deb https://plus-pkgs.nginx.com/ubuntu `lsb_release -cs` nginx-plus\n" | sudo tee /etc/apt/sources.list.d/nginx-plus.list 
-   wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90nginx 
-   apt-get update 
-   apt-get -y install nginx-plus 
+   $> mkdir -p /etc/ssl/nginx 
+   $> cp nginx-repo.* /etc/ssl/nginx 
+   $> wget http://nginx.org/keys/nginx_signing.key && sudo apt-key add nginx_signing.key 
+   $> apt-get install apt-transport-https lsb-release ca-certificates 
+   $> printf "deb https://plus-pkgs.nginx.com/ubuntu `lsb_release -cs` nginx-plus\n" | sudo tee /etc/apt/sources.list.d/nginx-plus.list 
+   $> wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90nginx 
+   $> apt-get update 
+   $> apt-get -y install nginx-plus 
    ```
 
 4. Verify the version of NGINX Plus that was installed: 
 
    ```bash
-   nginx -v 
+   $> nginx -v 
+   nginx version: nginx/1.19.0 (nginx-plus-r22)
    ```
 
 5. Install the NGINX Plus GeoIP2 Dynamic Module
 
       ```bash
-      apt-get -y install nginx-plus-module-geoip2 
+     $> apt-get -y install nginx-plus-module-geoip2 
 
       Reading package lists... Done 
       Building dependency tree        
@@ -111,7 +112,7 @@ By the end of the lab you will be able to:
       Setting up libmaxminddb0:amd64 (1.3.1-1) ... 
       Setting up nginx-plus-module-geoip2 (22+3.3-1~bionic) 
       ```
-   Notice in the end of the output the instructions to enabling the module via the NGINX config.
+   Notice in the end of the output the instructions to enable the module via the NGINX config.
    We will do this later:
    
       ```bash
@@ -131,13 +132,13 @@ By the end of the lab you will be able to:
 6. Start NGINX Plus
    
    ```bash
-   systemctl start nginx 
+   $> systemctl start nginx 
    ```
 
-7.  Verify that NGINX Plus has started
+7. Verify that NGINX Plus has started
 
    ```bash
-   ps -eaf | grep nginx 
+   $> ps -eaf | grep nginx 
 
    root      5532     1  0 19:35 ?        00:00:00 nginx: master process /usr/sbin/nginx -c /etc/nginx/nginx.conf 
    nginx     5534  5532  0 19:35 ?        00:00:00 nginx: worker process 
@@ -165,27 +166,27 @@ In this exercise, we will review configure NGINX Plus as a basic load balancer a
    NGINX commands and edit NGINX Plus configuration files via the VSCode Console and terminal. (SSH access via Putty is 
    also available as a SSH remote terminal access option.)
 
-3. In the terminal run the following NGINX commands
+3. In the terminal try running the following NGINX commands and inspect the output (output won't be listed in below):
 
    ```bash
    #  Print help for command-line parameters.
-   nginx -h 
+   $> nginx -h 
    # Test the configuration file: nginx checks the configuration for correct syntax, 
    # and then tries to open files referred in the configuration.
-   nginx -t 
+   $> nginx -t 
    # same as -t, but additionally dump configuration files to standard output
-   nginx -T 
+   $> nginx -T 
    # print nginx version
-   nginx -v
+   $> nginx -v
    # print nginx version, compiler version, and configure parameters.
-   nginx -V 
-   send a signal to the master process. The argument signal can be one of:
+   $> nginx -V 
+   # send a signal to the master process. The argument signal can be one of:
    # stop — shut down quickly
    # quit — shut down gracefully
    # reload — reload configuration, start the new worker process with a new
    #          configuration, gracefully shut down old worker processes.
    # reopen — reopen log files
-   nginx -s reload 
+   $> nginx -s reload 
    ```
 
 ## Exercise 3: Inspect NGINX Plus modules
@@ -218,7 +219,7 @@ Now at NGINX Plus is installed, browse to the NGINX configuration root, `/etc/ng
 5. In the terminal window using `View > Terminal menu` command, and in the terminal, run the following commands to reload nginx:
 
    ```bash
-   nginx -t && nginx -s reload
+   $> nginx -t && nginx -s reload
    ```
 
    ![reload nginx](media/2020-06-29_21-13.png)
@@ -226,6 +227,6 @@ Now at NGINX Plus is installed, browse to the NGINX configuration root, `/etc/ng
 6. See which Dynamic modules are installed: 
 
    ```bash
-   cd /etc/nginx/modules  
-   ls -al 
+   $> cd /etc/nginx/modules  
+   $> ls -al 
    ```

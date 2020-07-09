@@ -64,14 +64,14 @@ By the end of the lab you will be able to:
    Delete the file (if exists), then create an empty file:
 
     ```bash
-    rm /var/lib/nginx/state/servers.conf
+    $> rm /var/lib/nginx/state/servers.conf
     rm: cannot remove '/var/lib/nginx/state/servers.conf': No such file or directory
     ```
 
     Then run:
 
     ```bash
-    touch /var/lib/nginx/state/servers.conf
+    $> touch /var/lib/nginx/state/servers.conf
     ```
 
 5. In a Web Browser, open the NGINX dashboard on [[http://www/](http://www.example.com:8080/dashboard.htm)](http://www.example.com:8080/dashboard.html).
@@ -83,7 +83,7 @@ By the end of the lab you will be able to:
    retrieve this information from the NGINX API
 
   ```bash
-  curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
+  $> curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
 
   []
   ```
@@ -92,7 +92,7 @@ By the end of the lab you will be able to:
 
     ```bash
     # Add web1 - 10.1.1.5:80
-    curl -s -X \
+    $> curl -s -X \
     POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
     -H 'Content-Type: text/json; charset=utf-8' \
     -d '{
@@ -108,7 +108,7 @@ By the end of the lab you will be able to:
     }'
 
     # Add web2 - 10.1.1.6:80
-    curl -s -X \
+    $> curl -s -X \
     POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
     -H 'Content-Type: text/json; charset=utf-8' \
     -d '{
@@ -132,7 +132,7 @@ By the end of the lab you will be able to:
 
       ```bash
     # Add web3 - 10.1.1.7:80
-    curl -s -X \
+    $> curl -s -X \
     POST http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers \
     -H 'Content-Type: text/json; charset=utf-8' \
     -d '{
@@ -197,9 +197,9 @@ By the end of the lab you will be able to:
 8. We can also confirm that the state file has been updated:
 
     ```bash
-    cat /var/lib/nginx/state/servers.conf
+    $> cat /var/lib/nginx/state/servers.conf
 
-    cat /var/lib/nginx/state/servers.conf
+    $> cat /var/lib/nginx/state/servers.conf
 
     server 10.1.1.5:80;
     server 10.1.1.6:80;
@@ -209,7 +209,7 @@ By the end of the lab you will be able to:
 9. It is possible to also remove a server from the upstream group:
 
     ```bash
-    curl -X DELETE -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers/0 | jq
+    $> curl -X DELETE -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers/0 | jq
     [
       {
         "id": 1,
@@ -245,7 +245,7 @@ By the end of the lab you will be able to:
 
     ```bash
     # Find the ID of the down server i.e '"down": true', i.e. live
-    curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq '.[]  | select(.down==true)'
+    $> curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq '.[]  | select(.down==true)'
 
     {
       "id": 2,
@@ -266,7 +266,7 @@ By the end of the lab you will be able to:
 
     ```bash
     # Set server to '"down": false', i.e. live
-    curl -X PATCH -d '{ "down": false }' -s 'http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers/2'
+    $> curl -X PATCH -d '{ "down": false }' -s 'http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers/2'
 
     {"id":2,"server":"10.1.1.7:80","weight":1,"max_conns":0,"max_fails":1,"fail_timeout":"10s","slow_start":"10s","route":"","backup":true,"down":false}
     ```
@@ -274,7 +274,7 @@ By the end of the lab you will be able to:
 12. Once again, list out servers in our upstream, `dynamic`
 
     ```bash
-    curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
+    $> curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
     ```
 
   ![server list](media/2020-06-29_22-02.png)
@@ -284,20 +284,20 @@ By the end of the lab you will be able to:
 
     ```bash
     # inspect the state of out state file:
-    cat /var/lib/nginx/state/servers.conf
+    $> cat /var/lib/nginx/state/servers.conf
 
-    server 10.1.1.6:80;
-    server 10.1.1.7:80 slow_start=10s backup;
+    $> server 10.1.1.6:80;
+    $> server 10.1.1.7:80 slow_start=10s backup;
 
     # Reload NGINX
-    nginx -s reload
+    $> nginx -s reload
     ```
 
     **Note:** After a NGINX reload, the server `id` is reset to start at `0`:
 
     ```bash
     # Lastly, list out servers in our upstream, `dynamic` 
-    curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
+    $> curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
     
       {
         "id": 0,
