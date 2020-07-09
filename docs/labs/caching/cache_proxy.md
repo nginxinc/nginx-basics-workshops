@@ -108,7 +108,7 @@ By the end of the lab you will be able to:
    We will see that the **inital request** is served from the origin server as it is not cached on NGINX yet
 
     ```bash
-    curl -I http://www.example.com/smile.png
+    $> curl -I http://www.example.com/smile.png
 
     HTTP/1.1 200 OK
     Server: nginx/1.19.0
@@ -129,7 +129,7 @@ By the end of the lab you will be able to:
    We will see that the **subsequent requests** are served from the origin server as it is not cached on NGINX yet
 
     ```bash
-    curl -I http://www.example.com/smile.png
+    $> curl -I http://www.example.com/smile.png
 
     HTTP/1.1 200 OK
     Server: nginx/1.19.0
@@ -173,7 +173,7 @@ By the end of the lab you will be able to:
 
    ![test html page with images](media/2020-06-25_11-26.png)
 
-3. Alternatively you can copy, paste and execute the `curl` commands below multiple times in your terminal
+3. Alternatively you can copy, paste and execute the `curl` commands below multiple times in your terminal. **NOTE: these input lines do not have `$>` in order to facilitate bulk copy/paste.**
 
     ```bash
     # Copy and paste these lines into your terminal multiple times
@@ -188,7 +188,10 @@ By the end of the lab you will be able to:
     curl -s -I http://www.example.com/img/picture.jpg | grep "X-Cache-Status:"
     curl -s -I http://www.example.com/img/picture.png | grep "X-Cache-Status:"
     curl -s -I http://www.example.com/img/picture.webp | grep "X-Cache-Status:"
-
+   ```
+   
+   And the output should be (interlaced with the above input lines):
+   ```
     X-Cache-Status: HIT
     X-Cache-Status: HIT
     X-Cache-Status: HIT
@@ -265,10 +268,10 @@ By the end of the lab you will be able to:
     ```bash
 
     # First make sure the test image is in the cache:
-    curl -I http://www.example.com/smile.png
+    $> curl -I http://www.example.com/smile.png
 
     # Now, we can Purge that specific object from the cache
-    curl -I -X PURGE -D – "http://www.example.com/smile.png"
+    $> curl -I -X PURGE -D – "http://www.example.com/smile.png"
 
     HTTP/1.1 204 No Content
     Server: nginx/1.19.0
@@ -284,7 +287,7 @@ By the end of the lab you will be able to:
 
    ![Test page full of images](media/2020-06-25_11-26.png)
 
-5. Lets confirm all the images are in the cache:
+5. Lets confirm all the images are in the cache: **(Again you may bulk copy/paste these.)**
 
    ```bash
    # Copy and paste these lines into your terminal
@@ -317,9 +320,9 @@ By the end of the lab you will be able to:
 
    ```bash
    # Wildcard Purge all objects in the URL path prefix e.g. /img/
-   curl -I -X PURGE "http://www.example.com/img/*"
+   $> curl -I -X PURGE "http://www.example.com/img/*"
    # Wildcard Purge everything i.e. all objects in the '/' URL path prefix 
-   curl -I -X PURGE "http://www.example.com/*"
+   $> curl -I -X PURGE "http://www.example.com/*"
    ```
 
 7. Lets confirm wildcard cache purge has evicted all out cached images.The next request for these images should serve the

@@ -5,8 +5,13 @@ Implement NGINX Plus as an HTTP and HTTPS (SSL terminating) load balancer for tw
 ### Goals 
 
  * Provide a variety of NGINX Plus demonstrations
+ * Teach the process and meaning of each step setting up NGINX Plus
  * Provide examples of NGINX configurations best practices
  * Give you a feel for what it is like to work with NGINX Plus
+
+### How to use this document
+
+To ensure understanding of each and every step, every line which is to be entereed by the user is preceeded by `$>`. This does prevent the ability to copy and paste multiple lines at once, but this is by design to pace the exercises.
 
 ## The Demo environement
 
@@ -159,15 +164,15 @@ Before we can start, we need to copy our NGINX Plus repo key and certificate (`n
 
 ```bash
 # Enter working directory
-cd nginx-basics
+$> cd nginx-basics
 
 # Make sure your Nginx Plus repo key and certificate exist here
-ls nginx-plus/etc/ssl/nginx/nginx-*
+$> ls nginx-plus/etc/ssl/nginx/nginx-*
 nginx-repo.crt              nginx-repo.key
 
 # Downloaded docker images and build
-docker-compose pull
-docker-compose build --no-cache
+$> docker-compose pull
+$> docker-compose build --no-cache
 ```
 
 -----------------------
@@ -179,20 +184,20 @@ docker-compose build --no-cache
 Run `docker-compose` in the foreground so we can see real-time log output to the terminal:
 
 ```bash
-docker-compose up
+$> docker-compose up
 ```
 
 Or, if you made changes to any of the Docker containers or NGINX configurations, run:
 
 ```bash
 # Recreate containers and start demo
-docker-compose up --force-recreate
+$> docker-compose up --force-recreate
 ```
 
 **Confirm** the containers are running. You should see three containers running:
 
 ```bash
-docker ps
+$> docker ps
 CONTAINER ID        IMAGE                     COMMAND                  CREATED             STATUS              PORTS                                                              NAMES
 791ccac223ac        nginx-basics_nginx-plus   "nginx -g 'daemon of…"   5 seconds ago       Up 4 seconds        0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:8080->8080/tcp   nginx-basics_nginx-plus_1
 eacbc5630b4b        nginx-basics_docs         "/docker-entrypoint.…"   6 seconds ago       Up 5 seconds        80/tcp, 0.0.0.0:9000->9000/tcp                                     nginx-basics_docs_1
@@ -221,18 +226,18 @@ This demo system can also be ported to UDF
 
 ```bash
 # Enter working directory
-cd nginx-basics
+$> cd nginx-basics
 # Set variables
 USER=ubuntu
 HOST=bb56acb6-d774-4bed-b783-005a491b274b.access.udf.f5.com
 PORT=47000
 DATE_WITH_TIME=`date "+%Y%m%d-%H%M%S"`
 # Push local nginx plus config to remote server while making backup first
-ssh -p $PORT $USER@$HOST "sudo cp -r /etc/nginx /var/tmp/nginx-$DATE_WITH_TIME"
-ssh -p $PORT $USER@$HOST "sudo rm -rf /var/tmp/nginx-new"
-scp -r -P $PORT nginx-plus/etc/nginx $USER@$HOST:/var/tmp/nginx-new 
-ssh -p $PORT $USER@$HOST "sudo rsync -Prtv --exclude modules/ --delete /var/tmp/nginx-new/* /etc/nginx"
-ssh -p $PORT $USER@$HOST "sudo chown -R nginx:nginx /etc/nginx"
+$> ssh -p $PORT $USER@$HOST "sudo cp -r /etc/nginx /var/tmp/nginx-$DATE_WITH_TIME"
+$> ssh -p $PORT $USER@$HOST "sudo rm -rf /var/tmp/nginx-new"
+$> scp -r -P $PORT nginx-plus/etc/nginx $USER@$HOST:/var/tmp/nginx-new 
+$> ssh -p $PORT $USER@$HOST "sudo rsync -Prtv --exclude modules/ --delete /var/tmp/nginx-new/* /etc/nginx"
+$> ssh -p $PORT $USER@$HOST "sudo chown -R nginx:nginx /etc/nginx"
 ```
 
 3. Get the UDF Address (URL and Port) for the target Web Server NGINX Instance
@@ -243,34 +248,35 @@ ssh -p $PORT $USER@$HOST "sudo chown -R nginx:nginx /etc/nginx"
 
 ```bash
 # Set variables
-USER=ubuntu
-HOST=bb56acb6-d774-4bed-b783-005a491b274b.access.udf.f5.com
-PORT=47001
-DATE_WITH_TIME=`date "+%Y%m%d-%H%M%S"`
+$> USER=ubuntu
+$> HOST=bb56acb6-d774-4bed-b783-005a491b274b.access.udf.f5.com
+$> PORT=47001
+$> DATE_WITH_TIME=`date "+%Y%m%d-%H%M%S"`
 # Push local nginx web server config to remote server while making backup first
-ssh -p $PORT $USER@$HOST "sudo cp -r /etc/nginx /var/tmp/nginx-$DATE_WITH_TIME"
-ssh -p $PORT $USER@$HOST "sudo rm -rf /var/tmp/nginx-new"
-scp -r -P $PORT nginx-hello/etc/nginx $USER@$HOST:/var/tmp/nginx-new 
+$> ssh -p $PORT $USER@$HOST "sudo cp -r /etc/nginx /var/tmp/nginx-$DATE_WITH_TIME"
+$> ssh -p $PORT $USER@$HOST "sudo rm -rf /var/tmp/nginx-new"
+$> scp -r -P $PORT nginx-hello/etc/nginx $USER@$HOST:/var/tmp/nginx-new 
 # Copy Lab guide config
-scp -r -P $PORT docs/misc/lab_guide.conf $USER@$HOST:/var/tmp/nginx-new/conf.d 
-ssh -p $PORT $USER@$HOST "sudo rsync -Prtv --exclude modules/ --delete /var/tmp/nginx-new/* /etc/nginx"
-ssh -p $PORT $USER@$HOST "sudo chown -R nginx:nginx /etc/nginx"
+$> scp -r -P $PORT docs/misc/lab_guide.conf $USER@$HOST:/var/tmp/nginx-new/conf.d 
+$> ssh -p $PORT $USER@$HOST "sudo rsync -Prtv --exclude modules/ --delete /var/tmp/nginx-new/* /etc/nginx"
+$> ssh -p $PORT $USER@$HOST "sudo chown -R nginx:nginx /etc/nginx"
 # Push local web to remote server while making backup first
-ssh -p $PORT $USER@$HOST "sudo cp -r /usr/share/nginx/html /var/tmp/nginx-html-$DATE_WITH_TIME"
-ssh -p $PORT $USER@$HOST "sudo rm -rf /var/tmp/nginx-new-html"
-scp -r -P $PORT nginx-hello/usr/share/nginx/html $USER@$HOST:/var/tmp/nginx-new-html 
+$> ssh -p $PORT $USER@$HOST "sudo cp -r /usr/share/nginx/html /var/tmp/nginx-html-$DATE_WITH_TIME"
+$> ssh -p $PORT $USER@$HOST "sudo rm -rf /var/tmp/nginx-new-html"
+$> scp -r -P $PORT nginx-hello/usr/share/nginx/html $USER@$HOST:/var/tmp/nginx-new-html 
 # Copy Lab guide
-scp -r -P $PORT docs/labs $USER@$HOST:/var/tmp/nginx-new-html 
-ssh -p $PORT $USER@$HOST "sudo rsync -Prtv --delete /var/tmp/nginx-new-html/* /usr/share/nginx/html"
+$> scp -r -P $PORT docs/labs $USER@$HOST:/var/tmp/nginx-new-html 
+$> ssh -p $PORT $USER@$HOST "sudo rsync -Prtv --delete /var/tmp/nginx-new-html/* /usr/share/nginx/html"
 # Sync to other Web servers (if you have others configured with nginx-sync.sh)
 # Note: If there is a incorrect host in /root/.ssh/known_hosts, you may need to 
 # run the nginx-sync.sh command on the server, not remotely:
-ssh -p $PORT $USER@$HOST "sudo nginx-sync.sh"
+$> ssh -p $PORT $USER@$HOST "sudo nginx-sync.sh"
 ```
 
 Example `nginx-sync.conf` on the web server:
 
 ```bash
+# nginx-sync.conf
 NODES="web2 web3"
 CONFPATHS="/etc/nginx /etc/ssl /usr/share/nginx/html"
 #EXCLUDE="default.conf"

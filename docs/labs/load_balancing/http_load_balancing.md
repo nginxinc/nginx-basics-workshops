@@ -87,14 +87,14 @@ By the end of the lab you will be able to:
  a. On one terminal shell, `tail` the error logs for `www.example.com`: 
 
    ```bash
-   cd /var/log/nginx 
-   tail -f www.example.com_error.log 
+   $> cd /var/log/nginx 
+   $> tail -f www.example.com_error.log 
    ```
 
  b. In the other terminal shell, run the following `curl` command: 
  
    ```bash
-   curl -I -L http://localhost/old-url
+   $> curl -I -L http://localhost/old-url
    ```
 
    Note the entry in the `www.example.com_error.log` printed in the first terminal
