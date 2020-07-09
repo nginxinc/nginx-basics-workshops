@@ -11,20 +11,21 @@ Implement NGINX Plus as an HTTP and HTTPS (SSL terminating) load balancer for tw
 
 ### How to use this document
 
-To ensure understanding of each and every step, every line which is to be entereed by the user is preceeded by `$>`. This does prevent the ability to copy and paste multiple lines at once, but this is by design to pace the exercises.
+To ensure understanding of every step, every line which is to be entered by the user is preceded by `$>`.
+This is by design to pace the exercises and prevent the ability to bulk copy and paste multiple lines at once. 
 
-## The Demo environement
+## The Demo environment
 
-This demo requires four docker containers for the NGINX demos: a NGINX Plus ADC/load balancer, `nginx-plus`, and 
+This demo requires four docker containers for the NGINX demos: an NGINX Plus ADC/load balancer, `nginx-plus,` and 
 webservers, `nginx1`, `nginx2` and `nginx3`:
 
-An addtional container is used for the lab guide and is available on port 9000 
+An additional container is used for the lab guide and is available on **Port 9000** 
 
 Details of the containers:
 
  * **NGINX Plus** `(Latest)` based on ubuntu 18.04 (and a sample centos 7 Dockerfile is provided). 
  * **NGINX OSS** `(Latest)` is based on [**nginx-hello**](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello). 
-   NGINX webservers that serves a simple pages containing its hostname, IP address and port as wells as the request URI 
+   NGINX web servers that serve simple pages containing its hostname, IP address and port as wells as the request URI 
    and the local time of the webserver.
  * **Lab Guide** can be read from the [`docs/labs` folder](docs/labs/README.md) or in a web browser on [http://localhost:9000](http://localhost:9000). 
 
@@ -138,9 +139,9 @@ HTTP/PORT 90                                  |                 |
 
 2. A Docker host. With [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
 
-3. **Optional**: The demo uses hostnames: `www.example.com` and `www2.example.com`. For host name resolution you will need to add hostname bindings to your hosts file:
+3. **Optional**: The demo uses hostnames: `www.example.com` and `www2.example.com`. For hostname resolution you will need to add hostname bindings to your hosts file:
 
-For example on Linux/Unix/MacOS the host file is `/etc/hosts`
+For example, on Linux/Unix/macOS the host file is `/etc/hosts`
 
 ```bash
 # NGINX Plus demo system (local docker host)
@@ -158,7 +159,7 @@ Provided the Prerequisites have been met before running the stpes below, this is
 
 ### Build the demo
 
-In this demo we will have a one NGINX Plus ADC/load balancer (`nginx-plus`) and three NGINX OSS webserver (`web1`, `web2` and `web3`)
+In this demo, we will have a one NGINX Plus ADC/load balancer (`nginx-plus`) and three NGINX OSS webserver (`web1`, `web2` and `web3`)
 
 Before we can start, we need to copy our NGINX Plus repo key and certificate (`nginx-repo.key` and `nginx-repo.crt`) into the directory, `nginx-plus/etc/ssl/nginx/`, then build our stack:
 
