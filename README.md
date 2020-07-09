@@ -1,6 +1,7 @@
 # NGINX-Basics
 
-Implement NGINX Plus as an HTTP and HTTPS (SSL terminating) load balancer for two or more HTTP services
+Implement NGINX Plus as an HTTP and HTTPS (SSL terminating) load balancer for
+two or more HTTP services
 
 ### Goals 
 
@@ -11,34 +12,43 @@ Implement NGINX Plus as an HTTP and HTTPS (SSL terminating) load balancer for tw
 
 ### How to use this document
 
-To ensure understanding of every step, every line which is to be entered by the user is preceded by `$>`.
-This is by design to pace the exercises and prevent the ability to bulk copy and paste multiple lines at once. 
+To ensure understanding of every step, every line which is to be entered by the
+user is preceded by `$>`. This is by design to pace the exercises and prevent
+the ability to bulk copy and paste multiple lines at once.
 
 ## The Demo environment
 
-This demo requires four docker containers for the NGINX demos: an NGINX Plus ADC/load balancer, `nginx-plus,` and 
-webservers, `nginx1`, `nginx2` and `nginx3`:
+This demo requires four docker containers for the NGINX demos: an NGINX Plus
+ADC/load balancer, `nginx-plus,` and webservers, `nginx1`, `nginx2` and
+`nginx3`:
 
-An additional container is used for the lab guide and is available on **Port 9000** 
+An additional container is used for the lab guide and is available on **Port
+9000**
 
 Details of the containers:
 
- * **NGINX Plus** `(Latest)` based on ubuntu 18.04 (and a sample centos 7 Dockerfile is provided). 
- * **NGINX OSS** `(Latest)` is based on [**nginx-hello**](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello). 
-   NGINX web servers that serve simple pages containing its hostname, IP address and port as wells as the request URI 
-   and the local time of the webserver.
- * **Lab Guide** can be read from the [`docs/labs` folder](docs/labs/README.md) or in a web browser on [http://localhost:9000](http://localhost:9000). 
+ * **NGINX Plus** `(Latest)` based on ubuntu 18.04 (and a sample centos 7
+   Dockerfile is provided).
+ * **NGINX OSS** `(Latest)` is based on
+   [**nginx-hello**](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello).
+   NGINX web servers that serve simple pages containing its hostname, IP address
+   and port as wells as the request URI and the local time of the webserver.
+ * **Lab Guide** can be read from the [`docs/labs` folder](docs/labs/README.md)
+   or in a web browser on [http://localhost:9000](http://localhost:9000).
 
-**Note:**[NGINX Plus Documentation](https://docs.nginx.com/nginx/), [resources](https://www.nginx.com/resources/) 
-and [blog](https://www.nginx.com/blog/) are your best source of information for addtional technical information. There 
-are many detailed examples found on the internet too!
+**Note:**[NGINX Plus Documentation](https://docs.nginx.com/nginx/),
+[resources](https://www.nginx.com/resources/) and
+[blog](https://www.nginx.com/blog/) are your best source of information for
+addtional technical information. There are many detailed examples found on the
+internet too!
 
 ### Topology
 
 The base Docker Compose environment the lab is build on
 
 ```
-                                             (nginx-hello upstream: nginx1:80, nginx2:80)
+                                             (nginx-hello upstream: 
+                                             nginx1:80, nginx2:80, nginx3:80)
                       +---------------+                        
                       |               |       +-----------------+
 +-------------------->|               |       |                 |
@@ -135,11 +145,15 @@ HTTP/PORT 90                                  |                 |
 
 ## Prerequisites:
 
-1. NGINX evaluation license file. You can get it from [here](https://www.nginx.com/free-trial-request/)
+1. NGINX evaluation license file. You can get it from
+   [here](https://www.nginx.com/free-trial-request/)
 
-2. A Docker host. With [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
+2. A Docker host. With [Docker](https://docs.docker.com/get-docker/) and
+   [Docker Compose](https://docs.docker.com/compose/install/)
 
-3. **Optional**: The demo uses hostnames: `www.example.com` and `www2.example.com`. For hostname resolution you will need to add hostname bindings to your hosts file:
+3. **Optional**: The demo uses hostnames: `www.example.com` and
+   `www2.example.com`. For hostname resolution you will need to add hostname
+   bindings to your hosts file:
 
 For example, on Linux/Unix/macOS the host file is `/etc/hosts`
 
@@ -149,19 +163,24 @@ For example, on Linux/Unix/macOS the host file is `/etc/hosts`
 ```
 
 > **Note:**
-> DNS resolution between containers is provided by default using a new bridged network by docker networking and
-> NGINX has been preconfigured to use the Docker DNS server (127.0.0.11) to provide DNS resolution between NGINX and
-> upstream servers
+> DNS resolution between containers is provided by default using a new 
+> bridged network by docker networking and NGINX has been preconfigured 
+> to use the Docker DNS server (127.0.0.11) to provide DNS resolution 
+> between NGINX and upstream servers
 
 ## Build and run the demo environment
 
-Provided the Prerequisites have been met before running the stpes below, this is a **working** environment. 
+Provided the Prerequisites have been met before running the stpes below, this is
+a **working** environment.
 
 ### Build the demo
 
-In this demo, we will have a one NGINX Plus ADC/load balancer (`nginx-plus`) and three NGINX OSS webserver (`web1`, `web2` and `web3`)
+In this demo, we will have a one NGINX Plus ADC/load balancer (`nginx-plus`) and
+three NGINX OSS webserver (`web1`, `web2` and `web3`)
 
-Before we can start, we need to copy our NGINX Plus repo key and certificate (`nginx-repo.key` and `nginx-repo.crt`) into the directory, `nginx-plus/etc/ssl/nginx/`, then build our stack:
+Before we can start, we need to copy our NGINX Plus repo key and certificate
+(`nginx-repo.key` and `nginx-repo.crt`) into the directory,
+`nginx-plus/etc/ssl/nginx/`, then build our stack:
 
 ```bash
 # Enter working directory
@@ -177,18 +196,21 @@ $> docker-compose build --no-cache
 ```
 
 -----------------------
-> See other other useful [`docker`](docs/useful-docker-commands.md) and [`docker-compose`](docs/useful-docker-compose-commands.md) commands
------------------------
+> See other other useful [`docker`](docs/useful-docker-commands.md) and
+> [`docker-compose`](docs/useful-docker-compose-commands.md) commands
+-----------------------------------------------------------------------
 
 #### Start the Demo stack:
 
-Run `docker-compose` in the foreground so we can see real-time log output to the terminal:
+Run `docker-compose` in the foreground so we can see real-time log output to the
+terminal:
 
 ```bash
 $> docker-compose up
 ```
 
-Or, if you made changes to any of the Docker containers or NGINX configurations, run:
+Or, if you made changes to any of the Docker containers or NGINX configurations,
+run:
 
 ```bash
 # Recreate containers and start demo
@@ -207,11 +229,14 @@ eacbc5630b4b        nginx-basics_docs         "/docker-entrypoint.…"   6 secon
 0a31be1a3f13        nginx-basics_web3         "/docker-entrypoint.…"   6 seconds ago       Up 5 seconds        0.0.0.0:1121->80/tcp, 0.0.0.0:1120->90/tcp                         nginx-basics_web3_1
 ```
 
-The demo environment is ready in seconds. You can access the `nginx-hello` demo website on **HTTP / Port 80** 
-([`http://localhost`](http://localhost) or [http://www.example.com](http://example.com)) and on **HTTPS / Port 443**
-([https://www2.example.com](http://example.com)). 
+The demo environment is ready in seconds. You can access the `nginx-hello` demo
+website on **HTTP / Port 80** ([`http://localhost`](http://localhost) or
+[http://www.example.com](http://example.com)) and on **HTTPS / Port 443**
+([https://www2.example.com](http://example.com)).
 
-The NGINX API is available on **HTTP / Port 8080** ([`http://localhost:8080`](http://localhost)) or [http://www.example.com:8080](http://example.com:8080))
+The NGINX API is available on **HTTP / Port 8080**
+([`http://localhost:8080`](http://localhost)) or
+[http://www.example.com:8080](http://example.com:8080))
 
 The lab guide is available on [http://localhost:9000](http://localhost:9000). 
 
@@ -219,7 +244,8 @@ The lab guide is available on [http://localhost:9000](http://localhost:9000).
 
 This demo system can also be ported to UDF
 
-1. Get the UDF Address (URL and Port) for the target NGINX Plus Load Balancer Instance
+1. Get the UDF Address (URL and Port) for the target NGINX Plus Load Balancer
+   Instance
 
 ![UDF ssh info](docs/labs/intro/media/2020-06-25_15-29.png)
 

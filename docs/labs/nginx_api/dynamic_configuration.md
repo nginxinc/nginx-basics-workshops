@@ -2,21 +2,26 @@
 
 ## Introduction
 
-NGINX Plus enables configuration of upstream servers in a server group to be modified on-the-fly without reloading the 
-NGINX servers and its configuration files. This is useful for:
+NGINX Plus enables configuration of upstream servers in a server group to be
+modified on-the-fly without reloading the NGINX servers and its configuration
+files. This is useful for:
 
  * **Autoscaling**, when you need to add more servers
- * **Maintenance**, when you need to remove a server, specify a backup server, or take a server down temporarily
- * **Quick setup**, when you need to change upstream server settings such as server weight, active connections, slow start, 
-   failure timeouts.
- * **Monitoring**, when you get the state of the server or server group with one command
+ * **Maintenance**, when you need to remove a server, specify a backup server,
+   or take a server down temporarily
+ * **Quick setup**, when you need to change upstream server settings such as
+   server weight, active connections, slow start, failure timeouts.
+ * **Monitoring**, when you get the state of the server or server group with one
+   command
 
-All these changes are made with the NGINX Plus REST API interface with API commands. By default changes made with the 
-API are only stored only in the shared memory zone and so the changes are discarded when the NGINX Plus configuration 
-file is reloaded. 
+All these changes are made with the NGINX Plus REST API interface with API
+commands. By default changes made with the API are only stored only in the
+shared memory zone and so the changes are discarded when the NGINX Plus
+configuration file is reloaded.
 
-In this Module we will configure upstream servers and upstream server groups dynamically (on-the-fly) with the NGINX 
-Plus REST API and use the `state` directive so on-the-fly configurations persistent through NGINX reloads. 
+In this Module we will configure upstream servers and upstream server groups
+dynamically (on-the-fly) with the NGINX Plus REST API and use the `state`
+directive so on-the-fly configurations persistent through NGINX reloads.
 
 ## Learning Objectives 
 
@@ -28,23 +33,27 @@ By the end of the lab you will be able to:
 
 ## Exercise 1: Dynamic Configuration of an Upstream using the NGINX API
 
-1. In the `WORKSPACE` folder found on the desktop, open `NGINX-PLUS-1` in Visual Studio Code (VSCode)
+1. In the `WORKSPACE` folder found on the desktop, open `NGINX-PLUS-1` in Visual
+   Studio Code (VSCode)
 
   ![Select workspace](media/2020-06-29_15-55.png)
 
-2. In the VSCode, open a a **terminal window**, using `View > Terminal menu` command. You will now be able to both run 
-   NGINX commands and edit NGINX Plus configuration files via the VSCode Console and terminal. (SSH access via Putty is 
-   also available as a SSH remote terminal access option.)
+2. In the VSCode, open a a **terminal window**, using `View > Terminal menu`
+   command. You will now be able to both run NGINX commands and edit NGINX Plus
+   configuration files via the VSCode Console and terminal. (SSH access via
+   Putty is also available as a SSH remote terminal access option.)
 
     ![terminal inside vscode](media/2020-06-29_16-02_1.png)
 
 3. Now inspect the `/etc/nginx/conf.d/upstreams.conf` file. Note the following:
 
-    * The `zone` directive configures a zone in the shared memory and sets the zone name and size. The configuration of the 
-      server group is kept in this zone, so all worker processes use the same configuration. In our example, the `zone` is 
-      also  named `dynamic` and is `64k` megabyte in size.
-    * The `state` directive configures Persistence of Dynamic Configuration by writing the state information to a file that 
-      persists during a reload. The recommended path for Linux distributions is `/var/lib/nginx/state/`
+    * The `zone` directive configures a zone in the shared memory and sets the
+      zone name and size. The configuration of the server group is kept in this
+      zone, so all worker processes use the same configuration. In our example,
+      the `zone` is also named `dynamic` and is `64k` megabyte in size.
+    * The `state` directive configures Persistence of Dynamic Configuration by
+      writing the state information to a file that persists during a reload. The
+      recommended path for Linux distributions is `/var/lib/nginx/state/`
 
       ```nginx
       # /etc/nginx/conf.d/upstream.conf 
@@ -60,8 +69,9 @@ By the end of the lab you will be able to:
       }
       ```
 
-4. In the Terminal window, on the NGINX plus instance, ensure that the `state` file is at a empty state for this demo.
-   Delete the file (if exists), then create an empty file:
+4. In the Terminal window, on the NGINX plus instance, ensure that the `state`
+   file is at a empty state for this demo. Delete the file (if exists), then
+   create an empty file:
 
     ```bash
     $> rm /var/lib/nginx/state/servers.conf
@@ -74,13 +84,16 @@ By the end of the lab you will be able to:
     $> touch /var/lib/nginx/state/servers.conf
     ```
 
-5. In a Web Browser, open the NGINX dashboard on [[http://www/](http://www.example.com:8080/dashboard.htm)](http://www.example.com:8080/dashboard.html).
-   There is a bookmark in the Chrome Web Browser. Navigate to `HTTP Upstreams`, and note that the `dynamic` is empty:
+5. In a Web Browser, open the NGINX dashboard on
+   [[http://www/](http://www.example.com:8080/dashboard.htm)](http://www.example.com:8080/dashboard.html).
+   There is a bookmark in the Chrome Web Browser. Navigate to `HTTP Upstreams`,
+   and note that the `dynamic` is empty:
 
   ![nginx plus dashboard showing the empty dynamic upstream](media/2020-06-23_16-26.png)
 
-6. In the Terminal window, we can also confirm the empty state of our upstream, `dynamic`, using our a `curl` command to
-   retrieve this information from the NGINX API
+6. In the Terminal window, we can also confirm the empty state of our upstream,
+   `dynamic`, using our a `curl` command to retrieve this information from the
+   NGINX API
 
   ```bash
   $> curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
@@ -88,7 +101,8 @@ By the end of the lab you will be able to:
   []
   ```
 
-7. Lets now add a two servers, `web1` (`10.1.1.5:80`) and `web2` (`10.1.1.6:80`) to the `dynamic` upstream group using the API
+7. Lets now add a two servers, `web1` (`10.1.1.5:80`) and `web2` (`10.1.1.6:80`)
+   to the `dynamic` upstream group using the API
 
     ```bash
     # Add web1 - 10.1.1.5:80
@@ -128,7 +142,8 @@ By the end of the lab you will be able to:
 
     ![add web2](media/2020-06-29_21-54.png)
 
-8. Lets now add `web3` (`10.1.1.7:80`), **marked as down**, to the `dynamic` upstream group using the API
+8. Lets now add `web3` (`10.1.1.7:80`), **marked as down**, to the `dynamic`
+   upstream group using the API
 
       ```bash
     # Add web3 - 10.1.1.7:80
@@ -150,7 +165,8 @@ By the end of the lab you will be able to:
 
     ![add web3](media/2020-06-29_21-56.png)
 
-9. Once again list out the servers in our upstream, `dynamic`, and view the changes made
+9. Once again list out the servers in our upstream, `dynamic`, and view the
+   changes made
 
     ```json
     curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
@@ -240,8 +256,9 @@ By the end of the lab you will be able to:
 
     ![remove server](media/2020-06-29_21-58.png)
 
-10. To modify our `down` server back to rotation and accept live traffic, we need to change the server parameter from
-    `down: true` to `down: false`. We first must find the server ID:
+10. To modify our `down` server back to rotation and accept live traffic, we
+    need to change the server parameter from `down: true` to `down: false`. We
+    first must find the server ID:
 
     ```bash
     # Find the ID of the down server i.e '"down": true', i.e. live
@@ -262,7 +279,8 @@ By the end of the lab you will be able to:
 
     ```
 
-11. Now that we have identified the server id, (e.g. `"id: 2"`) we can modify the `down` parameter:
+11. Now that we have identified the server id, (e.g. `"id: 2"`) we can modify
+    the `down` parameter:
 
     ```bash
     # Set server to '"down": false', i.e. live
@@ -279,8 +297,8 @@ By the end of the lab you will be able to:
 
   ![server list](media/2020-06-29_22-02.png)
 
-13. We can check the that the `state` file are making our upstream changes persistent by reloading NGINX and checking the
-    dashboard and API
+13. We can check the that the `state` file are making our upstream changes
+    persistent by reloading NGINX and checking the dashboard and API
 
     ```bash
     # inspect the state of out state file:

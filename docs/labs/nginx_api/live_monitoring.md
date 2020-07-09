@@ -21,20 +21,25 @@ By the end of the lab you will be able to:
 
 ## Exercise 1: Explore the Live Activity Monitoring JSON Feed​ from demo.nginx.com
 
-When you access the API, NGINX Plus returns a JSON‑formatted document containing the current statistics. You can request 
-complete statistics at `/api/[api-version]/`, where `[api-version]` is the version number of the NGINX Plus API. 
+When you access the API, NGINX Plus returns a JSON‑formatted document containing
+the current statistics. You can request complete statistics at
+`/api/[api-version]/`, where `[api-version]` is the version number of the NGINX
+Plus API.
 
-Lets look at the Live Activity Monitoring JSON Feed​ in detail. Drill down to obtain subsets of the data or single data 
-points, at specific API endpoints, and Parse JSON data using `jq` and `curl` from command line:
+Lets look at the Live Activity Monitoring JSON Feed​ in detail. Drill down to
+obtain subsets of the data or single data points, at specific API endpoints, and
+Parse JSON data using `jq` and `curl` from command line:
 
 
-1. In the `SSH` folder found on the desktop, open any Linux SSH session found on here, e.g. `NGINX-PLUS-1`
+1. In the `SSH` folder found on the desktop, open any Linux SSH session found on
+   here, e.g. `NGINX-PLUS-1`
 
   ![Select ssh session](media/2020-06-29_22-06.png)
 
 
-2. In the Terminal Window, using `curl` and `jq` for JSON formatting, make a request to the API endpoint, `/api/api-version/nginx/`
-   to retrieve basic version, uptime, and identification information​
+2. In the Terminal Window, using `curl` and `jq` for JSON formatting, make a
+   request to the API endpoint, `/api/api-version/nginx/` to retrieve basic
+   version, uptime, and identification information​
 
     ```bash
     $> curl -s https://demo.nginx.com/api/6/nginx/ | jq
@@ -51,8 +56,9 @@ points, at specific API endpoints, and Parse JSON data using `jq` and `curl` fro
     }
     ```
 
-3. Using `curl` and `jq`, make a request to the API endpoint, `/api/api-version/connections/` to retrieve total active 
-   and idle connections​
+3. Using `curl` and `jq`, make a request to the API endpoint,
+   `/api/api-version/connections/` to retrieve total active and idle
+   connections​
 
     ```bash
     $> curl -s https://demo.nginx.com/api/6/connections/ | jq
@@ -65,8 +71,9 @@ points, at specific API endpoints, and Parse JSON data using `jq` and `curl` fro
     }
     ```
 
-4. Using `curl` and `jq`, make a request to the API endpoint, `/api/api-version/http/server_zones/` to retrieve request 
-   and response counts for each HTTP status zone​
+4. Using `curl` and `jq`, make a request to the API endpoint,
+   `/api/api-version/http/server_zones/` to retrieve request and response counts
+   for each HTTP status zone​
 
   ```bash
   $> curl -s https://demo.nginx.com/api/6/http/server_zones/ | jq
@@ -121,8 +128,9 @@ points, at specific API endpoints, and Parse JSON data using `jq` and `curl` fro
   # Trimmed
   ```
 
-5. Using `curl` and `jq`, make a request to the API endpoint, `/api/api-version/http/caches/` to retrieve instrumentation
-  for each named cache zone
+5. Using `curl` and `jq`, make a request to the API endpoint,
+   `/api/api-version/http/caches/` to retrieve instrumentation for each named
+   cache zone
 
   ```bash
   $> curl -s https://demo.nginx.com/api/6/http/caches/ | jq
@@ -171,8 +179,10 @@ points, at specific API endpoints, and Parse JSON data using `jq` and `curl` fro
 
   ```
 
-6. Using `curl` and `jq`, make a request to the API endpoint, `/api/api-version/stream/upstreams/` to retrieve request
-   and response counts, response time, health‑check status, and uptime statistics per server in each TCP/UDP upstream group
+6. Using `curl` and `jq`, make a request to the API endpoint,
+   `/api/api-version/stream/upstreams/` to retrieve request and response counts,
+   response time, health‑check status, and uptime statistics per server in each
+   TCP/UDP upstream group
 
     ```bash
     $> curl -s https://demo.nginx.com/api/6/stream/upstreams/ | jq
@@ -219,7 +229,8 @@ points, at specific API endpoints, and Parse JSON data using `jq` and `curl` fro
             # Trimmed..
     ```
 
-7. Using `curl` and `jq`, make a request to the API endpoint, `/api/api-version/ssl/` to retrieve SSL/TLS statistics
+7. Using `curl` and `jq`, make a request to the API endpoint,
+   `/api/api-version/ssl/` to retrieve SSL/TLS statistics
 
   ```bash
   $> curl -s https://demo.nginx.com/api/6/ssl/ | jq

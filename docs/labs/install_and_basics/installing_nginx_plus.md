@@ -2,7 +2,9 @@
 
 ## Introduction
 
-NGINX Plus is supported on Amazon Linux, CentOS, Debian, FreeBSD, Oracle Linux, Red Hat Enterprise Linux (RHEL), SUSE Linux Enterprise Server (SLES), and Ubuntu.
+NGINX Plus is supported on Amazon Linux, CentOS, Debian, FreeBSD, Oracle Linux,
+Red Hat Enterprise Linux (RHEL), SUSE Linux Enterprise Server (SLES), and
+Ubuntu.
 
 For Sizing guidance for Deploying NGINX Plus, see [Sizing Guide for Deploying NGINX Plus on Bare Metal Servers](https://www.nginx.com/resources/datasheets/nginx-plus-sizing-guide/)
 
@@ -10,8 +12,10 @@ For Sizing guidance for Deploying NGINX Plus, see [Sizing Guide for Deploying NG
  * An NGINX Plus subscription (purchased or trial)
  * A supported operating system
  * root privilege
- * Your credentials to the NGINX Plus Customer Portal, provided by email from NGINX, Inc.
- * Your NGINX Plus certificate and public key (`nginx-repo.crt` and `nginx-repo.key` files), provided by email from NGINX, Inc.
+ * Your credentials to the NGINX Plus Customer Portal, provided by email from
+   NGINX, Inc.
+ * Your NGINX Plus certificate and public key (`nginx-repo.crt` and
+   `nginx-repo.key` files), provided by email from NGINX, Inc.
 
 **References:** 
  * [Installing NGINX Plus](https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-plus/)
@@ -28,7 +32,8 @@ By the end of the lab you will be able to:
 
 ## Exercise 1: Install NGINX Plus 
 
-1. In the `WORKSPACE` folder found on the desktop, open `NGINX-PLUS-3.code-workspace` in Visual      Studio Code (VSCode)
+1. In the `WORKSPACE` folder found on the desktop, open
+   `NGINX-PLUS-3.code-workspace` in Visual Studio Code (VSCode)
    
    If are prompted **Are you sure you want to continue?**, select **continue**
 
@@ -36,9 +41,10 @@ By the end of the lab you will be able to:
 
    ![prompt](media/2020-06-29_20-57.png)
 
-2. In the VSCode, open a a **terminal window**, using `View > Terminal menu` command. You will now be able to both run 
-   NGINX commands and edit NGINX Plus configuration files via the VSCode Console and terminal. (SSH access via Putty is 
-   also available as a SSH remote terminal access option.)
+2. In the VSCode, open a a **terminal window**, using `View > Terminal menu`
+   command. You will now be able to both run NGINX commands and edit NGINX Plus
+   configuration files via the VSCode Console and terminal. (SSH access via
+   Putty is also available as a SSH remote terminal access option.)
 
    ![Open new terminal](media/2020-06-29_21-01.png)
 
@@ -145,28 +151,33 @@ By the end of the lab you will be able to:
    root      5541  4062  0 19:35 pts/1    00:00:00 grep --color=auto nginx 
    ```
 
-8. Test the NGINX Plus instance in your browser. Open **Google Chrome** from your Desktop and enter the following URL, 
-   [http://nginx-plus-3](http://nginx-plus-3). You should see the NGINX default page:
+8. Test the NGINX Plus instance in your browser. Open **Google Chrome** from
+   your Desktop and enter the following URL,
+   [http://nginx-plus-3](http://nginx-plus-3). You should see the NGINX default
+   page:
 
    ![NGINX default page](media/2020-06-26_12-33.png)
 
 
 ## Exercise 2: NGINX Plus command line basics
 
-In this exercise, we will review configure NGINX Plus as a basic load balancer and test/verify configured functionality.   
+In this exercise, we will review configure NGINX Plus as a basic load balancer
+and test/verify configured functionality.  
 
-1. If you have closed VSCode, once again, open `NGINX-PLUS-3code-workspace` found in the he `WORKSPACE` folder, on the desktop,
-   in VSCode
+1. If you have closed VSCode, once again, open `NGINX-PLUS-3code-workspace`
+   found in the he `WORKSPACE` folder, on the desktop, in VSCode
 
    ![Select workspace](media/2020-06-29_20-56.png)
 
    ![VCCode](media/2020-06-26_12-27.png)
 
-2. In the VSCode, open a a **terminal window**, using `View > Terminal menu` command. You will now be able to both run 
-   NGINX commands and edit NGINX Plus configuration files via the VSCode Console and terminal. (SSH access via Putty is 
-   also available as a SSH remote terminal access option.)
+2. In the VSCode, open a a **terminal window**, using `View > Terminal menu`
+   command. You will now be able to both run NGINX commands and edit NGINX Plus
+   configuration files via the VSCode Console and terminal. (SSH access via
+   Putty is also available as a SSH remote terminal access option.)
 
-3. In the terminal try running the following NGINX commands and inspect the output (output won't be listed in below):
+3. In the terminal try running the following NGINX commands and inspect the
+   output (output won't be listed in below):
 
    ```bash
    #  Print help for command-line parameters.
@@ -191,7 +202,8 @@ In this exercise, we will review configure NGINX Plus as a basic load balancer a
 
 ## Exercise 3: Inspect NGINX Plus modules
 
-Now at NGINX Plus is installed, browse to the NGINX configuration root, `/etc/nginx`
+Now at NGINX Plus is installed, browse to the NGINX configuration root,
+`/etc/nginx`
 
 1. `File > Open Folder...`
 
@@ -203,8 +215,9 @@ Now at NGINX Plus is installed, browse to the NGINX configuration root, `/etc/ng
 
 3. Select the `nginx.conf` file in the VSCode Explorer section. 
 
-4. To enable the 3rd-party GeoIP2 dynamic modules for NGINX Plus that have been installed, add the following lines to 
-   `/etc/nginx/nginx.conf` in the **main context** and **reload nginx**: 
+4. To enable the 3rd-party GeoIP2 dynamic modules for NGINX Plus that have been
+   installed, add the following lines to `/etc/nginx/nginx.conf` in the **main
+   context** and **reload nginx**:
 
    ```nginx
    # load modules
@@ -216,7 +229,8 @@ Now at NGINX Plus is installed, browse to the NGINX configuration root, `/etc/ng
 
    ![load modules](media/2020-06-29_21-11.png)
 
-5. In the terminal window using `View > Terminal menu` command, and in the terminal, run the following commands to reload nginx:
+5. In the terminal window using `View > Terminal menu` command, and in the
+   terminal, run the following commands to reload nginx:
 
    ```bash
    $> nginx -t && nginx -s reload

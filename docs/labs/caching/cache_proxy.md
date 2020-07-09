@@ -2,10 +2,13 @@
 
 ## Introduction
 
-One of the most popular use cases for NGINX Plus is as a content cache. The NGINX content cache sits in between a client 
-and an "Origin server", commonly deployed as a reverse proxy or load balancer in an application stack to both to 
-accelerate local origin servers and to create edge servers for content delivery networks (CDNs). Caching can reduce the 
-load on your origin servers by a huge factor, depending on the cacheability of your content and the profile of user traffic.
+One of the most popular use cases for NGINX Plus is as a content cache. The
+NGINX content cache sits in between a client and an "Origin server", commonly
+deployed as a reverse proxy or load balancer in an application stack to both to
+accelerate local origin servers and to create edge servers for content delivery
+networks (CDNs). Caching can reduce the load on your origin servers by a huge
+factor, depending on the cacheability of your content and the profile of user
+traffic.
 
 **References:** 
  * [NGINX Content Caching](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching)
@@ -22,18 +25,21 @@ By the end of the lab you will be able to:
 
 ## Exercise 1: Cache proxy for web content
 
-1. In the `WORKSPACE` folder found on the desktop, open `NGINX-PLUS-1.code-workspace` in Visual Studio Code (VSCode)
+1. In the `WORKSPACE` folder found on the desktop, open
+   `NGINX-PLUS-1.code-workspace` in Visual Studio Code (VSCode)
 
    ![Select workspace](media/2020-06-29_15-55.png)
 
-2. In the VSCode, open a a **terminal window**, using `View > Terminal menu` command. You will now be able to both run 
-   NGINX commands and edit NGINX Plus configuration files via the VSCode Console and terminal. (SSH access via Putty is 
-   also available as a SSH remote terminal access option.)
+2. In the VSCode, open a a **terminal window**, using `View > Terminal menu`
+   command. You will now be able to both run NGINX commands and edit NGINX Plus
+   configuration files via the VSCode Console and terminal. (SSH access via
+   Putty is also available as a SSH remote terminal access option.)
 
    ![terminal inside vscode](media/2020-06-29_16-02_1.png)
 
 
-3. Inspect `/etc/nginx/conf.d/proxy_cache_global.conf` and inspect the proxy caches configured on NGINX
+3. Inspect `/etc/nginx/conf.d/proxy_cache_global.conf` and inspect the proxy
+   caches configured on NGINX
 
     ```nginx
 
@@ -52,8 +58,10 @@ By the end of the lab you will be able to:
 
 4. Now, inspect `/etc/nginx/conf.d/example.com.conf` and note the following:
 
-    * The `location` block matching image file extentions where we have enabled our cache proxy "`image_cache`"
-    * We have put all specific cache settings for image files in its own configuration file called `image_cache.conf`
+    * The `location` block matching image file extentions where we have enabled
+      our cache proxy "`image_cache`"
+    * We have put all specific cache settings for image files in its own
+      configuration file called `image_cache.conf`
 
     ```nginx 
     # /etc/nginx/conf.d/example.com.conf
@@ -70,7 +78,8 @@ By the end of the lab you will be able to:
         }
     ```
 
-5. Now, inspect `/etc/nginx/includes/proxy_cache/image_cache.conf` and note the following:
+5. Now, inspect `/etc/nginx/includes/proxy_cache/image_cache.conf` and note the
+   following:
 
     ```nginx 
 
@@ -104,8 +113,9 @@ By the end of the lab you will be able to:
     # etc...
     ```
 
-6. Lets see our cache proxy in action. In the Terminal window, request `smile.png` using a Web Browser or `curl`. 
-   We will see that the **inital request** is served from the origin server as it is not cached on NGINX yet
+6. Lets see our cache proxy in action. In the Terminal window, request
+   `smile.png` using a Web Browser or `curl`. We will see that the **inital
+   request** is served from the origin server as it is not cached on NGINX yet
 
     ```bash
     $> curl -I http://www.example.com/smile.png
@@ -125,8 +135,9 @@ By the end of the lab you will be able to:
     Accept-Ranges: bytes
     ```
 
-7. Request `smile.png` again, using a web browser or `curl`. 
-   We will see that the **subsequent requests** are served from the origin server as it is not cached on NGINX yet
+7. Request `smile.png` again, using a web browser or `curl`. We will see that
+   the **subsequent requests** are served from the origin server as it is not
+   cached on NGINX yet
 
     ```bash
     $> curl -I http://www.example.com/smile.png
@@ -150,10 +161,12 @@ By the end of the lab you will be able to:
 
 8. Alternatively, using Chrome developer tools, we can see those HTTP headers.
 
-   When you want to inspect a the web pages Network Activity: **right-click** on the webpage and select **Inspect**
-   to open the Chrome DevTools > select the **Network tab** > Check **Disable Cache** > Reload the webpage >
-   (the webpage and webpage content wil reload) > find the web content to inspect (e.g. `smile.png`) > Look at the
-   **Headers** tab for **Reponse Headers** and **Request Headers**
+   When you want to inspect a the web pages Network Activity: **right-click** on
+   the webpage and select **Inspect** to open the Chrome DevTools > select the
+   **Network tab** > Check **Disable Cache** > Reload the webpage > (the webpage
+   and webpage content wil reload) > find the web content to inspect (e.g.
+   `smile.png`) > Look at the **Headers** tab for **Reponse Headers** and
+   **Request Headers**
 
     When inspecting the response headers in Chrome DevTools, you will see the HTTP headers we saw using `curl`
 
@@ -162,18 +175,23 @@ By the end of the lab you will be able to:
 
 ## Exercise 2: Visualize cache status on the live activity monitoring dashboard
 
-1. In a Web Browser, we can visualize cache status on the live activity monitoring dashboard: Navigate to out NGINX Plus dashboard on
-   [www.example.com:8080](http://www.example.com:8080) > **Caches**. 
+1. In a Web Browser, we can visualize cache status on the live activity
+   monitoring dashboard: Navigate to out NGINX Plus dashboard on
+   [www.example.com:8080](http://www.example.com:8080) > **Caches**.
 
-    The Cache Hit Ratio shown for the zone, `image_cache` will increase as we repeatedly request cached content.
+    The Cache Hit Ratio shown for the zone, `image_cache` will increase as we
+    repeatedly request cached content.
 
-2. On another tab in your Web Browser, navigate to [www.example.com/img/test.html](http://www.example.com/img/test.html) 
-   to load images served from the NGINX cache. Hit the Web Browser's refresh button multiple times to simulate multiple
-   requests
+2. On another tab in your Web Browser, navigate to
+   [www.example.com/img/test.html](http://www.example.com/img/test.html) to load
+   images served from the NGINX cache. Hit the Web Browser's refresh button
+   multiple times to simulate multiple requests
 
    ![test html page with images](media/2020-06-25_11-26.png)
 
-3. Alternatively you can copy, paste and execute the `curl` commands below multiple times in your terminal. **NOTE: these input lines do not have `$>` in order to facilitate bulk copy/paste.**
+3. Alternatively you can copy, paste and execute the `curl` commands below
+   multiple times in your terminal. **NOTE: these input lines do not have `$>`
+   in order to facilitate bulk copy/paste.**
 
     ```bash
     # Copy and paste these lines into your terminal multiple times
@@ -205,22 +223,27 @@ By the end of the lab you will be able to:
     X-Cache-Status: HIT
     ```
 
-4. You will see the Cache Hit Ratio increase as most of your requests are now served from the NGINX cache, eliminating the
-    the need for requests to your Origin Servers
+4. You will see the Cache Hit Ratio increase as most of your requests are now
+   served from the NGINX cache, eliminating the the need for requests to your
+   Origin Servers
 
      ![cache hit ratio](media/2020-06-25_14-53.png)
 
 ## Exercise 3: Restricting Access to the Purge Command and using Cache purge API
 
-1. Inspect `/etc/nginx/conf.d/proxy_cache_global.conf` again, and find the `geo` and `map` blocks that identifies requests that use the
-   HTTP `PURGE` method and deletes objects in the cache matching those URLs.
+1. Inspect `/etc/nginx/conf.d/proxy_cache_global.conf` again, and find the `geo`
+   and `map` blocks that identifies requests that use the HTTP `PURGE` method
+   and deletes objects in the cache matching those URLs.
 
-     * The `geo` block sets a custom variable, `$purge_allowed`, to `1` only on select client IP addresses
-     * The `map` block sets another custom variable, `$purge_method` to the value of `$purge_allowed` (`0` or `1`)
+     * The `geo` block sets a custom variable, `$purge_allowed`, to `1` only on
+       select client IP addresses
+     * The `map` block sets another custom variable, `$purge_method` to the
+       value of `$purge_allowed` (`0` or `1`)
 
-   In this example, NGINX checks if the `PURGE` method is used in a request, and, if so, analyzes the client IP address. 
-   If the IP address is whitelisted, then the `$purge_method` is set to `$purge_allowed`: `1` permits purging, and `0` 
-   denies it.
+   In this example, NGINX checks if the `PURGE` method is used in a request,
+   and, if so, analyzes the client IP address. If the IP address is whitelisted,
+   then the `$purge_method` is set to `$purge_allowed`: `1` permits purging, and
+   `0` denies it.
 
       ```nginx
       # /etc/nginx/conf.d/proxy_cache_global.conf
@@ -245,8 +268,8 @@ By the end of the lab you will be able to:
       }
       ```
 
-2. Inspect `example.com.conf`, and find in the main location block `/` we have enabled cache purge calls here when 
-   `$purge_method` exists (`1`)
+2. Inspect `example.com.conf`, and find in the main location block `/` we have
+   enabled cache purge calls here when `$purge_method` exists (`1`)
 
     ```nginx
     # /etc/nginx/conf.d/example.conf
@@ -262,8 +285,9 @@ By the end of the lab you will be able to:
     }
     ```
 
-3. Lets see our cache purge API in action: In the Terminal window, make a `curl` request to purge a single object,`smile.png` 
-   using the HTTP method `PURGE`. Note that the expected reponse code for a successful purge is a `HTTP 204` 
+3. Lets see our cache purge API in action: In the Terminal window, make a `curl`
+   request to purge a single object,`smile.png` using the HTTP method `PURGE`.
+   Note that the expected reponse code for a successful purge is a `HTTP 204`
 
     ```bash
 
@@ -282,8 +306,10 @@ By the end of the lab you will be able to:
     Cache-Control: public
     ```
 
-4. We can also do a wild card purge using `*` in our URL.  First, in a Web Browser, navigate to [www.example.com/img/test.html](http://www.example.com/img/test.html) 
-   and make sure our test images are in the cache
+4. We can also do a wild card purge using `*` in our URL. First, in a Web
+   Browser, navigate to
+   [www.example.com/img/test.html](http://www.example.com/img/test.html) and
+   make sure our test images are in the cache
 
    ![Test page full of images](media/2020-06-25_11-26.png)
 
@@ -325,8 +351,9 @@ By the end of the lab you will be able to:
    $> curl -I -X PURGE "http://www.example.com/*"
    ```
 
-7. Lets confirm wildcard cache purge has evicted all out cached images.The next request for these images should serve the
-   image from the Origin Servers, as it is not available in the NGINX cache yet.
+7. Lets confirm wildcard cache purge has evicted all out cached images. The next
+   request for these images should serve the image from the Origin Servers, as
+   it is not available in the NGINX cache yet.
 
    ```bash
    # Copy and paste these lines into your terminal
