@@ -85,7 +85,7 @@ By the end of the lab you will be able to:
     ```
 
 5. In a Web Browser, open the NGINX dashboard on
-   [[http://www/](http://www.example.com:8080/dashboard.htm)](http://www.example.com:8080/dashboard.html).
+   [`http://www.example.com:8080/dashboard.html`](http://www.example.com:8080/dashboard.html).
    There is a bookmark in the Chrome Web Browser. Navigate to `HTTP Upstreams`,
    and note that the `dynamic` is empty:
 
