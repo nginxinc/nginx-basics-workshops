@@ -159,9 +159,6 @@ In this section, we will use `Postman` to interact with the NGINX API. In the Op
 
     ![List server postman](media/dc10_2020-08-27.png)
 
-
-  ![server list](media/2020-06-29_22-02.png)
-
 16. We can check the that the `state` file are making our upstream changes
     persistent by reloading NGINX and checking the dashboard and API
 
