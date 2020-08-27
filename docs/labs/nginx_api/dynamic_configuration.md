@@ -175,36 +175,8 @@ In this section, we will use `Postman` to interact with the NGINX API. In the Op
 
     **Note:** After a NGINX reload, the server `id` is reset to start at `0`:
 
-    ```bash
-    # Lastly, list out servers in our upstream, `dynamic` 
-    $> curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
-    
-      {
-        "id": 0,
-        "server": "10.1.1.6:80",
-        "weight": 1,
-        "max_conns": 0,
-        "max_fails": 1,
-        "fail_timeout": "10s",
-        "slow_start": "0s",
-        "route": "",
-        "backup": false,
-        "down": false
-      },
-      {
-        "id": 1,
-        "server": "10.1.1.7:80",
-        "weight": 1,
-        "max_conns": 0,
-        "max_fails": 1,
-        "fail_timeout": "10s",
-        "slow_start": "10s",
-        "route": "",
-        "backup": true,
-        "down": false
-      }
-    ]
-    ```
+    ![List server postman](media/dc11_2020-08-26.png)
+
 
 ### Optional: Dynamic Configuration of an Upstream using the NGINX API using cURL
 
