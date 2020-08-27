@@ -155,9 +155,10 @@ In this section, we will use `Postman` to interact with the NGINX API. In the Op
 
 15. Once again, list out servers in our upstream, `dynamic`
 
-    ```bash
-    $> curl -s http://nginx-plus-1:8080/api/6/http/upstreams/dynamic/servers | jq
-    ```
+    Using `Postman` tool:
+
+    ![List server postman](media/dc10_2020-08-27.png)
+
 
   ![server list](media/2020-06-29_22-02.png)
 
