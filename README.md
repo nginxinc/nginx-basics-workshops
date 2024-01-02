@@ -1,3 +1,6 @@
+# Under Construction
+This workshop is under a re-write.  Use at your own risk.
+
 # NGINX-Basics
 
 Implement NGINX Plus as an HTTP and HTTPS (SSL terminating) load balancer for
