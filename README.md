@@ -1,6 +1,6 @@
-![NGINX Basics Workshop Banner](media/nicworkshop-banner.png)
+![NGINX Basics Workshop Banner](media/basics-workshop-banner.png)
 
-< Change Banner >
+<br/>
 
 # Under Construction - This workshop is under a re-write.  Use at your own risk.
 

@@ -1,27 +1,37 @@
-# Build NGINX Plus Docker image
+# Build and Run NGINX Plus with Docker
 
-## Build and Run NGINX Plus with Docker
+## Introduction
 
-You will now build the Plus version of NGINX, using a license.  You will need a subscription license, and both SSL .crt and .key files.  These files provide access to the `NGINX Plus repository` where the Plus binary files are located.  These are not publicly accessible, you must have a valid Certificate and Key for repo access.
-
-> What is NGINX Plus?  Plus is the Commercial version of NGINX, adding additional Enterprise features on top of the base NGINX OSS build.  Here is a Summary list of the Plus features:
-
-- Dynamic reconfiguration reloads, no downtime
-- Dynamic NGINX software updates, no downtime
-- Dynamic DNS resolution and DNS Service discovery
-- NGINX Plus API w/statistics and dashboard, over 240 metrics for TCP/HTTPS
-- Dynamic Upstreams
-- Key Value store
-- Cache Purge API controls
-- JWT processing with OIDC for user authentication
-- App Protect Firewall WAF
+You will now build the Plus version of NGINX, using a license.  You will need a subscription license, and both SSL .crt and .key files.  These files provide access to the `NGINX Plus repository` where the Plus binary files are located.  These are not publicly accessible, you must have a valid Certificate and Key for repo access.  This new NGINX Plus container will be used for the rest of the Lab exercises, adding Plus features and options to your environment.
 
 ## Learning Objectives 
 
 By the end of the lab you will be able to: 
  * Build an `NGINX Plus Docker` image
- * Run this NGINX Plus image
- * Test Plus container
+ * Run this NGINX Plus image, adding it to your lab environment
+ * Test the Plus container
+ * Migrate NGINX OSS configurations to NGINX Plus
+ 
+<br/>
+   
+NGINX Plus | Docker
+:-------------------------:|:-------------------------:
+![NGINX Plus](media/nginx-plus-icon.png)  |![Docker](media/docker-icon.png)
+
+
+> What is NGINX Plus?  Plus is the `Commercial version of NGINX`, adding additional Enterprise features on top of the base NGINX OSS build.  Here is a Summary list of the Plus features:
+
+- Dynamic reconfiguration reloads with no downtime
+- Dynamic NGINX software updates with no downtime
+- Dynamic DNS resolution and DNS Service discovery
+- NGINX Plus API w/statistics and dashboard, over 240 metrics for TCP/HTTPS
+- NGINX JavaScript Prometheus exporter libraries
+- Dynamic Upstreams
+- Key Value store
+- Cache Purge API controls
+- NGINX Clustering for High Availability
+- JWT processing with OIDC for user authentication
+- App Protect Firewall WAF
  
 ## Pre-Requisites
 
@@ -126,11 +136,11 @@ By the end of the lab you will be able to:
     ```bash
     #Sample output
     CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                NAMES
-    41ec967f9f9f        nginx:alpine_v1.0        "nginx -g 'daemon of..."   20 seconds ago      Up 19 seconds       0.0.0.0:80->80/tcp   nginxoss
+    41ec967f9f9f        nginx:alpine_v1.0        "nginx -g 'daemon of..."   20 seconds ago      Up 19 seconds       0.0.0.0:80->80/tcp   nginx-plus
 
     ```
 
-1. Test the NGINX Plus container for the default webpage
+1. Test the NGINX Plus container for the default Welcome page
 
     ```bash
     curl -I http://localhost
@@ -152,22 +162,22 @@ By the end of the lab you will be able to:
 
     ```
 
-1. Test NGINX container with a browser
+1. Test NGINX Plus container with a browser:
 
     Launch your browser, go to http://localhost
 
     You should see the default NGINX Welcome web page.
 
-    ![NGINX Welcome](media/lab1_nginx-welcome.png)
+    ![NGINX Welcome](media/lab5_nginx-welcome.png)
 
-1. Test access to NGINX container with Docker Exec
+1. Test access to NGINX container with Docker Exec:
 
     ```bash
     docker exec -it <CONTAINER ID> /bin/bash
 
     ```
 
-1. Run some commands inside the NGINX Container
+1. Run some commands inside the NGINX Container:
 
     ```bash
     # Look around the nginx folders
@@ -229,7 +239,7 @@ By the end of the lab you will be able to:
 
     ```
 
-    - Ask NGINX for help
+    - Ask NGINX for help ( with NGINX, not your romance ):
 
     ```bash
     /usr/sbin/nginx -h
@@ -254,7 +264,7 @@ By the end of the lab you will be able to:
 
     ```
 
-    - Verify what version of NGINX is running
+    - Verify what version of NGINX is running:
 
     ```bash
     /usr/sbin/nginx -V
@@ -316,8 +326,9 @@ By the end of the lab you will be able to:
 
     ```
 
-**Congratulations, you are now a member of Team NGINX Plus !**
+>**Congratulations, you are now a member of Team NGINX Plus !**
 
+![NGINX Logo](media/nginx-logo.png)
 
 **This completes this Lab.**
 

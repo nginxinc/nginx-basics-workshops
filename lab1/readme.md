@@ -1,9 +1,14 @@
-# Installing NGINX on Docker
+# Building and Run NGINX Opensource on Docker
 
 ## Introduction
 
-In this lab, you will build and run NGINX OSS and Plus in Docker containers.  Then you will run an NGINX demo web server.  After all are running, you will verify that all containers, web servers, and NGINX are up and running.  All of these NGINX containers will be used during the rest of this Workshop to complete the remaining Lab Exercises.  It is important to build this Workshop correctly to receive the most benefit from the labs.
+In this lab, you will build and run NGINX OSS in Docker containers.  Then you will run several NGINX demo web servers.  After all are running, you will verify that all containers, web servers, and NGINX are up and running.  All of these NGINX containers will be used during the rest of this Workshop to complete the remaining Lab Exercises.  It is important to build this Workshop correctly to receive the most benefit from the labs.
 
+NGINX OSS | Docker
+:-------------------------:|:-------------------------:
+![NGINX Plus](media/nginx-icon.png)  |![Docker](media/docker-icon.png)
+ 
+ 
 ## Learning Objectives 
 
 By the end of the lab you will be able to: 
@@ -118,7 +123,7 @@ By the end of the lab you will be able to:
 
     Launch your browser, go to http://localhost
 
-    You should see the default NGINX Welcome web page.
+    You should see the default NGINX Welcome web page.  << Needs a new screenshot >>
 
     ![NGINX Welcome](media/lab1_nginx-welcome.png)
 
@@ -278,16 +283,9 @@ By the end of the lab you will be able to:
 
     ```
 
-**Congratulations, you are now a member of Team NGINX !**
- 
+>**Congratulations, you are now a member of Team NGINX !**
 
-## Test and Verify all containers and NGINX
-
-1.
-2.
-3.
-4.
-
+![NGINX Logo](media/nginx-logo.png)
 
 **This completes this Lab.**
 
