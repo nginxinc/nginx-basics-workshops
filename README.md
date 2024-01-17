@@ -12,11 +12,11 @@
 
 <br/>
 
-> ><strong>Welcome to the NGINX Plus Basics Workshop!</strong>
+> ><strong>Welcome to the NGINX OSS and Plus Basics Workshop!</strong>
 
 <br/>
 
-This Workshop will introduce `NGINX web and proxy servers` with hands-on practice through self-paced lab exercises.  You will learn about NGINX OSS and NGINX Plus, with no prior experience required.  These lab exercises will teach you by example how to install, configure, test, operate, troubleshoot, and fix NGINX; using common commands, tools, and applications.  There are literally dozens of use cases for NGINX, this Basics Workshop will focus on the most common ones for new users and deployments.  This Workshop content is designed to run in almost any environment that can run Docker and Linux containers, for broad appeal and consumption by users. 
+This Workshop will introduce `NGINX web and reverse proxy servers` with hands-on self-paced lab exercises.  You will learn about NGINX OSS and NGINX Plus, with no prior experience required.  These lab exercises will teach you by example how to install, configure, test, operate, troubleshoot, and fix NGINX; using common commands, tools, and applications.  There are literally dozens of use cases for NGINX, this Basics Workshop will focus on the most common ones for new users and deployments.  This Workshop content is designed to run in almost any environment that can run Docker and Linux containers, for broad appeal and consumption by users. 
 
 These Hands-On Lab Exercises are designed to build upon each other, adding additional functions and features as you progress through them, completing the labs in sequential order is required.
 

@@ -9,10 +9,8 @@ In this lab, you will build and run NGINX OSS and Plus in Docker containers.  Th
 By the end of the lab you will be able to: 
  * Build an `NGINX Opensource Docker` image
  * Run this NGINX OSS image
- * Build an `NGINX Plus Docker` image
- * Run this NGINX Plus image
- * Run NGINX demo web containers
- * Complete initial container build and NGINX tests
+ * Run demo NGINX web containers
+ * Verify initial container build and NGINX tests
 
 ## Pre-Requisites
 
@@ -58,7 +56,7 @@ By the end of the lab you will be able to:
 
     ```
 
-1. List the Docker containers
+1. List the Docker images
 
     ```bash
     docker images
@@ -142,10 +140,10 @@ By the end of the lab you will be able to:
     # Check for nginx packages installed
     apk info -vv |grep nginx
 
-    # What nginx process are running?
+    # What nginx processes are running?
     ps aux |grep nginx
 
-    # Check TOP for resource usage
+    # Check Linux TOP for resource usage
     top -n 1
 
     # Which TCP Ports are being used by NGINX ?
@@ -193,7 +191,7 @@ By the end of the lab you will be able to:
 
     ```
 
-    1. Ask NGINX for help
+    - Ask NGINX for help
 
     ```bash
     /usr/sbin/nginx -h
@@ -201,7 +199,6 @@ By the end of the lab you will be able to:
     ```
     ```bash
     #Sample output
-
     nginx version: nginx/1.17.0
     Usage: nginx [-?hvVtTq] [-s signal] [-c filename] [-p prefix] [-g directives]
 
@@ -219,7 +216,7 @@ By the end of the lab you will be able to:
 
     ```
 
-    1. Verify what version of NGINX is running
+    - Verify what version of NGINX is running
 
     ```bash
     /usr/sbin/nginx -V
@@ -281,17 +278,8 @@ By the end of the lab you will be able to:
 
     ```
 
-**Congratulations, you are now on Team NGINX !**
-
-
-## Build and Run NGINX Plus with Docker
-
-You will now build the Plus version of NGINX, using a license.  You need a subscription license, and both SSL .crt and .key files.  These files provide access to the NGINX Plus repository where the files are located.  They are not publicly accessible, you must have a valid Certificate and Key for access.
-
-1.
-2.
-3.
-4.
+**Congratulations, you are now a member of Team NGINX !**
+ 
 
 ## Test and Verify all containers and NGINX
 
