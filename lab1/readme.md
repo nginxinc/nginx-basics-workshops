@@ -7,8 +7,7 @@ In this lab, you will build and run NGINX OSS in Docker containers.  Then you wi
 NGINX OSS | Docker
 :-------------------------:|:-------------------------:
 ![NGINX Plus](media/nginx-icon.png)  |![Docker](media/docker-icon.png)
- 
- 
+  
 ## Learning Objectives 
 
 By the end of the lab you will be able to: 
@@ -25,7 +24,7 @@ By the end of the lab you will be able to:
 
 ## Build and Run NGINX OSS with Docker
 
-1. Clone the NGINX Docker repo.  This will download all the files needed to build and run NGINX OSS as a Docker container:
+1. In a new folder, Git clone the NGINX Docker repo.  This will download all the files needed to build and run NGINX OSS as a Docker container:
 
     ```bash
     sudo su -
