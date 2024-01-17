@@ -16,11 +16,12 @@
 
 <br/>
 
-This Workshop will introduce `NGINX web and proxy servers` with hands-on practice through self-paced lab exercises.  You will learn about NGINX and NGINX Plus, with no prior experience required.  These lab exercises will teach you by example how to install, configure, test, operate, troubleshoot, and fix NGINX; using common commands, tools, and applications.  There are literally dozens of use cases for NGINX, this Basics Workshop will focus on the most common ones for new users and deployments.  This Workshop content is designed to run in almost any environment that can run Docker and Linux containers, for broad appeal and consumption by users. 
+This Workshop will introduce `NGINX web and proxy servers` with hands-on practice through self-paced lab exercises.  You will learn about NGINX OSS and NGINX Plus, with no prior experience required.  These lab exercises will teach you by example how to install, configure, test, operate, troubleshoot, and fix NGINX; using common commands, tools, and applications.  There are literally dozens of use cases for NGINX, this Basics Workshop will focus on the most common ones for new users and deployments.  This Workshop content is designed to run in almost any environment that can run Docker and Linux containers, for broad appeal and consumption by users. 
 
 These Hands-On Lab Exercises are designed to build upon each other, adding additional functions and features as you progress through them, completing the labs in sequential order is required.
 
 <br/>
+# Change this graphic to png?
 
 ![Developer Seated](media/developer-seated.svg)
 
@@ -28,10 +29,10 @@ These Hands-On Lab Exercises are designed to build upon each other, adding addit
 
 ## Goals 
 
- * Provide an introduction to NGINX Plus
- * How to install and setup NGINX Plus on Virtual Machines and Docker
- * How to configure NGINX for web server functions
+ * How to build and setup NGINX OSS and Plus on Docker
+ * How to configure NGINX for basic web server functions
  * How to configure NGINX for Proxy functions
+ * Provide an introduction to NGINX Plus
  * How to monitor, log, troubleshoot, and fix common issues
  * Provide examples of NGINX configurations best practices
  * Introduction to more Advanced Topics
@@ -44,12 +45,13 @@ To successfully complete the Hands On exercises for this Workshop, there are bot
 
 - You should be familiar with the Linux command line, copying, editing, and saving files.
 - You should be familiar with TCP, HTTP, SSL, and basic networking concepts.
-- You should be familiar with basic Docker and container concepts.
-- Optional, you should be familiar with load balancing concepts and terminology.
+- You should be familiar with basic Docker and container commands and concepts.
+- You should be familiar with Computer Desktop tools like Chrome, VScode, Postman.
+- Optional, you should be familiar with server load balancing concepts and terminology.
 
 ### Technical Requirements
 
-The Hands On lab exercises are written for hosts running as Docker containers.  These containers are quite small, and should all run easily on most modern laptops or servers.  You will need to provide the following components, prior to starting the exercises:
+The Hands On lab exercises are written for students with hosts running multiple Docker containers.  These containers are quite small, and should all run easily on most modern computer hardware.  You will need to provide the following components, prior to starting the exercises:
 
 1. NGINX Plus subscription or Evaluation license files. You can request a free 30-day Trial from [NGINX Plus Trial](https://www.nginx.com/free-trial-request/).  The license files will normally arrive in your email within a few hours of submitting a request.
 
@@ -77,19 +79,19 @@ To ensure understanding of every step, every line which is to be entered by the 
 This Workshop is built with 2 components.
 
 1. An Ubuntu Desktop, which will host all the Docker containers, and provide a Linux Desktop UI for using various appls, like Chrome, VisualStudio Code, Postman, Terminal.
-1. An Ubuntu Virtual Machine, which is used to show the installation of NGINX Plus on a Virtual Machine.
 
 As you progress thru the lab exercises, you will be adding more containers, and more features and options to NGINX.  `It is important that you complete the lab exercises in the order presented in this Workshop, so that you can see and learn how to configure NGINX properly, and complete all exercises successfully.`
 
 The docker containers used are as follows:
-- NGINX Plus ADC/load balancer, named `nginx-plus,`
-- Web server #1, 2, and 3; named `web1`, `web2` and `web3` respectively.
+- NGINX Opensource ADC/load balancer, named `nginxoss,`
+- NGINX Plus ADC/load balancer, named `nginxplus,`
+- Web server #1, 2, and 3; named `nginxweb1`, `nginxweb2` and `nginxweb3` respectively.
 
 List and details of the containers:
 
  * **NGINX Plus** `(Latest)` based on ubuntu 22.04. An example centos7 Dockerfile is provided for information only.
  * **NGINX OSS** `(Latest)` is based on
-   [**nginx-hello**](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello).
+   [**nginxinc/ingress-demo**](https://hub.docker.com/r/nginxinc/ingress-demo).
    NGINX web servers that serve simple HTML pages containing the Hostname, IP address
    and port as wells as the request URI, the local time of the webserver, and other metadata.
  * **Lab Guide** can be read from the [`docs/labs` folder](docs/labs/README.md)
