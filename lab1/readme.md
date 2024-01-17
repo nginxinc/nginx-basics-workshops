@@ -6,7 +6,7 @@ In this lab, you will build and run NGINX OSS in Docker containers.  Then you wi
 
 NGINX OSS | Docker
 :-------------------------:|:-------------------------:
-![NGINX Plus](media/nginx-icon.png)  |![Docker](media/docker-icon.png)
+![NGINX Plus](media/nginx-icon.png)  |![Docker](media/docker-icon2.png)
   
 ## Learning Objectives 
 
@@ -53,7 +53,7 @@ By the end of the lab you will be able to:
 
     ```
 
-1. Build the OSS NGINX Docker image
+1. Build the OSS NGINX Docker image based on Alpine Linux:
 
     ```bash
     docker build --no-cache -t nginx:alpine_v1.0 .

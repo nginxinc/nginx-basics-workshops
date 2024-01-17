@@ -16,7 +16,7 @@ By the end of the lab you will be able to:
    
 NGINX Plus | Docker
 :-------------------------:|:-------------------------:
-![NGINX Plus](media/nginx-plus-icon.png)  |![Docker](media/docker-icon.png)
+![NGINX Plus](media/nginx-plus-icon.png)  |![Docker](media/docker-icon2.png)
 
 
 > What is NGINX Plus?  Plus is the `Commercial version of NGINX`, adding additional Enterprise features on top of the base NGINX OSS build.  Here is a Summary list of the Plus features:
@@ -94,7 +94,7 @@ NGINX Plus | Docker
 
     ```
 
-1. Build the Plus NGINX Docker image
+1. Build the Plus NGINX Docker image based on Debian Linux:
 
     ```bash
     docker build --no-cache -t nginx-plus:debian-stretch_v1.0 .
