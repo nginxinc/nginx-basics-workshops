@@ -1,0 +1,58 @@
+version: '3.3'
+services:
+  # NGINX webservers with ingress-demo pages
+  # NGINX Basics, Jan 2024
+  # Chris Akker, Shouvik Dutta
+  web1:
+      hostname: web1
+      build: nginx-demo
+      volumes:
+        - ./nginx-demo/etc/nginx:/etc/nginx
+        - ./nginx-demo/usr/share/nginx/html:/usr/share/nginx/html
+      expose:
+        - "80"
+        - "90"
+  web2:
+      hostname: web2
+      build: nginx-demo
+      volumes:
+        - ./nginx-demo/etc/nginx:/etc/nginx
+        - ./nginx-demo/usr/share/nginx/html:/usr/share/nginx/html
+      ports:
+        - "80"
+        - "90"
+  web3:
+      hostname: web3
+      build: nginx-demo
+      volumes:
+        - ./nginx-demo/etc/nginx:/etc/nginx
+        - ./nginx-demo/usr/share/nginx/html:/usr/share/nginx/html
+      ports:
+        - "80"
+        - "90"
+  # Lab Guide
+  #docs:
+  #    hostname: docs
+  #    build: docs
+  #    volumes:
+  #      - ./docs/labs:/usr/share/nginx/html/labs
+  #      - ./docs/misc/lab_guide.conf:/etc/nginx/conf.d/lab_guide.conf
+  #    ports:
+  #      - 9000:9000
+  # NGINX Plus Load Balancer       
+  # nginx-plus:
+    #  hostname: nginx-plus
+    #  build: nginx-plus
+    #  links:
+    #      - web1:web1
+    #      - web2:web2
+    #      - web3:web3
+    #  volumes:
+    #      - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d
+    #      - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
+    #      - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+    #  ports:
+    #      - 8080:8080
+    #      - 80:80
+    #      - 443:443
+    #  restart: always

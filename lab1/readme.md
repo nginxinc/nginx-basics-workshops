@@ -1,4 +1,4 @@
-# Building and Run NGINX Opensource on Docker
+# Build and Run NGINX Opensource on Docker
 
 ## Introduction
 
@@ -6,7 +6,7 @@ In this lab, you will build and run NGINX OSS in Docker containers.  Then you wi
 
 NGINX OSS | Docker
 :-------------------------:|:-------------------------:
-![NGINX Plus](media/nginx-icon.png)  |![Docker](media/docker-icon2.png)
+![NGINX OSS](media/nginx-icon.png)  |![Docker](media/docker-icon2.png)
   
 ## Learning Objectives 
 
@@ -34,22 +34,22 @@ By the end of the lab you will be able to:
 
     ```
 
-1. Edit the Dockerfile to add some common Linux tools to the Docker image, to make it easier to see/edit and test various NGINX features:
+1. Make a copy, then edit the Dockerfile to add some common Linux tools to the Docker image, to make it easier to see/edit and test various NGINX features:
 
     ```bash
     cd docker-nginx
     cd mainline
     cd alpine
+    cp Dockerfile Dockerfile.orig
     vi Dockerfile
     ```
 
-    Add the following block below the ENV variables:
+    Add the following tools to the last line:
 
     ```bash
     # install tools
-    RUN apk update && \
-    apk upgrade && \
-    apk add bash bash-completion curl jq wget vim    # added tools 
+
+    && apk add --no-cache curl ca-certificates bash bash-completion jq wget vim    # added tools 
 
     ```
 
@@ -285,6 +285,66 @@ By the end of the lab you will be able to:
 >**Congratulations, you are now a member of Team NGINX !**
 
 ![NGINX Logo](media/nginx-logo.png)
+
+## Create NGINX Demo web servers
+
+You will now create an NGINX demo environment, using 3 docker containers with NGINX running as a web server.  These will be used as your `backends` or `upstreams` for the remaining labs.  These are availabe on Docker hub as public images, so you can use them for testing later.
+
+1. Inspect the Dockerfile for these Demo containers.  You will see the following items of import:
+
+- Ports 80 and 443 are open for HTTP and HTTPS traffic
+- Three of them are being used to test various loadbalancing concepts
+
+1. Start a container to each of the 3 web servers"
+
+```bash
+sudo docker run -d --name web1 -p 8001:80 nginxinc/ingress-demo:latest
+sudo docker run -d --name web2 -p 8002:80 nginxinc/ingress-demo:latest
+sudo docker run -d --name web3 -p 8003:80 nginxinc/ingress-demo:latest
+```
+
+1. Verify all three are running, and test all three:
+
+```bash
+sudo docker ps -a
+
+```
+
+```bash
+#Sample output
+CONTAINER ID   IMAGE                          COMMAND                  CREATED              STATUS              PORTS                           NAMES
+27eda0029a82   nginxinc/ingress-demo:latest   "/docker-entrypoint.…"   About a minute ago   Up About a minute   443/tcp, 0.0.0.0:8003->80/tcp   web3
+73c5ca3890f5   nginxinc/ingress-demo:latest   "/docker-entrypoint.…"   About a minute ago   Up About a minute   443/tcp, 0.0.0.0:8002->80/tcp   web2
+633cba8b2178   nginxinc/ingress-demo:latest   "/docker-entrypoint.…"   3 minutes ago        Up 3 minutes        443/tcp, 0.0.0.0:8001->80/tcp   web1
+
+```
+
+```bash
+curl -I http://localhost:8001
+
+```
+
+```bash
+#Sample output
+HTTP/1.1 200 OK
+Server: nginx/1.19.6
+Date: Thu, 18 Jan 2024 22:34:51 GMT
+Content-Type: text/html; charset=utf-8
+Connection: keep-alive
+Expires: Thu, 18 Jan 2024 22:34:50 GMT
+Cache-Control: no-cache
+
+```
+
+Check all three.  Notice the `Server Name` is the same as the Container ID, and the `Server Address` is an IP Address from your local Docker Network.  Make NOTE of these 3 IP Addresses, as you 
+
+Now try your browser, open Chrome and try http://localhost:8001, http://localhost:8002, http://localhost:8003 in the address bar, you should see three different web servers:
+
+NGINX Web1 | NGINX Web2 | NGINX Web3 
+:-------------------------:|:-------------------------:|:-------------------------:
+![NGINX Web1](media/lab1_nginx-web1.png)  |![NGINX Web2](media/lab1_nginx-web2.png) |![NGINX Web3](media/lab1_nginx-web3.png) 
+
+
 
 **This completes this Lab.**
 
