@@ -1,32 +1,32 @@
 version: '3.3'
 services:
-  # NGINX webservers with ingress-demo pages
+  # NGINX webservers with nginx-hello pages
   # NGINX Basics, Jan 2024
   # Chris Akker, Shouvik Dutta
   web1:
       hostname: web1
-      build: nginx-demo
+      build: nginx-hello
       volumes:
-        - ./nginx-demo/etc/nginx:/etc/nginx
-        - ./nginx-demo/usr/share/nginx/html:/usr/share/nginx/html
+        - ./nginx-hello/etc/nginx:/etc/nginx
+        - ./nginx-hello/usr/share/nginx/html:/usr/share/nginx/html
       expose:
         - "80"
         - "90"
   web2:
       hostname: web2
-      build: nginx-demo
+      build: nginx-hello
       volumes:
-        - ./nginx-demo/etc/nginx:/etc/nginx
-        - ./nginx-demo/usr/share/nginx/html:/usr/share/nginx/html
+        - ./nginx-hello/etc/nginx:/etc/nginx
+        - ./nginx-hello/usr/share/nginx/html:/usr/share/nginx/html
       ports:
         - "80"
         - "90"
   web3:
       hostname: web3
-      build: nginx-demo
+      build: nginx-hello
       volumes:
-        - ./nginx-demo/etc/nginx:/etc/nginx
-        - ./nginx-demo/usr/share/nginx/html:/usr/share/nginx/html
+        - ./nginx-hello/etc/nginx:/etc/nginx
+        - ./nginx-hello/usr/share/nginx/html:/usr/share/nginx/html
       ports:
         - "80"
         - "90"

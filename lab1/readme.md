@@ -352,7 +352,7 @@ NGINX Web1 | NGINX Web2 | NGINX Web3
 
 ## References:
 
-- [NGINX Plus](https://docs.nginx.com/nginx/)
+- [NGINX OSS](https://nginx.org/en/docs/)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
 - [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
 - [Docker](https://www.docker.com/)
