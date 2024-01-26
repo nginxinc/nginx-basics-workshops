@@ -1,35 +1,19 @@
-# Introduction to NGINX web server
+# Introduction to NGINX Web Server
 
 ## Introduction
 
-In this lab, NGINX as a web server will be introduced.  NGINX architecture and basic operations, as well as basic web and content serving principles will be covered.
+In this lab, NGINX as a web server will be introduced.  NGINX architecture and basic operations, as well as basic web and content serving concepts will be covered.  A quick review of HTTP and URLs is presented, as your NGINX configurations will follow these HTTP principles.
 
 ## Learning Objectives 
 
 By the end of the lab you will be able to: 
- * Describe NGINX origins, architecture, and operations
- * Create and edit NGINX configs following best practices
- * Create NGINX configurations for basic web content
- 
- * Be proficient with NGINX logging files, formats, variables
+* Describe NGINX origins, architecture, and operations
+* Have a basic understanding of HTTP Requests and URLs
+* Create NGINX configurations for basic web content
+* Create and edit simple NGINX configs following best practices
+* Be proficient with NGINX logging files, formats, variables
 
-## The History of NGINX
 
-NGINX was originally written in 2002 by Igor Sysov while he was working at rambler.ru, a web company providing Internet Search content.  As Rambler continued to grow, Igor kept hitting the practical limit of 10,000 simultaneous HTTP requests with Apache.  The only way to handle more traffic was to build and run more servers.  So NGINX was written as the answer to the `C10k concurrency problem` - how do you handle more than 10,000 concurrent requests on a single Linux server.  Igor created a new TCP connection handling concept call the `Worker`.  The worker is a process that continually waits for incoming TCP connections, and immediately handles the Request, and delivers the Response.  It is event-driven programming logic.  Importantly, NGINX workers can use any CPU, and can scale up in performance as the hardware scales up, providing a nearly linear performance curve.  There are many articles written and available about this NGINX Worker connection architecture if you are interested in reading more about it. 
-
-Another architecural concept in NGINX worth noting, is the `NGINX Master` process.  The master process interacts with the Linux OS, controls the Workers, reads config files, writes to error and logging files, validates configuration changes, then loads them into memory.  It is considered the Control plane process, while the Workers are considered the Data plane processes.  The separation of Control functions from Data handling functions is also very beneficial to handling high volumes of web traffic.
-
-NGINX also uses a Shared memory model, where common elements are equally accessed by all workers.  This reduces the overall memory footprint considerably, making NGINX very lightweight, and ideal for containers and other small compute environments.  You can literally run NGINX off a legacy floppy disk !
-
-In the NGINX Architectural diagram below, you can see these different core components of NGINX, and how they relate to each other.  You will notice that Control and Management type functions are separate and independent from the Data flow functions of the Workers that are handling the traffic.  You will find links to NGINX core architectures and concepts in the References section.
-
->> It is this unique architecture that makes NGINX so powerful and efficient.
-
-![NGINX Architecture](media/lab2_nginx-architecture.png)
-
-In 2004, NGINX was released as open source software (OSS).  It rapidly gained popularity and has been adopted by millions of websites since.
-
-In 2013, NGINX Plus as released, providing additional features and Commercial Support for Enterprise customers. 
 
 
 ## NGINX Commands
@@ -56,20 +40,18 @@ $ nginx -T
 
 ```
 
-
-
 ### NGINX Reloads
 
-What does NGINX do, when you change the configuration and request a reload?  At a high level, this is what NGINX does:
+What does NGINX do, when you change the configuration and request a reload?  At a high level, this is what happens:
 
 - The `nginx -s reload` command sends a SIGHUP signal to the Linux Kernel.
 - The master process reads all the config files, and validates the syntax, configuration commands, variables, and many other dependencies.  It also validates that any dependent Linux system level objects are correct, like folder/file names and paths, file permissions, networking objects like IP addresses, sockets, etc.  If there are any errors, it prints out the configuration filename and the line number where the error exists, and some helpful information, like "path /cahce not found" (you have a typo: /cahce should be spelled /cache).  The validation STOPS on the first error encountered.  So you must address the error, and run `nginx -t` again to further check for errors.
 - Once the master process configuration validation is successful, then NGINX will do the following:
-1. with NGINX OSS, the Worker processes are immediately shutdown, along with all existing TCP connections.  The master process then spawns new Worker processes, and they begin handling traffic based on the new configuration.  Any traffic in flight is dropped.
-2. with NGINX Plus, new Worker processes are created, and begin using the new configuration immediately for all new connections and requests.  The old Workers are allowed to complete their job, and close their TCP connections naturally, traffic in flight is not dropped!  The master process terminates the old Workers after they close all their connections.  This is called Dynamic Reconfiguration in NGINX Plus documentation.
+1. With NGINX OSS, the Worker processes are immediately shutdown, along with all existing TCP connections.  The master process then spawns new Worker processes, and they begin handling new connections and traffic based on the new configuration.  Any traffic in flight is dropped.
+2. With NGINX Plus, new Worker processes are created, and begin using the new configuration immediately for all new connections and requests.  The old Workers are allowed to complete their previous task, and then close their TCP connections naturally, traffic in flight is not dropped!  The master process terminates the old Workers after they close all their connections.  This is called Dynamic Reconfiguration in NGINX Plus documentation.
 - The nginx master process writes log information about the reload to the error.log so you can see what happened when.
 
-< NGINX start, stop, error.log lab exercises here - systemctl, top, ps aux, etc >
+< NGINX start, stop, reload while watching the error.log lab exercises here - top, ps aux, etc >
 
 
 ### NGINX Configuration - Contexts, Includes, Directives, Blocks
@@ -93,7 +75,7 @@ Let's take a look at some examples, using the default `nginx.conf` that comes in
 
 Inspect the nginx.conf file, here are some explanations:
 
-```bash
+```nginx
 # This is the "main" NGINX context, where NGINX gets its start up parameters
 # Notice main does NOT have curly braces {} !
 #
@@ -106,7 +88,7 @@ pid        /var/run/nginx.pid;             #set NGINX master process PID file
 
 ```
 
-```bash
+```nginx
 # This is the block and context called "events"
 # Configures NGINX Workers and other core parameters
 #
@@ -117,16 +99,16 @@ events {
 
 ```
 
-```bash
+```nginx
 # This is the "http" context, used for all http configurations
-# Notice the "includes", which tells NGINX to use these files
+# Notice both "include" commands, which tells NGINX to use these files
 #
 
 http {
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
 
-    # Set the access log format
+    # Set the access logging format
     log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
                       '$status $body_bytes_sent "$http_referer" '
                       '"$http_user_agent" "$http_x_forwarded_for"';
@@ -145,7 +127,7 @@ http {
 
 ```
 
-```bash
+```nginx
 # This is a "server" and "location" block, used for creating the http virtual server
 # And creating the URL paths 
 #
@@ -156,14 +138,14 @@ server {
     listen       80;                  # TCP port to listen on
     server_name  localhost;           # HTTP hostname matching
 
-    access_log  /var/log/nginx/host.access.log  main;    # Notice the custom filename
+    access_log  /var/log/nginx/localhost.access.log  main;    # Notice the custom filename
 
     location / {                         # URL to look for "/", the base
         root   /usr/share/nginx/html;    # folder for content to be served
         index  index.html index.htm;     # default html page to use
     }
 
-    location /images/ {                   # URL to look for "/images" 
+    location /images/ {                   # URL path for "/images" 
         root   /data;                     # folder for images
     }
 )
@@ -175,30 +157,98 @@ server {
 
 In general, the contexts and blocks are in a logical hierarchy that follows the construction of an HTTP URL, as follows.
 
-main and events > nginx start up parameters
-http > high level http parameters - logging, data types, timers, include files
-server > virtual server parameters - port, hostname, access log, include files
-location > URL path, object type
+- main and events > nginx start up parameters
+- http > high level http parameters - logging, data types, timers, include files
+- server > virtual server parameters - listen port, hostname, access log, include files
+- location > URL path, object type
 
 http://www.example.com:8080/images/smile.png
 
 schema://hostname:port/path/file.type
 
 
-
 ### NGINX Linux File Structure
 
-The hierarchy of these contexts also maps to how the folders/files are laid out on disk. This is how the folders and files are laid out for these lab exercises, following NGINX guidelines and best practices.
+The hierarchy of these contexts also maps to the folders/files layout on disk. This is how the folders and files are laid out for these lab exercises, following NGINX guidelines and best practices.
 
 ```
 < /etc/nginx tee here >
 
 ```
 
+### HTTP URL Review
 
-## NGINX static web content
+In order to understand how NGINX works as web server, a basic understanding of the HTTP protocol, and how URLS work is neccessary.  This is not a lab on HTTP, but the principle objects and definitions are breifly reviewed here as they relate to NGINX.  You will find a link to more information on HTTP in the References section.
 
-Now that you have a basic understanding of the NGINX binary, contexts, and configuration files, let's look at how NGINX operates as a web server.  You will configure some HTML pages, and create NGINX configs to serve some content based on the URL in the HTTP request.
+So what is a URL??  URL stands for `Uniform Resource Location` - an Internet standard that describes a web object that is globally unique.
+
+![HTTP Request](media/lab2_http_request.png)
+
+Every URL consists of 4 or 5 distinct fields.
+
+Given:   http://www.example.com/app1?arg=23972df
+
+Scheme  | Hostname        | URI    | Argument
+:------:|:--------:|:--------:|:--------:
+http:// | www.example.com | /app1 | ?arg=23972df
+
+>If the TCP port used by the webserver is `not` 80 or 443, it must be included in the URL request, like this example using port 8443:
+
+Given:  https://www.example.com:8443/app1?arg=23972df
+
+Scheme  | Hostname        | Port  | URI    | Argument
+:------:|:--------:|:--------:|:--------:|:--------:
+https:// | www.example.com | :8443 | /app1 | ?arg=23972df
+
+In the examples above: 
+- the Scheme is the protocol to use, usually either `HTTP` or `HTTPS`.  It must be followed by a colon, and two forward slashs.
+- The Hostname is a fully qualified DNS name, often with a subdomain like `www` in this example.  It must contain the root level Domain name.  It must follow DNS standards based naming conventions.
+- The Port is only required, if you are not using Port 80 for HTTP, or Port 443 for HTTPS.  The Hostname and Port must be separated by a colon `:`. These are the two standard ports used by all modern browsers, and does not appear in the URL if using the standard port 80 or 443.
+- The URI, `Uniform Resource Identifier`, is often called the `path`, because it often refers to a matching folder name on the web server's disk system.  It must start with a forward slash `/`, just like a Linux folder does.
+- The Argument, is an optional extension of the URI, and adds additional information the web server needs to understand the request properly.  It must start with a question mark, and each argument has a unique name followed by an equal sign. Multiple arguments are allowed, each separated by another question mark `?`.
+
+As you configure NGINX, you will see that it uses these HTTP standards and definitions to determine how to handle incoming requests, where to route them, and how to respond correctly.
+
+Now you can configure the NGINX contexts to handle an HTTP request properly.  Let's overly the NGINX configuration contexts with the example URL.
+
+Given:   http://www.example.com/app1
+
+Scheme  | Hostname        | URI    
+:------:|:--------:|:--------:
+http:// | www.example.com | /app1
+
+Would require the following NGINX configuration Contexts:
+
+URL Field | Context
+:--------:|:---------------:
+scheme  | http{}
+hostname | server{}
+URI | location{}
+
+
+```nginx
+# Note:  the use of indenting the nested contexts makes it easy to read
+#
+http {
+
+  server {
+    listen 80;
+    server_name www.example.com;
+    
+      location /app1 {
+      try_files $uri $uri/;
+      }
+   }
+}
+
+```
+
+
+### NGINX static web content
+
+Now that you have a basic understanding of the NGINX binary, contexts, and configuration files, let's configure NGINX as a web server following HTTP standards.  You will configure some HTML pages, and create NGINX configs to serve some content based on the URL in the HTTP request.
+
+
 
 
 **This completes this Lab.**
@@ -210,6 +260,7 @@ Now that you have a basic understanding of the NGINX binary, contexts, and confi
 - [NGINX Beginner's Guide](https://nginx.org/en/docs/beginners_guide.html)
 - [NGINX OSS](https://nginx.org/en/docs/)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
+- [HTTP URL Overview](https://en.wikipedia.org/wiki/URL)
 - [NGINX on Floppy disk](https://www.youtube.com/watch?v=IjjiTD-1Cvg)
 
 

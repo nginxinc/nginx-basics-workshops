@@ -2,8 +2,7 @@
 
 ## Introduction
 
-In this lab, you will build a test lab environment using NGINX and Docker.  This will require that you build and run NGINX Opensource as a `Reverse Proxy Load Balancer` in a Docker container.  Then you will run several NGINX demo web servers, pulled from Docker Hub.  After all the containers are running, you will test and verify each container, the NGINX Proxy and the web servers.  All of these NGINX containers will be used as a learning platform for this Workshop to complete the remaining Lab Exercises.  It is important to build and run these NGINX containers correctly to complete the exercises and receive the most benefit from the 
-Workshop.
+In this lab, you will build a test lab environment using NGINX and Docker.  This will require that you build and run NGINX Opensource as a `Web Server` in a Docker container.  Then you will test and verify the web server functions.  This NGINX container will be used as a learning platform for several labs in this Workshop.  It is important to build and run this NGINX web server container correctly to complete the exercises and receive the most benefit from the Workshop.
 
 NGINX OSS | Docker
 :-------------------------:|:-------------------------:
@@ -15,8 +14,8 @@ By the end of the lab you will be able to:
  * Build an `NGINX Opensource Docker` image
  * Build your Workshop enviroment with Docker Compose
  * Run the NGINX OSS image
- * Run the demo NGINX web containers
  * Verify initial container build and NGINX tests
+ * Review the History and Architectrure of NGINX
 
 ## Pre-Requisites
 
@@ -27,29 +26,27 @@ By the end of the lab you will be able to:
 - Familiarity with basic Docker concepts and commands
 - Familiarity with basic HTTP protocol
 
-## Build and Run NGINX OSS with Docker
-
-1. Inspect the Dockerfile, located in the `/lab1/nginx-oss folder`.  Notice the `FROM` directive uses the NGINX Alpine base image, and also the `RUN apk add` command, installs additional tool libraries to the image.  These tools are needed for copy/edit of files, and to run various tests while using the container in the exercises.
-
-```bash
-FROM nginx:mainline-alpine                                                     # use the Alpine base image
-RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   # Add common tools
-
-```
-
 ## Build the Workshop Environment with Docker Compose
 
-1. Inspect the `docker-compose.yml` file, located in the /lab1 folder.  Notice you are building the NGINX-OSS proxy container, (using the modified `/nginx-oss/Dockerfile` from the previous step).  
+For this lab you will build/run 1 Docker container, used as an NGINX web server.  You will use Docker Compose to build the image, run it, and shut it down when you are finished.
+
+### Build and Run NGINX OSS with Docker
+
+1. Inspect the Dockerfile, located in the `/lab1/nginx-oss folder`.  Notice the `FROM` directive uses the `NGINX Alpine` base image, and also the `RUN apk add` command, which installs additional tool libraries in the image.  These tools are needed for copy/edit of files, and to run various tests while using the container in the exercises.
+
+    ```bash
+    FROM nginx:mainline-alpine                                                     # use the Alpine base image
+    RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   # Add common tools
+
+    ```
+
+1. Inspect the `docker-compose.yml` file, located in the /lab1 folder.  Notice you are building the NGINX-OSS web container, (using the modified `/nginx-oss/Dockerfile` from the previous step).  
 
     ```bash
     ...
     nginx-oss:                  # NGINX OSS Load Balancer
         hostname: nginx-oss
         build: nginx-oss        # Build new container, using /nginx-oss/Dockerfile
-        links:
-            - web1:web1
-            - web2:web2
-            - web3:web3
         volumes:
             - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d   # Copy these folders to container
             - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
@@ -62,32 +59,7 @@ RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   #
 
     ```
 
-    Also in the `docker-compose.yml` you are running three Docker NGINX webserver containers, using an image from Docker Hub.  These will be your upstream, backend webservers for the exercises.
-
-    ```bash
-    ...
-    web1:
-        hostname: web1
-        image: nginxinc/ingress-demo       # Image from Docker Hub
-        ports:
-            - "80"                           # Open for HTTP
-            - "443"                          # Open for HTTPS
-    web2:
-        hostname: web2
-        image: nginxinc/ingress-demo
-        ports:
-            - "80"
-            - "433"
-    web3:
-        hostname: web3
-        image: nginxinc/ingress-demo
-        ports:
-            - "80"
-            - "443"   
-
-    ```
-
-1. Verify all four containers are running:
+1. Verify your container is running:
 
     ```bash
     docker ps -a
@@ -99,56 +71,41 @@ RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   #
 
     CONTAINER ID   IMAGE                   COMMAND                  CREATED          STATUS          PORTS                                                              NAMES
     28df738bd4bb   lab1-nginx-oss          "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:9000->9000/tcp   lab1-nginx-oss-1
-    49c0ffe31abf   nginxinc/ingress-demo   "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   0.0.0.0:56906->80/tcp, 0.0.0.0:56907->443/tcp                      lab1-web1-1
-    f600f082cae3   nginxinc/ingress-demo   "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   0.0.0.0:56902->80/tcp, 0.0.0.0:56903->443/tcp                      lab1-web3-1
-    642129dd20fc   nginxinc/ingress-demo   "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   443/tcp, 0.0.0.0:56905->80/tcp, 0.0.0.0:56904->433/tcp             lab1-web2-1
 
     ```
 
-    >> < **ISSUE - we don't have a default.conf, so the Nginx Welcome page is missing on nginx-oss image**  Or do we test the nginx-oss image with Welcome first, then add the backends and test a second time in Proxy mode ? >
+    >> < **ISSUE - we don't have a default.conf, so the Nginx Welcome page is missing on nginx-oss image**   >
 
 
-1. Test the NGINX load balancing to the containers for the default webpage, run this command at least 3 times:
+1. Test access to the NGINX default web page:
 
     ```bash
-    curl -is http://localhost |grep Server
+    curl -I http://localhost
 
     ```
 
     ```bash
     #Sample output
-
-      Server: nginx/1.25.3
-      <p class="smaller"><span>Server Name:</span> <span>web1</span></p>
-      <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.4:80</font></span></p>
-
-      Server: nginx/1.25.3
-      <p class="smaller"><span>Server Name:</span> <span>web2</span></p>
-      <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.3:80</font></span></p>
-
-      Server: nginx/1.25.3
-      <p class="smaller"><span>Server Name:</span> <span>web3</span></p>
-      <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.2:80</font></span></p>
+    HTTP/1.1 200 OK
+    Server: nginx/1.25.3
+    Date: Thu, 25 Jan 2024 23:55:47 GMT
+    Content-Type: text/html
+    Content-Length: 615
+    Last-Modified: Tue, 24 Oct 2023 16:48:50 GMT
+    Connection: keep-alive
+    ETag: "6537f572-267"
+    Accept-Ranges: bytes
 
     ```
 
-    You should see `Server Names` like `web1`, `web2`, and `web3` as NGINX load balances all three backends - your NGINX-OSS is now a Reverse Proxy, and load balancing traffic to 3 web containers! Notice the `Server Address`, with the IP address of each upstream container.  Note:  Your IP addresses will likely be different.
-
-1. Test again, this time using a browser, click `Refresh` at least 3 times:
+1. Test again, this time using your browser:
 
     Launch your browser, go to http://localhost
 
-    You should see the Welcome to nginx page, or the `Out of Stock` web page.
-
-    < new screenshot needed here >
+    You should see the Welcome to nginx web page.
     
     ![NGINX Welcome](media/lab1_nginx-welcome.png)
 
-    or
-
-    NGINX Web1 | NGINX Web2 | NGINX Web3 
-    :-------------------------:|:-------------------------:|:-------------------------:
-    ![NGINX Web1](media/lab1_nginx-web1.png)  |![NGINX Web2](media/lab1_nginx-web2.png) |![NGINX Web3](media/lab1_nginx-web3.png) 
 
 1. Test access to the `NGINX stub status` page.  This page provides basic metrics for NGINX TCP connections and HTTP requests.
 
@@ -182,28 +139,28 @@ RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   #
 
     ```bash
     # Look around the nginx folders
-    ls -l /etc/nginx
+    nginx-oss:/# ls -l /etc/nginx
 
-    ls -l /etc/nginx/.conf
+    nginx-oss:/# ls -l /etc/nginx/.conf
 
     # Check for nginx packages installed
-    apk info -vv |grep nginx
+    nginx-oss:/# apk info -vv |grep nginx
 
     # What nginx processes are running?
-    ps aux |grep nginx
+    nginx-oss:/# ps aux |grep nginx
 
     # Check Linux TOP for resource usage
-    top -n 1
+    nginx-oss:/# top -n 1
 
     # Which TCP Ports are being used by NGINX ?
-    netstat -alpn
+    nginx-oss:/# netstat -alpn
 
     ```
 
     ```bash
     #Sample outputs
 
-    #apk
+    #apk nginx packages
 
     nginx-1.25.3-r1 - High performance web server
     nginx-module-geoip-1.25.3-r1 - nginx GeoIP dynamic modules
@@ -246,7 +203,7 @@ RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   #
     - Ask NGINX for help, (with NGINX, not dancing)
 
     ```bash
-    /usr/sbin/nginx -h
+    nginx-oss:/# nginx -h
 
     ```
     ```bash
@@ -266,13 +223,14 @@ RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   #
     -e filename   : set error log file (default: /var/log/nginx/error.log)
     -c filename   : set configuration file (default: /etc/nginx/nginx.conf)
     -g directives : set global directives out of configuration file
+    -d dancing    : no help available
 
     ```
 
-    - Verify what version of NGINX is running
+    - Verify what version of NGINX is running, which modules are included
 
     ```bash
-    /usr/sbin/nginx -V
+    nginx-oss:/# nginx -V
 
     ```
 
@@ -289,7 +247,7 @@ RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   #
 1. Test the current NGINX configuration
 
     ```bash
-    /usr/sbin/nginx -t
+    nginx-oss:/# nginx -t
 
     ```
 
@@ -303,7 +261,7 @@ RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   #
 1. Dump the entire NGINX configuration, includes all files.
 
     ```bash
-    more /usr/sbin/nginx -T
+    nginx-oss:/# more nginx -T
 
     ```
 
@@ -317,25 +275,60 @@ RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   #
 1. Check the logs for the NGINX-OSS container.
 
     ```bash
-    docker logs <CONTAINER ID>
+    docker logs <nginx-oss CONTAINER ID>
 
     ```
 
     ```bash
     #Sample output
+    docker stuff
+    ...
+    /docker-entrypoint.sh: Configuration complete; ready for start up
     172.17.0.1 - - [18/Jun/2019:18:41:32 +0000] "GET / HTTP/1.1" 200 612 "-" "curl/7.47.0" "-"
     172.17.0.1 - - [18/Jun/2019:18:41:45 +0000] "HEAD / HTTP/1.1" 200 0 "-" "curl/7.47.0" "-"
-    35.240.46.11 - - [18/Jun/2019:18:46:13 +0000] "GET / HTTP/1.1" 200 612 "-" "Mozilla/5.0 zgrab/0.x" "-"
+    35.260.46.11 - - [18/Jun/2019:18:46:13 +0000] "GET / HTTP/1.1" 200 612 "-" "Mozilla/5.0 zgrab/0.x" "-"
     127.0.0.1 - - [18/Jun/2019:19:07:12 +0000] "GET / HTTP/1.1" 200 612 "-" "curl/7.64.0" "-"
     127.0.0.1 - - [18/Jun/2019:19:07:16 +0000] "HEAD / HTTP/1.1" 200 0 "-" "curl/7.64.0" "-"
 
     ```
 
->**Congratulations, you are now a member of Team NGINX !**
+>>**Congratulations, you are now a member of Team NGINX !**
 
-![NGINX Logo](media/nginx-logo.png)
+![NGINX Logo](media/nginx-tshirt.png)
 
+## The History and Architecture of NGINX
 
+NGINX was originally written in 2002 by Igor Sysov while he was working at rambler.ru, a web company providing Internet Search content.  As Rambler continued to grow, Igor kept hitting the practical limit of 10,000 simultaneous HTTP requests with Apache HTTP server.  The only way to handle more traffic was to buy and run more servers.  So NGINX was written to solve the `C10k concurrency problem` - how do you handle more than 10,000 concurrent requests on a single Linux server.  Igor created a new TCP connection and request handling concept call the `NGINX Worker`.  The Worker is a Linux process that continually waits for incoming TCP connections, and immediately handles the Request, and delivers the Response.  It is based on event-driven computer program logic written in the native C programming language, which is well-known for its speed and power.  Importantly, NGINX Workers can use any CPU, and can scale in performance as the hardware scales up, providing a nearly linear performance curve.  There are many articles written and available about this NGINX Worker architecture if you are interested in reading more about it. 
+
+Another architecural concept in NGINX worth noting, is the `NGINX Master` process.  The master process interacts with the Linux OS, controls the Workers, reads config files, writes to error and logging files, validates configuration changes, then loads them into memory.  It is considered the Control plane process, while the Workers are considered the Data plane processes.  The separation of Control functions from Data handling functions is also very beneficial to handling high volumes of web traffic.
+
+NGINX also uses a Shared memory model, where common elements are equally accessed by all workers.  This reduces the overall memory footprint considerably, making NGINX very lightweight, and ideal for containers and other small compute environments.  You can literally run NGINX off a legacy floppy disk !
+
+In the NGINX Architectural diagram below, you can see these different core components of NGINX, and how they relate to each other.  You will notice that Control and Management type functions are separate and independent from the Data flow functions of the Workers that are handling the traffic.  You will find links to NGINX core architectures and concepts in the References section.
+
+>> It is this unique architecture that makes NGINX so powerful and efficient.
+
+![NGINX Architecture](media/lab1_nginx-architecture.png)
+
+In 2004, NGINX was released as open source software (OSS).  It rapidly gained popularity and has been adopted by millions of websites.
+
+In 2013, NGINX Plus was released, providing additional features and Commercial Support for Enterprise customers. 
+
+>If you are finished with all the testing of the NGINX web server container, you can use Docker Compose to shut down your test environment:
+
+    ```bash
+    docker-compose down
+
+    ```
+
+    ```bash
+    #Sample output
+
+    Running 2/2
+    Container lab1-nginx-oss-1   Removed                            
+    Network lab1_default         Removed
+
+    ```
 
 **This completes this Lab.**
 
@@ -348,6 +341,7 @@ RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   #
 - [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
+- [NGINX Architecture Blog](https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/)
 
 <br/>
 
