@@ -2,21 +2,41 @@
 
 ## Introduction
 
-In this lab, NGINX as a web server will be introduced.  NGINX architecture and basic operations, as well as basic web and content serving concepts will be covered.  A quick review of HTTP and URLs is presented, as your NGINX configurations will follow these HTTP principles.
+In this lab, NGINX as a web server will be introduced, basic web and content serving concepts will be covered.  A quick review of HTTP and URLs is presented, as your NGINX configurations will follow these HTTP principles.
 
 ## Learning Objectives 
 
 By the end of the lab you will be able to: 
-* Describe NGINX origins, architecture, and operations
+* Describe NGINX web server operations
 * Have a basic understanding of HTTP Requests and URLs
 * Create NGINX configurations for basic web content
 * Create and edit simple NGINX configs following best practices
 * Be proficient with NGINX logging files, formats, variables
 
+## Prerequisites
 
+You will use the `nginx-oss` Docker container from Lab1, start the container if needed:
 
+```bash
+docker-compose up
 
-## NGINX Commands
+```
+
+Verify it is running, get the Container ID:
+
+```bash
+docker ps -a
+
+```
+
+Log into the container, and run some NGINX commands:
+
+```bash
+docker exec -it < nginx-oss Container ID > /bin/bash
+
+```
+
+### NGINX Commands
 
 ```bash
 
@@ -29,14 +49,17 @@ $ nginx -s quit
 #terminates all NGINX processes
 $ nginx -s stop
 
-#configuration syntax test
+#configuration syntax and file test
 $ nginx -t
+
+#dumps the current running configurations
+$ nginx -T
 
 #reloads configurations
 $ nginx -s reload
 
-#dumps the current running configurations
-$ nginx -T
+#start nginx
+$ systemctl start nginx
 
 ```
 

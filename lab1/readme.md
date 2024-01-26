@@ -1,3 +1,4 @@
+
 # Build and Run NGINX Opensource on Docker
 
 ## Introduction
@@ -11,11 +12,12 @@ NGINX OSS | Docker
 ## Learning Objectives 
 
 By the end of the lab you will be able to: 
+ * Introduction to the History and Architectrure of NGINX
  * Build an `NGINX Opensource Docker` image
  * Build your Workshop enviroment with Docker Compose
  * Run the NGINX OSS image
  * Verify initial container build and NGINX tests
- * Review the History and Architectrure of NGINX
+ 
 
 ## Pre-Requisites
 
@@ -26,11 +28,49 @@ By the end of the lab you will be able to:
 - Familiarity with basic Docker concepts and commands
 - Familiarity with basic HTTP protocol
 
+## The History and Architecture of NGINX
+
+NGINX | NGINX
+:-------------------------:|:-------------------------:
+![NGINX OSS](media/nginx-icon.png)|![NGINX Logo](media/nginx-logo.png)
+
+NGINX was written in 2002 by Igor Sysov while he was working at rambler.ru, a web company providing Internet Search content.  As Rambler continued to grow, Igor kept hitting the practical limit of 10,000 simultaneous HTTP requests with Apache HTTP server.  The only way to handle more traffic was to buy and run more servers.  So he wrote NGINX to solve the `C10k concurrency problem` - how do you handle more than 10,000 concurrent requests on a single Linux server.  
+
+Igor created a new TCP connection and request handling concept called the `NGINX Worker`.  The Workers are Linux processes that continually wait for incoming TCP connections, and immediately handle the Request, and deliver the Response.  It is based on event-driven computer program logic written in the `native C programming language`, which is well-known for its speed and power.  Importantly, NGINX Workers can use any CPU, and can scale in performance as the compute hardware scales up, providing a nearly linear performance curve.  There are many articles written and available about this NGINX Worker architecture if you are interested in reading more about it.  
+
+Another architecural concept in NGINX worth noting, is the `NGINX Master` process.  The master process interacts with the Linux OS, controls the Workers, reads and validates config files before using them, writes to error and logging files, and performs other NGINX and Linux management tasks.  It is considered the Control plane process, while the Workers are considered the Data plane processes.  The `separation of Control functions from Data handling functions` is also very beneficial to handling high concurrency, high volume web traffic.
+
+NGINX also uses a `Shared Memory model`, where common elements are equally accessed by all Workers.  This reduces the overall memory footprint considerably, making NGINX very lightweight, and ideal for containers and other small compute environments.  You can literally run NGINX off a legacy floppy disk!
+
+In the `NGINX Architectural` diagram below, you can see these different core components of NGINX, and how they relate to each other.  You will notice that Control and Management type functions are separate and independent from the Data flow functions of the Workers that are handling the traffic.  You will find links to NGINX core architectures and concepts in the References section.
+
+>> It is this unique architecture that makes NGINX so powerful and efficient.
+
+![NGINX Architecture](media/lab1_nginx-architecture.png)
+
+- In 2004, NGINX was released as open source software (OSS).  It rapidly gained popularity and has been adopted by millions of websites.
+
+- In 2013, NGINX Plus was released, providing additional features and Commercial Support for Enterprise customers. 
+
+
 ## Build the Workshop Environment with Docker Compose
 
-For this lab you will build/run 1 Docker container, used as an NGINX web server.  You will use Docker Compose to build the image, run it, and shut it down when you are finished.
+For this first lab you will build and run 1 Docker container, used as an NGINX web server.  You will use Docker Compose to build the image, run it, and shut it down when you are finished.
 
 ### Build and Run NGINX OSS with Docker
+
+Visual Studio Code | Docker Compose | GitHub 
+:-------------------------:|:-------------------------:|:-------------------------:
+![Visual Studio](media/vs-code-icon.png)|![NGINX Logo](media/docker-icon2.png)|![Github Logo](media/github-icon.png)
+
+1. On your computer, create a new folder to hold all the Workshop materials.  Then clone the Workshop's Github reposititory to this folder:
+
+    ```bash
+    $ git clone https://github.com/nginxinc/nginx-basics-workshops.git
+    
+    ```
+
+1. Open the Workshop folder with `Visual Studio Code`, or an IDE / text editor of your choice, so you can read and edit the files provided.
 
 1. Inspect the Dockerfile, located in the `/lab1/nginx-oss folder`.  Notice the `FROM` directive uses the `NGINX Alpine` base image, and also the `RUN apk add` command, which installs additional tool libraries in the image.  These tools are needed for copy/edit of files, and to run various tests while using the container in the exercises.
 
@@ -40,22 +80,36 @@ For this lab you will build/run 1 Docker container, used as an NGINX web server.
 
     ```
 
-1. Inspect the `docker-compose.yml` file, located in the /lab1 folder.  Notice you are building the NGINX-OSS web container, (using the modified `/nginx-oss/Dockerfile` from the previous step).  
+1. Inspect the `docker-compose.yml` file, located in the /lab1 folder.  Notice you are building the NGINX-OSS webserver container, (using the modified `/nginx-oss/Dockerfile` from the previous step).  
 
     ```bash
     ...
     nginx-oss:                  # NGINX OSS Load Balancer
         hostname: nginx-oss
         build: nginx-oss        # Build new container, using /nginx-oss/Dockerfile
-        volumes:
-            - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d   # Copy these folders to container
+        volumes:                # Copy these folders to container
+            - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d   
             - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
             - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
         ports:
-            - 9000:9000        # Open for stub status page
-            - 80:80            # Open for HTTP
-            - 443:443          # Open for HTTPS
+            - 9000:9000         # Open for stub status page
+            - 80:80             # Open for HTTP
+            - 443:443           # Open for HTTPS
         restart: always
+
+    ```
+1. Run Docker Compose to build and run your NGINX OSS container:
+
+    ```bash
+    docker-compose up --force-recreate
+
+    ```
+
+    ```bash
+    #Sample output
+    Running 2/2
+    Container lab1-nginx-oss-1     Created               0.1s
+    Network lab1_default           Created               0.1s
 
     ```
 
@@ -73,8 +127,6 @@ For this lab you will build/run 1 Docker container, used as an NGINX web server.
     28df738bd4bb   lab1-nginx-oss          "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:9000->9000/tcp   lab1-nginx-oss-1
 
     ```
-
-    >> < **ISSUE - we don't have a default.conf, so the Nginx Welcome page is missing on nginx-oss image**   >
 
 
 1. Test access to the NGINX default web page:
@@ -296,23 +348,6 @@ For this lab you will build/run 1 Docker container, used as an NGINX web server.
 
 ![NGINX Logo](media/nginx-tshirt.png)
 
-## The History and Architecture of NGINX
-
-NGINX was originally written in 2002 by Igor Sysov while he was working at rambler.ru, a web company providing Internet Search content.  As Rambler continued to grow, Igor kept hitting the practical limit of 10,000 simultaneous HTTP requests with Apache HTTP server.  The only way to handle more traffic was to buy and run more servers.  So NGINX was written to solve the `C10k concurrency problem` - how do you handle more than 10,000 concurrent requests on a single Linux server.  Igor created a new TCP connection and request handling concept call the `NGINX Worker`.  The Worker is a Linux process that continually waits for incoming TCP connections, and immediately handles the Request, and delivers the Response.  It is based on event-driven computer program logic written in the native C programming language, which is well-known for its speed and power.  Importantly, NGINX Workers can use any CPU, and can scale in performance as the hardware scales up, providing a nearly linear performance curve.  There are many articles written and available about this NGINX Worker architecture if you are interested in reading more about it. 
-
-Another architecural concept in NGINX worth noting, is the `NGINX Master` process.  The master process interacts with the Linux OS, controls the Workers, reads config files, writes to error and logging files, validates configuration changes, then loads them into memory.  It is considered the Control plane process, while the Workers are considered the Data plane processes.  The separation of Control functions from Data handling functions is also very beneficial to handling high volumes of web traffic.
-
-NGINX also uses a Shared memory model, where common elements are equally accessed by all workers.  This reduces the overall memory footprint considerably, making NGINX very lightweight, and ideal for containers and other small compute environments.  You can literally run NGINX off a legacy floppy disk !
-
-In the NGINX Architectural diagram below, you can see these different core components of NGINX, and how they relate to each other.  You will notice that Control and Management type functions are separate and independent from the Data flow functions of the Workers that are handling the traffic.  You will find links to NGINX core architectures and concepts in the References section.
-
->> It is this unique architecture that makes NGINX so powerful and efficient.
-
-![NGINX Architecture](media/lab1_nginx-architecture.png)
-
-In 2004, NGINX was released as open source software (OSS).  It rapidly gained popularity and has been adopted by millions of websites.
-
-In 2013, NGINX Plus was released, providing additional features and Commercial Support for Enterprise customers. 
 
 >If you are finished with all the testing of the NGINX web server container, you can use Docker Compose to shut down your test environment:
 
