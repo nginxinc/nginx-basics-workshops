@@ -18,7 +18,6 @@ By the end of the lab you will be able to:
  * Run the NGINX OSS image
  * Verify initial container build and NGINX tests
  
-
 ## Pre-Requisites
 
 - You must have Docker installed and running
@@ -87,10 +86,8 @@ Visual Studio Code | Docker Compose | GitHub
     nginx-oss:                  # NGINX OSS Load Balancer
         hostname: nginx-oss
         build: nginx-oss        # Build new container, using /nginx-oss/Dockerfile
-        volumes:                # Copy these folders to container
-            - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d   
-            - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
-            - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+        volumes:                # Copy this file to container
+            - ./nginx-oss/etc/nginx/conf.d/stub_status.conf:/etc/nginx/conf.d/stub_status.conf   
         ports:
             - 9000:9000         # Open for stub status page
             - 80:80             # Open for HTTP

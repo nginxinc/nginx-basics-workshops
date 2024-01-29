@@ -232,7 +232,7 @@ In the examples above:
 
 As you configure NGINX, you will see that it uses these HTTP standards and definitions to determine how to handle incoming requests, where to route them, and how to respond correctly.
 
-Now you can configure the NGINX contexts to handle an HTTP request properly.  Let's overly the NGINX configuration contexts with the example URL.
+Now you can configure the NGINX contexts to handle an HTTP request properly.  Let's overlay the NGINX configuration contexts with the example URL.
 
 Given:   http://www.example.com/app1
 
@@ -259,7 +259,7 @@ http {
     server_name www.example.com;
     
       location /app1 {
-      try_files $uri $uri/;
+      index index.html;
       }
    }
 }
@@ -272,7 +272,7 @@ http {
 Now that you have a basic understanding of the NGINX binary, contexts, and configuration files, let's configure NGINX as a web server following HTTP standards.  You will configure some HTML pages, and create NGINX configs to serve some content based on the URL in the HTTP request.
 
 
-
+< basic static content exercises here >
 
 **This completes this Lab.**
 
