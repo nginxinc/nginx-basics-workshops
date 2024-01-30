@@ -125,7 +125,6 @@ Visual Studio Code | Docker Compose | GitHub
 
     ```
 
-
 1. Test access to the NGINX default web page:
 
     ```bash
