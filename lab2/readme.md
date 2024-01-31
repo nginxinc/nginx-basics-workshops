@@ -217,7 +217,7 @@ The hierarchy of these contexts also maps to the folders/files layout on disk. T
 
 ### NGINX static web content
 
-Now that you have a basic understanding of the NGINX binary, contexts, and configuration files, let's configure NGINX as a web server following HTTP standards.  You will configure some HTML pages, and create NGINX configs to serve some content based on the URL in the HTTP request.
+Now that you have a basic understanding of the NGINX binary, contexts, and configuration files, let's configure NGINX as a web server following HTTP standards.  You will configure some websites, URI paths, HTML pages, and create NGINX configs to correctly serve some content based on the Full URL in the HTTP request.
 
 ### NGINX Host based Routing
 
@@ -337,18 +337,18 @@ Congrats, you have reached www2.example.com, the base path /
 
 ```
 
-Now you see that the `Host Based Routing` is working correctly, because you provided the Host Header that NGINX needs to select the correct virtual Server block.  Some important items to be aware of with Host Headers and Host Based Routing:
+Now you see that the `Host Based Routing` is working correctly, because you provided the Host Header that NGINX needs to select the correct virtual `Server{}` block.  Some important items to understand with Host Headers and Host Based Routing:
 
 - NGINX is using the `same IP Address and TCP port` ( listen 80 ) for *both* of these hostnames.  You can literally run thousands of websites with unique hostnames on just one IP address:port.  NGINX will route the incoming request to the matching Server block as expected.
-- The `default_server` parameter is used as a last resort Server block, it is used when NONE of the hostnames in the request are a match.  It is an optional parameter, you do not have to declare a default_server if it is not needed.
+- The `default_server` parameter is used as a last resort Server block, it is used when none of the hostnames in the request are a match.  This is an optional parameter, you do not have to declare a default_server if it is not needed.
 - The `return` directive used in the exercises above is a quick and easy way to test Server and Location blocks in NGINX, it can be used to verify NGINX is routing your requests to the proper block.
-- The HTTP Host Header is required for HTTP 1.1 and later protocols, so it will be a common element of your NGINX configurations that must be correct!
+- The HTTP Host Header is required for HTTP/1.1 and later protocols, so the `server_name directive` will be a common element of your NGINX configurations that must be correct!
 
 ### NGINX Path based Routing
 
-< basic static content exercises here >
+Now that you have a basic understand of how NGINX routes requests based on the Host Header matching an HTTP hostname, let's look deeper at the next component of the URL, the `URI path`.
 
-In this exercise, you will continue to learn how NGINX routes requests, by looking at the URI ( the path ) of the URL.  You will create a Third website, to show Path based Routing.
+In this exercise, you will continue to learn how NGINX routes requests, by looking at the URI ( the path ) of the URL.  You will create a third website, to show Path based routing.
 
 1. Using VI, create a new file called `cafe.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
@@ -400,7 +400,7 @@ server {
 
 1. Reload NGINX with `nginx -s reload`.
 
-1. Run some tests with curl, don't forget your Host Header:
+1. Test your new /paths with curl, don't forget your Host Header:
 
 ```bash
 curl 172.18.0.2 -H "Host: cafe.example.com"
@@ -445,23 +445,145 @@ at cafe.example.com, path /hours/closed
 
 ```
 
-> NOTE:  You added an NGINX variable, `$uri` to the return, to echo back what the request URI was.  There are many more NGINX variables that can be used like this.  Let's try a few now:
+> NOTE:  You added an NGINX variable, `$uri` to the return directive, to echo back what the request URI path that was sent.  There are many more NGINX variables that can be used like this.  Let's use more of these `NGINX $variables` to build a simple `debug` page, that will echo back some of the important information you might need when working/testing NGINX:
 
-
-
-
-< image URL test here>
-
-1. You need an image to send back to the user.  What better graphic than the NGINX logo?
-
-Using wget, download an NGINX logo, and change the name of the file to nginx-logo.jpg.  If you cant' find one, try this one:
+1. Using VI, add a new `location block` called `/debug` to your existing `cafe.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
 ```bash
-wget https://www.nginx.com/wp-content/uploads/2016/08/NGINX-Logo-smaller-300x300.jpg -O nginx-logo.jpg
+vi cafe.example.com.conf
+```
+
+```nginx
+
+    location /debug {      # Used for testing, returns IP, HTTP, NGINX info 
+        
+        return 200 "NGINX Debug/Testing URL from cafe.example.com\n\nIP Parameters: ClientIP=$remote_addr, NginxIP=$server_addr, UpstreamIP=$upstream_addr, Connection=$connection\n\nHTTP Parameters: Scheme=$scheme, Host=$host, URI=$request, Args=$args, Method=$request_method, UserAgent=$http_user_agent, RequestID=$request_id\n\nSystem Parameters: Time=$time_local, NGINX version=$nginx_version, NGINX PID=$pid\n\n";
+    }
+    
+```
+
+1. After saving and quitting VI, test it with `nginx -t`.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
+
+1. Reload NGINX with `nginx -s reload`.
+
+1. Test your new /debug path with curl, did you remember your Host Header?
+
+```bash
+curl 172.18.0.2/debug -H "Host: cafe.example.com"
 
 ```
 
-Move it to the /usr/share/nginx/html folder.
+You should see a response from the `/debug location block`, with the NGINX `$variables` filled in with data for each request to http://cafe.example.com/debug :
+
+```bash
+#Sample output
+NGINX Debug/Testing URL from cafe.example.com
+
+IP Parameters: ClientIP=172.18.0.2, NginxIP=172.18.0.2, UpstreamIP=, Connection=8
+
+HTTP Parameters: Scheme=http, Host=cafe.example.com, URI=GET /debug HTTP/1.1, Args=, Method=GET, UserAgent=curl/8.5.0, RequestID=7a29149e6a687bb52c6901dfc19079f8
+
+System Parameters: Time=31/Jan/2024:18:53:11 +0000, NGINX version=1.25.3, NGINX PID=89
+
+```
+
+If you like this debug page, feel free to explore and ADD additional Request and Response variables, to make the page display the data that is interesting to you.
+
+### NGINX Static HTML pages
+
+Let try some HTML files and images.  You will create another new website, `cars.example.com`, that will have 3 new HTML files and some images of the cars, which will represent 3 high performance autos: the Lexus RCF, Nissan GTR, and Acura NSX.  Each car will have it's own URL and location block, and matching .html files on disk.
+
+The default directory for serving HTML content with NGINX is /usr/share/nginx/html, so you will use that as the root of your new website.
+
+1. Using VI, create a new file called `cars.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
+
+```bash
+vi cars.example.com.conf
+
+```
+
+```nginx
+
+server {
+    
+    listen 80;      # Listening on port 80 on all IP addresses on this machine
+
+    server_name cars.example.com;   # Set hostname to match in request
+
+    access_log  /var/log/nginx/cars.example.com.log main; 
+    error_log   /var/log/nginx/cars.example.com_error.log notice;
+
+    root /usr/share/nginx/html;      # Set the root folder for the HTML and JPG files
+
+    location / {
+        
+        return 200 "Let's go fast, you have reached cars.example.com, path $uri\n";
+    }
+    
+    location /gtr {
+
+        try_files $uri $uri.html;     # Look for a filename that matches the URI requested
+   
+    }
+    
+    location /nsx {
+        try_files $uri $uri.html;
+    }
+    
+    location /rcf {
+        try_files $uri $uri.html;
+    }
+
+} 
+
+```
+
+1. After saving and quitting VI, test it with `nginx -t`.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
+
+1. Reload NGINX with `nginx -s reload`.
+
+1. Test all three URLs, one for each car with curl, don't forget your Host Header!:
+
+```bash
+curl localhost/gtr -H "Host: cars.example.com"
+curl localhost/nsx -H "Host: cars.example.com"
+curl localhost/rcf -H "Host: cars.example.com"
+
+```
+
+```bash
+#Sample output
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx GTR !</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx GTR !</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working.</p>
+
+<img src="gtr.jpg" alt="GTR" height="480" width="640"></img>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+
+```
+
+Try them in a browser, like http://localhost/rcf.html :
+
+![NGINX Welcome RCF](media/lab2_welcome_rcf.png)
+
+You will notice, this page has just a few simple modification to NGINX's default Welcome page.
+
 
 ### NGINX Commands
 
@@ -512,6 +634,8 @@ What does NGINX do, when you change the configuration and request a reload?  At 
 - [NGINX Beginner's Guide](https://nginx.org/en/docs/beginners_guide.html)
 - [NGINX OSS](https://nginx.org/en/docs/)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
+- [NIGNX Directives](https://nginx.org/en/docs/dirindex.html)
+- [NGINX Variables](https://nginx.org/en/docs/varindex.html)
 - [HTTP URL Overview](https://en.wikipedia.org/wiki/URL)
 - [NGINX on Floppy disk](https://www.youtube.com/watch?v=IjjiTD-1Cvg)
 

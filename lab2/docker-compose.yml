@@ -8,6 +8,7 @@ services:
     build: nginx-oss          # Build new container, using /nginx-oss/Dockerfile
     volumes:
         - ./nginx-oss/etc/nginx/conf.d/stub_status.conf:/etc/nginx/conf.d/stub_status.conf            # Copy this file to container
+        - ./nginx-oss/usr/share/nginx/html/.:/usr/share/nginx/html/.           # Copy these files to container
     ports:
         - 80:80       # Open for HTTP
         - 443:443     # Open for HTTPS
