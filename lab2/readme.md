@@ -24,46 +24,44 @@ By the end of the lab you will be able to:
 
 ### HTTP URL Review
 
-In order to understand how NGINX works as web server, a basic understanding of the HTTP protocol, and how URLS work is neccessary.  This is not a lab on HTTP, but the principle objects and definitions are breifly reviewed here as they relate to NGINX.  You will find a link to more information on HTTP in the References section.
+In order to understand how NGINX works as web server, a basic understanding of the HTTP protocol, and how URLS work is neccessary.  This is not a lab on HTTP, but the principle objects and definitions are briefly reviewed here as they relate to NGINX.  You will find a link to more information on HTTP in the References section.
 
 So what is a URL??  URL stands for `Uniform Resource Location` - an Internet standard that describes a web object that is globally unique.
-
-< need new diagram here >
 
 ![HTTP Request](media/lab2_http_request.png)
 
 Every URL consists of 4 or 5 distinct fields.
 
-Given:   http://www.example.com/app1?arg=23972df
+Given:   http://www.example.com/application1?arg=123456
 
-Scheme  | Hostname        | URI    | Argument
-:------:|:--------:|:--------:|:--------:
-http:// | www.example.com | /app1 | ?arg=23972df
+Scheme  | Hostname        | URI           | Argument
+:------:|:---------------:|:-------------:|:-----------:
+http:// | www.example.com | /application1 | ?arg=123456
 
->If the TCP port used by the webserver is `not` 80 or 443, it must be included in the URL request, like this example using port 8443:
+>If the TCP port used by the webserver is `not 80`, it must be included in the URL request, like this example using port 8080:
 
-Given:  https://www.example.com:8443/app1?arg=23972df
+Given:  http://www.example.com:8080/application1?arg=123456
 
 Scheme  | Hostname        | Port  | URI    | Argument
 :------:|:--------:|:--------:|:--------:|:--------:
-https:// | www.example.com | :8443 | /app1 | ?arg=23972df
+http:// | www.example.com | :8080 | /application1 | ?arg=123456
 
 In the examples above: 
 - the Scheme is the protocol to use, usually either `HTTP` or `HTTPS`.  It must be followed by a colon, and two forward slashs.
-- The Hostname is a fully qualified DNS name, often with a subdomain like `www` in this example.  It must contain the root level Domain name.  It must follow DNS standards based naming conventions.
-- The Port is only required, if you are not using Port 80 for HTTP, or Port 443 for HTTPS.  The Hostname and Port must be separated by a colon `:`. These are the two standard ports used by all modern browsers, and does not appear in the URL if using the standard port 80 or 443.
-- The URI, `Uniform Resource Identifier`, is often called the `path`, because it often refers to a matching folder name on the web server's disk system.  It must start with a forward slash `/`, just like a Linux folder does.
-- The Argument, is an optional extension of the URI, and adds additional information the web server needs to understand the request properly.  It must start with a question mark, and each argument has a unique name followed by an equal sign. Multiple arguments are allowed, each separated by another question mark `?`.
+- The Hostname is a fully qualified DNS name, often with a subdomain like `www` in this example.  It must contain the root level Domain name.  It must follow DNS standards based naming conventions.  Using a non-FQDN name is possible, but outside the scope of this lab.
+- Modern browsers use port 80 for HTTP requests, and port 443 for HTTPS by default, and this port number does not appear in the URL.  However, if you are not using Port 80 for HTTP, or Port 443 for HTTPS, the Hostname and Port must be separated by a colon `:`. 
+- The URI, `Uniform Resource Identifier`, is often called the `path`, because it often refers to a matching folder name on the web server's disk system.  It must start with a forward slash `/`, just like a Linux disk folder does.
+- The Argument, also commonly known as a `query string` is an optional extension of the URI, and adds additional information the web server might need to understand the request properly.  It must start with a question mark, and each argument has a unique name followed by an equal sign. Multiple arguments are allowed, each separated by the ampersand character `&`.
 
 As you configure NGINX, you will see that it uses these HTTP standards and definitions to determine how to handle incoming requests, where to route them, and how to respond correctly.
 
 Now you can configure the NGINX contexts to handle an HTTP request properly.  Let's overlay the NGINX configuration contexts with the example URL.
 
-Given:   http://www.example.com/app1
+Given:   http://www.example.com/application1
 
 Scheme  | Hostname        | URI    
 :------:|:--------:|:--------:
-http:// | www.example.com | /app1
+http:// | www.example.com | /application1
 
 Would require the following NGINX configuration Contexts:
 
@@ -75,7 +73,7 @@ URI | location{}
 
 
 ```nginx
-# Note:  the use of indenting the nested contexts makes it easy to read
+# Note:  the use of indented nested contexts makes it easier to read
 #
 http {
 
@@ -83,7 +81,7 @@ http {
     listen 80;
     server_name www.example.com;
     
-      location /app1 {
+      location /application1 {
       index index.html;
       }
    }
@@ -138,6 +136,7 @@ events {
 
 ```nginx
 # This is the "http" context, used for all http configurations
+#
 # Notice both "include" commands, which tells NGINX to use these files
 #
 
@@ -145,7 +144,7 @@ http {
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
 
-    # Set the access logging format
+    # Set the access logging format - this is the NGINX default log format
     log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
                       '$status $body_bytes_sent "$http_referer" '
                       '"$http_user_agent" "$http_x_forwarded_for"';
@@ -191,7 +190,6 @@ server {
 
 ![NGINX Contexts](media/lab2_nginx-contexts.png)
 
-
 In general, the contexts and blocks are in a logical hierarchy that follows the construction of an HTTP URL, as follows.
 
 - main and events > nginx start up parameters
@@ -201,21 +199,42 @@ In general, the contexts and blocks are in a logical hierarchy that follows the 
 
 http://www.example.com:8080/images/smile.png
 
-schema://hostname:port/path/file.type
+maps to:
 
+**schema://hostname:port/uri/object.type**
 
-### NGINX Linux File Structure
+>NOTE:  The lab exercises will focus on the HTTP, Server, and Location contexts and blocks.  The Stream context is for Layer4 TCP/UDP traffic, which is not covered in these labs.
+
+### NGINX on Linux File Structure
 
 The hierarchy of these contexts also maps to the folders/files layout on disk. This is how the folders and files are laid out for this lab exercise, following NGINX guidelines and best practices.
 
-```
-< /etc/nginx tee here >
+```bash
+
+/etc # tree nginx
+nginx                             
+├── conf.d                        # http contexts
+│   ├── cafe.example.com.conf     # server and location contexts for each website
+│   ├── cars.example.com.conf
+│   ├── default.conf
+│   ├── stub_status.conf
+│   ├── www.example.com.conf
+│   └── www2.example.com.conf
+├── fastcgi.conf
+├── fastcgi_params
+├── mime.types
+├── modules -> /usr/lib/nginx/modules
+├── nginx.conf                    # main and events contexts
+├── scgi_params
+└── uwsgi_params
+
+1 directories, 13 files
 
 ```
 
+It is considered an NGINX best practice to follow this folder and file layout, so you will learn and use this in the lab exercises.
 
-
-### NGINX static web content
+## NGINX as a Webserver Exercises
 
 Now that you have a basic understanding of the NGINX binary, contexts, and configuration files, let's configure NGINX as a web server following HTTP standards.  You will configure some websites, URI paths, HTML pages, and create NGINX configs to correctly serve some content based on the Full URL in the HTTP request.
 
@@ -225,34 +244,34 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
 1. Docker Exec into the nginx-oss container.
 
-```bash
-docker exec -it < nginx-oss Container ID > /bin/bash
+    ```bash
+    docker exec -it < nginx-oss Container ID > /bin/bash
 
-```
+    ```
 
 1. Change to the `/etc/nginx/conf.d` folder.  Remember, this is the default folder for NGINX HTTP configuration files.
 
 1. Using VI, create a new file called `www.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
-```nginx
+    ```nginx
 
- server {
-    
-    listen 80 default_server;      # Listening on port 80 on all IP addresses on this machine
-
-    server_name www.example.com;   # Set hostname to match in request
-
-    access_log  /var/log/nginx/www.example.com.log main; 
-    error_log   /var/log/nginx/www.example.com_error.log notice; 
-
-    location / {
+    server {
         
-        return 200 "You have reached www.example.com, location /\n";
+        listen 80 default_server;      # Listening on port 80 on all IP addresses on this machine
+
+        server_name www.example.com;   # Set hostname to match in request
+
+        access_log  /var/log/nginx/www.example.com.log main; 
+        error_log   /var/log/nginx/www.example.com_error.log notice; 
+
+        location / {
+            
+            return 200 "You have reached www.example.com, location /\n";
+        }
+
     }
 
-}
-
-```
+    ```
 
 1. After saving and quitting VI, test it with `nginx -t`.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
 
@@ -260,54 +279,56 @@ docker exec -it < nginx-oss Container ID > /bin/bash
 
 1. Find the IP address of your nginx-oss container.
 
-```bash
-ifconfig
+    ```bash
+    ifconfig
 
-```
+    ```
+
 1. Test access to your new website, using curl to the IP address above:
 
-```bash
-curl 172.18.0.2
+    ```bash
+    curl 172.18.0.2
 
-```
+    ```
 
-You should see something like:
+    You should see something like:
 
-```bash
-#Sample output
-You have reached www.example.com, location block /
+    ```bash
+    #Sample output
+    You have reached www.example.com, location block /
 
-```
+    ```
 
 1. Using VI, create a new file called `www2.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
-```bash
-vi www2.example.com.conf
-```
+    ```bash
+    vi www2.example.com.conf
 
-```nginx
+    ```
 
- server {
-    
-    listen 80 default_server;      # Listening on port 80 on all IP addresses on this machine
+    ```nginx
 
-    server_name wwww2.example.com;   # Set hostname to match in request
-
-    access_log  /var/log/nginx/www2.example.com.log main; 
-    error_log   /var/log/nginx/www2.example.com_error.log notice; 
-
-    location / {
+    server {
         
-        return 200 "Congrats, you have reached www2.example.com, the base path /\n";
+        listen 80 default_server;      # Listening on port 80 on all IP addresses on this machine
+
+        server_name wwww2.example.com;   # Set hostname to match in request
+
+        access_log  /var/log/nginx/www2.example.com.log main; 
+        error_log   /var/log/nginx/www2.example.com_error.log notice; 
+
+        location / {
+            
+            return 200 "Congrats, you have reached www2.example.com, the base path /\n";
+        }
+
     }
 
-}
-
-```
+    ```
 
 1. Quit VI and save your file, and test your NGINX config ( using `nginx -t`).
 
-What happened ?  Did you figure out the error?  You can't actually have 2 default servers in NGINX - that makes sense, right ?
+    **Uh oh - what happened?**  Did you figure out the error?  You can't actually have 2 default servers in NGINX - that makes sense, right ?
 
 1. Go back and edit line #7 wiht the `listen` parameter in www2.example.com.conf, and remove the `default_server` parameter, save and exit VI again.
 
@@ -315,10 +336,10 @@ What happened ?  Did you figure out the error?  You can't actually have 2 defaul
 
 1. Test access to the second website, using curl to the same IP address:
 
-```bash
-curl 172.18.0.2
+    ```bash
+    curl 172.18.0.2
 
-```
+    ```
 
 >BUT WAIT!  Curl is still going to the FIRST website - why ??
 
@@ -402,65 +423,66 @@ server {
 
 1. Test your new /paths with curl, don't forget your Host Header:
 
-```bash
-curl 172.18.0.2 -H "Host: cafe.example.com"
+    ```bash
+    curl 172.18.0.2 -H "Host: cafe.example.com"
 
-```
-```bash
-curl 172.18.0.2/coffee -H "Host: cafe.example.com"
+    ```
+    ```bash
+    curl 172.18.0.2/coffee -H "Host: cafe.example.com"
 
-```
+    ```
 
-```bash
-curl 172.18.0.2/tea -H "Host: cafe.example.com"
+    ```bash
+    curl 172.18.0.2/tea -H "Host: cafe.example.com"
 
-```
+    ```
 
-```bash
-curl 172.18.0.2/hours -H "Host: cafe.example.com"
+    ```bash
+    curl 172.18.0.2/hours -H "Host: cafe.example.com"
 
-```
+    ```
 
-```bash
-#Sample outputs
-Congrats, you have reached cafe.example.com, path /
+    ```bash
+    #Sample outputs
+    Congrats, you have reached cafe.example.com, path /
 
-Caffiene relief from cafe.example.com, path /coffee
+    Caffiene relief from cafe.example.com, path /coffee
 
-Green Tea from cafe.example.com, path /tea
+    Green Tea from cafe.example.com, path /tea
 
-We are open:
-Sun 6am-3pm
-Mon Closed
-Tue 6am-3pm
-Wed 6am-3pm
-Thurs 6am-3pm
-Fri 6am-3pm
-Sat 6am-3pm
-Sun 6am-3pm
-at cafe.example.com, path /hours
+    We are open:
+    Sun 6am-3pm
+    Mon Closed
+    Tue 6am-3pm
+    Wed 6am-3pm
+    Thurs 6am-3pm
+    Fri 6am-3pm
+    Sat 6am-3pm
+    Sun 6am-3pm
+    at cafe.example.com, path /hours
 
-Sorry - We are Closed on Tuesdays
-at cafe.example.com, path /hours/closed
+    Sorry - We are Closed on Tuesdays
+    at cafe.example.com, path /hours/closed
 
-```
+    ```
 
-> NOTE:  You added an NGINX variable, `$uri` to the return directive, to echo back what the request URI path that was sent.  There are many more NGINX variables that can be used like this.  Let's use more of these `NGINX $variables` to build a simple `debug` page, that will echo back some of the important information you might need when working/testing NGINX:
+    > NOTE:  You added an NGINX variable, `$uri` to the return directive, to echo back what the request URI path that was sent.  There are many more NGINX variables that can be used like this.  Let's use more of these `NGINX $variables` to build a simple `debug` page, that will echo back some of the important information you might need when working/testing NGINX:
 
 1. Using VI, add a new `location block` called `/debug` to your existing `cafe.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
-```bash
-vi cafe.example.com.conf
-```
+    ```bash
+    vi cafe.example.com.conf
 
-```nginx
+    ```
 
-    location /debug {      # Used for testing, returns IP, HTTP, NGINX info 
+    ```nginx
+
+        location /debug {      # Used for testing, returns IP, HTTP, NGINX info 
+            
+            return 200 "NGINX Debug/Testing URL from cafe.example.com\n\nIP Parameters: ClientIP=$remote_addr, NginxIP=$server_addr, UpstreamIP=$upstream_addr, Connection=$connection\n\nHTTP Parameters: Scheme=$scheme, Host=$host, URI=$request, Args=$args, Method=$request_method, UserAgent=$http_user_agent, RequestID=$request_id\n\nSystem Parameters: Time=$time_local, NGINX version=$nginx_version, NGINX PID=$pid\n\n";
+        }
         
-        return 200 "NGINX Debug/Testing URL from cafe.example.com\n\nIP Parameters: ClientIP=$remote_addr, NginxIP=$server_addr, UpstreamIP=$upstream_addr, Connection=$connection\n\nHTTP Parameters: Scheme=$scheme, Host=$host, URI=$request, Args=$args, Method=$request_method, UserAgent=$http_user_agent, RequestID=$request_id\n\nSystem Parameters: Time=$time_local, NGINX version=$nginx_version, NGINX PID=$pid\n\n";
-    }
-    
-```
+    ```
 
 1. After saving and quitting VI, test it with `nginx -t`.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
 
@@ -468,75 +490,72 @@ vi cafe.example.com.conf
 
 1. Test your new /debug path with curl, did you remember your Host Header?
 
-```bash
-curl 172.18.0.2/debug -H "Host: cafe.example.com"
+    ```bash
+    curl 172.18.0.2/debug -H "Host: cafe.example.com"
 
-```
+    ```
 
-You should see a response from the `/debug location block`, with the NGINX `$variables` filled in with data for each request to http://cafe.example.com/debug :
+    You should see a response from the `/debug location block`, with the NGINX `$variables` filled in with data for each request to http://cafe.example.com/debug :
 
-```bash
-#Sample output
-NGINX Debug/Testing URL from cafe.example.com
+    ```bash
+    #Sample output
+    NGINX Debug/Testing URL from cafe.example.com
 
-IP Parameters: ClientIP=172.18.0.2, NginxIP=172.18.0.2, UpstreamIP=, Connection=8
+    IP Parameters: ClientIP=172.18.0.2, NginxIP=172.18.0.2, UpstreamIP=, Connection=8
 
-HTTP Parameters: Scheme=http, Host=cafe.example.com, URI=GET /debug HTTP/1.1, Args=, Method=GET, UserAgent=curl/8.5.0, RequestID=7a29149e6a687bb52c6901dfc19079f8
+    HTTP Parameters: Scheme=http, Host=cafe.example.com, URI=GET /debug HTTP/1.1, Args=, Method=GET, UserAgent=curl/8.5.0, RequestID=7a29149e6a687bb52c6901dfc19079f8
 
-System Parameters: Time=31/Jan/2024:18:53:11 +0000, NGINX version=1.25.3, NGINX PID=89
+    System Parameters: Time=31/Jan/2024:18:53:11 +0000, NGINX version=1.25.3, NGINX PID=89
 
-```
+    ```
 
 If you like this debug page, feel free to explore and ADD additional Request and Response variables, to make the page display the data that is interesting to you.
 
 ### NGINX Static HTML pages
 
-Let try some HTML files and images.  You will create another new website, `cars.example.com`, that will have 3 new HTML files and some images of the cars, which will represent 3 high performance autos: the Lexus RCF, Nissan GTR, and Acura NSX.  Each car will have it's own URL and location block, and matching .html files on disk.
+Let try some HTML files and images.  You will create another new website, `cars.example.com`, that will have 3 new HTML files and some images of the cars, which will represent 3 high performance autos: the `Lexus RCF, Nissan GTR, and Acura NSX`.  Each car will have it's own URL and location block, and matching .html files on disk.
 
-The default directory for serving HTML content with NGINX is /usr/share/nginx/html, so you will use that as the root of your new website.
+The default directory for serving HTML content with NGINX is `/usr/share/nginx/html`, so you will use that as the root of your new website.
 
 1. Using VI, create a new file called `cars.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
-```bash
-vi cars.example.com.conf
+    ```bash
+    vi cars.example.com.conf
 
-```
+    ```
 
-```nginx
+    ```nginx
 
-server {
-    
-    listen 80;      # Listening on port 80 on all IP addresses on this machine
-
-    server_name cars.example.com;   # Set hostname to match in request
-
-    access_log  /var/log/nginx/cars.example.com.log main; 
-    error_log   /var/log/nginx/cars.example.com_error.log notice;
-
-    root /usr/share/nginx/html;      # Set the root folder for the HTML and JPG files
-
-    location / {
+    server {
         
-        return 200 "Let's go fast, you have reached cars.example.com, path $uri\n";
-    }
-    
-    location /gtr {
+        listen 80;      # Listening on port 80 on all IP addresses on this machine
 
-        try_files $uri $uri.html;     # Look for a filename that matches the URI requested
-   
-    }
-    
-    location /nsx {
-        try_files $uri $uri.html;
-    }
-    
-    location /rcf {
-        try_files $uri $uri.html;
-    }
+        server_name cars.example.com;   # Set hostname to match in request
 
-} 
+        access_log  /var/log/nginx/cars.example.com.log main; 
+        error_log   /var/log/nginx/cars.example.com_error.log notice;
 
-```
+        root /usr/share/nginx/html;      # Set the root folder for the HTML and JPG files
+
+        location / {           
+            return 200 "Let's go fast, you have reached cars.example.com, path $uri\n";
+        }
+
+        location /gtr {
+            try_files $uri $uri.html;     # Look for a filename that matches the URI requested
+        }
+        
+        location /nsx {
+            try_files $uri $uri.html;
+        }
+        
+        location /rcf {
+            try_files $uri $uri.html;
+        }
+
+    } 
+
+    ```
 
 1. After saving and quitting VI, test it with `nginx -t`.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
 
@@ -544,48 +563,48 @@ server {
 
 1. Test all three URLs, one for each car with curl, don't forget your Host Header!:
 
-```bash
-curl localhost/gtr -H "Host: cars.example.com"
-curl localhost/nsx -H "Host: cars.example.com"
-curl localhost/rcf -H "Host: cars.example.com"
+    ```bash
+    curl localhost/gtr -H "Host: cars.example.com"
+    curl localhost/nsx -H "Host: cars.example.com"
+    curl localhost/rcf -H "Host: cars.example.com"
 
-```
+    ```
 
-```bash
-#Sample output
-<!DOCTYPE html>
-<html>
-<head>
-<title>Welcome to nginx GTR !</title>
-<style>
-    body {
-        width: 35em;
-        margin: 0 auto;
-        font-family: Tahoma, Verdana, Arial, sans-serif;
-    }
-</style>
-</head>
-<body>
-<h1>Welcome to nginx GTR !</h1>
-<p>If you see this page, the nginx web server is successfully installed and
-working.</p>
+    ```bash
+    #Sample output
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>Welcome to nginx GTR !</title>
+    <style>
+        body {
+            width: 35em;
+            margin: 0 auto;
+            font-family: Tahoma, Verdana, Arial, sans-serif;
+        }
+    </style>
+    </head>
+    <body>
+    <h1>Welcome to nginx GTR !</h1>
+    <p>If you see this page, the nginx web server is successfully installed and
+    working.</p>
 
-<img src="gtr.jpg" alt="GTR" height="480" width="640"></img>
+    <img src="gtr.jpg" alt="GTR" height="480" width="640"></img>
 
-<p><em>Thank you for using nginx.</em></p>
-</body>
-</html>
+    <p><em>Thank you for using nginx.</em></p>
+    </body>
+    </html>
 
-```
+    ```
 
-Try them in a browser, like http://localhost/rcf.html :
+    Try them in a browser, like http://localhost/rcf.html :
 
-![NGINX Welcome RCF](media/lab2_welcome_rcf.png)
+    ![NGINX Welcome RCF](media/lab2_welcome_rcf.png)
 
-You will notice, this page has just a few simple modification to NGINX's default Welcome page.
+    You will notice, this page has just a few simple modification to NGINX's default Welcome page.
 
 
-### NGINX Commands
+### Introduction to NGINX Commands
 
 ```bash
 
@@ -625,6 +644,137 @@ What does NGINX do, when you change the configuration and request a reload?  At 
 
 < NGINX start, stop, reload while watching the error.log lab exercises here - top, ps aux, etc >
 
+### NGINX Logging
+
+In this exercise, you will learn about NGINX logging.  There are only 2 logs that you need to worry about.  The NGINX error.log, and the Access.log.
+
+The NGINX `error.log`, despite it's name, is also used to record start/stop/reload events, and other important messages when NGINX boots up.   It is also the `FIRST` place you should look if you suspect a problem with your website or NGINX configurations.  It will record any DNS, TCP, HTTP, or HTTPS errors it encounters with processing traffic in realtime. It also records issues with the Linux Host system during runtime, like running out of memory or disk, etc.  You will drastically reduce the time required to find and address issues if you start your troubleshooting process with the NGINX error.log.  There is only one NGINX error.log file, but you can change the name and folder if you like.
+
+The NGINX `access.log`, is where the HTTP request/response metadata is recorded.  It is a Best Practice to have a separate unique access log file for each website/server block, and sometimes you might even want an access.log for a uri/location block.  You will configure these in the following exercises, using many of the hundreds of available NGINX $variables.  The access logging is very flexible, allowing you to configure a `log format` that meets your needs.
+
+For reference, this is the default NGINX logging format, called `main` or combined, which is always found in `/etc/nginx/nginx.conf` in the http context, is enabled by default, and can be found at `/var/log/nginx/access.log`:  
+
+```nginx
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+    
+    access_log  /var/log/nginx/access.log  main;   # default name and location
+
+```
+
+As a Best Practice, you should not modify this main log format, but rather copy this one and create a new one with your changes.  The `include` directive is also introduced here, because it makes your NGINX configurations more concise, uniform, and consistent.  As you will likely want to use the same access log format for multiple websites, you will define it ONCE, but use it for every server block, instead of duplicating the log format config for every website.  If you need to make a change to your log format, you can update it in one file, but it would apply to all your websites/server blocks.
+
+1. Create a new folder `/includes` under the /etc/nginx folder.  Then create a second folder called `log_formats` in the /etc/nginx/includes folder.  This is where the new log format files will be created.
+
+```bash
+/etc/nginx$ mkdir includes
+
+cd includes
+mkdir log_format
+
+cd log_format
+
+```
+
+Now using VI, create a new file called `main_ext.conf`, and add this following log format to it:
+
+```nginx
+# Extended Metrics Log Format
+log_format  main_ext    'remote_addr="$remote_addr", '
+                        '[time_local=$time_local], '
+                        'request="$request", '
+                        'status="$status", '
+                        'http_referer="$http_referer", '
+                        'body_bytes_sent="$body_bytes_sent", '
+                        'Host="$host", '
+                        'sn="$server_name", '
+                        'request_time=$request_time, '
+                        'http_user_agent="$http_user_agent", '
+                        'http_x_forwarded_for="$http_x_forwarded_for", '
+                        'request_length="$request_length", ';
+
+```
+
+Save the file and quit VI.
+
+Notice we have added a few new fields using $variables, like the $server_name, $request_time, etc.  You can modify this as you like, I'm sure your organization already has an HTTP access log format you could use.
+
+Now you need to tell NGINX where to find these new log format definitions. Using VI, edit your nginx.conf, to add your `/includes/log_formats` folder as a search location:
+
+```nginx
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    include /etc/nginx/includes/log_formats/*.conf; # Custom Access logs formats found here
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    include /etc/nginx/conf.d/*.conf;
+}
+```
+
+Save your nginx.conf, quit VI, and test your config with `nginx -t`.
+
+Next, modify your `cars.example.com` website to use this new log format:
+
+```bash
+vi /etc/nginx/conf.d/cars.example.com.conf
+
+```
+
+```nginx
+
+server {
+    
+    listen 80;      # Listening on port 80 on all IP addresses on this machine
+
+    server_name cars.example.com;   # Set hostname to match in request
+
+    access_log  /var/log/nginx/cars.example.com.log main_ext;  # Change log format to main_ext
+
+```
+
+Save your cars website file, and exit VI.
+
+Test your nginx configuration, and reload nginx.  If all was correct, it will reload and now your cars.example.com website will be using a new access log.  Let's go check.
+
+Open the /var/log/nginx/cars.example.com.log file, and watch as you send a couple requests.
+
+```bash
+docker logs <nginx-oss ContainerID> --follow
+
+```
+It should look similar to this:
+
+```bash
+192.168.65.1 - - [01/Feb/2024:20:27:46 +0000] "GET /rcf.html HTTP/1.1" 200 462 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" "-"
+192.168.65.1 - - [01/Feb/2024:20:27:46 +0000] "GET /rcf.jpg HTTP/1.1" 200 132435 "http://localhost/rcf.html" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" "-"
+
+```
+
+You see one request for the html page, and a second request for the rcf.jpg image.
+
+
+
+
+
+
+
+
 **This completes this Lab.**
 
 <br/>
@@ -636,6 +786,7 @@ What does NGINX do, when you change the configuration and request a reload?  At 
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
 - [NIGNX Directives](https://nginx.org/en/docs/dirindex.html)
 - [NGINX Variables](https://nginx.org/en/docs/varindex.html)
+- [NGINC Logging](https://docs.nginx.com/nginx/admin-guide/monitoring/logging/)
 - [HTTP URL Overview](https://en.wikipedia.org/wiki/URL)
 - [NGINX on Floppy disk](https://www.youtube.com/watch?v=IjjiTD-1Cvg)
 
