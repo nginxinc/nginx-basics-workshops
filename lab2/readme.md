@@ -13,7 +13,7 @@ In this lab, NGINX as a web server will be introduced, basic web and content ser
 <br/>
 
 By the end of the lab you will be able to: 
-* Describe NGINX web server operations
+* Describe NGINX server operations
 * Have a basic understanding of HTTP Requests and URLs
 * Create NGINX configurations for basic web content
 * Create and edit simple NGINX configs following best practices
@@ -137,6 +137,74 @@ $ systemctl stop nginx      #stop nginx processes
 
 ```
 
+Go ahead and try some of these NGINX commands in your nginx-oss container now, so you are familiar with them.  Open a second Terminal, so you can Watch the docker logs while you try these different commands.  It is recommended that you use 2 Terminals, one for issuing commands, and one for watching logs.
+
+1. Docker Exec into the nginx-oss container.
+
+    ```bash
+    docker exec -it < nginx-oss Container ID > /bin/bash
+
+    ```
+
+1. In a second Terminal, watch the nginx-oss container's log file, and watch as you send various NGINX commands.
+
+    ```bash
+    docker logs <nginx-oss ContainerID> --follow
+
+    ```
+    It should look similar to this:
+
+    ```bash
+    #Sample output
+
+    /etc/nginx # nginx -v
+    nginx version: nginx/1.25.3
+
+    /etc/nginx # nginx -s quit
+    2024/02/02 20:01:32 [notice] 1#1: signal 3 (SIGQUIT) received from 66, shutting down
+    2024/02/02 20:01:32 [notice] 53#53: gracefully shutting down
+    2024/02/02 20:01:32 [notice] 53#53: exiting
+    2024/02/02 20:01:32 [notice] 54#54: gracefully shutting down
+    2024/02/02 20:01:32 [notice] 54#54: exiting
+    2024/02/02 20:01:32 [notice] 1#1: signal 17 (SIGCHLD) received from 56
+    2024/02/02 20:01:32 [notice] 1#1: worker process 56 exited with code 0
+    ...
+
+    /etc/nginx # nginx -s stop
+    2024/02/02 20:06:22 [notice] 1#1: signal 15 (SIGTERM) received from 48, exiting
+    2024/02/02 20:01:32 [notice] 53#53: gracefully shutting down
+    2024/02/02 20:01:32 [notice] 53#53: exiting
+    2024/02/02 20:01:32 [notice] 54#54: gracefully shutting down
+    2024/02/02 20:01:32 [notice] 54#54: exiting
+    2024/02/02 20:01:32 [notice] 1#1: signal 17 (SIGCHLD) received from 56
+    2024/02/02 20:01:32 [notice] 1#1: worker process 56 exited with code 0
+    ...
+
+    /etc/nginx # nginx -t
+    nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+    nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+    /etc/nginx # nginx -T
+    nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+    nginx: configuration file /etc/nginx/nginx.conf test is successful
+    # configuration file /etc/nginx/nginx.conf:
+    ...
+    # displays all .conf file contents
+    ...
+
+    /etc/nginx # nginx -s reload
+    2024/02/02 20:10:04 [notice] 44#44: signal process started
+
+    2024/02/02 20:10:04 [notice] 1#1: signal 1 (SIGHUP) received from 44, reconfiguring
+    2024/02/02 20:10:04 [notice] 1#1: reconfiguring
+    2024/02/02 20:10:04 [notice] 1#1: using the "epoll" event method
+    ...
+
+    NOTE: systemctl commands may not be available in your container OS
+
+    ```
+
+
 <br/>
 
 ### NGINX Reloads
@@ -214,7 +282,7 @@ Or use can use another Linux command `ps |grep nginx` to see the nginx processes
 
 <br/>
 
-Now that you can see and control NGINX, a review of the configuration details is required. There are many things to understand about how to configure NGINX, you learn this step by step from top to bottom.
+Now that you can see and control NGINX, a review of the configuration details is required. There are many things to understand about how to configure NGINX, you will learn this step by step from top to bottom.
 
 NGINX Configurations are made up from 4 common elements:
 
@@ -381,6 +449,16 @@ Now that you have a basic understanding of the NGINX binary, contexts, and confi
 
 In this exercise, you will create 2 new HTTP configurations, for 2 different web sites.  You will use `www.example.com` and `www2.example.com` as the two hostnames.
 
+1. First, using VI or a text editor, update your local DNS resolver hosts file, usually `etc/hosts` on MacOS/Linux, to add these FQDN Hostnames used for these lab exercises. `www.example.com www2.example.com`
+
+    ```bash
+    vi /etc/hosts
+
+    # NGINX Basics hostnames for labs
+    127.0.0.1	localhost www.example.com www2.example.com 
+
+    ```
+
 1. Docker Exec into the nginx-oss container.
 
     ```bash
@@ -405,7 +483,9 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
         location / {
             
+            default_type text/html;    # Set type to avoid browser downloading to file
             return 200 "You have reached www.example.com, location /\n";
+
         }
 
     }
@@ -423,10 +503,14 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
     ```
 
-1. Test access to your new website, using curl to the IP address above:
+1. Test access to your new website, using curl to the IP address above, and to your local docker IP address:
 
     ```bash
+    # inside the container
     curl 172.18.0.2
+   
+    # from outside
+    curl 127.0.0.1
 
     ```
 
@@ -449,7 +533,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
     server {
         
-        listen 80 default_server;      # Listening on port 80 on all IP addresses on this machine
+        listen 80 default_server;        # Listening on port 80 on all IP addresses on this machine
 
         server_name wwww2.example.com;   # Set hostname to match in request
 
@@ -458,7 +542,9 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
         location / {
             
+            default_type text/html;      
             return 200 "Congrats, you have reached www2.example.com, the base path /\n";
+
         }
 
     }
@@ -476,7 +562,11 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 1. Test access to the second website, using curl to the same IP address:
 
     ```bash
+    # inside the container
     curl 172.18.0.2
+    
+    # from outside
+    curl 127.0.0.1
 
     ```
 
@@ -487,7 +577,11 @@ You need to include the `Host Header` in your curl request, so NGINX can route t
 Try adding the Host Header:
 
 ```bash
-curl 172.18.0.2 -H "Host: www2.example.com"
+    # inside the container
+    curl 172.18.0.2 -H "Host: www2.example.com"
+    
+    # from outside
+    curl 127.0.0.1 -H "Host: www2.example.com"
 
 ```
 
@@ -514,10 +608,20 @@ Now that you have a basic understand of how NGINX routes requests based on the H
 
 In this exercise, you will continue to learn how NGINX routes requests, by looking at the URI ( the path ) of the URL.  You will create a third website, to show Path based routing.
 
+1. First, using VI or a text editor, update your local DNS resolver hosts file, usually `etc/hosts` on MacOS/Linux, to add these FQDN Hostnames used for these lab exercises. `cafe.example.com`
+
+    ```bash
+    vi /etc/hosts
+
+    # NGINX Basics hostnames for labs
+    127.0.0.1	localhost www.example.com www2.example.com cafe.example.com
+
+    ```
+
 1. Using VI, create a new file called `cafe.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
 ```bash
-vi cafe.example.com.conf
+/etc/nginx/conf.d$ vi cafe.example.com.conf
 ```
 
 ```nginx
@@ -533,26 +637,31 @@ server {
 
     location / {
         
+        default_type text/html;
         return 200 "Congrats, you have reached cafe.example.com, path $uri\n";
     }
     
     location /coffee {
         
+        default_type text/html;
         return 200 "Caffiene relief from cafe.example.com, path $uri\n";
     }
     
     location /tea {
         
+        default_type text/html;
         return 200 "Green Tea from cafe.example.com, path $uri\n";
     }
     
     location /hours {
         
+        default_type text/html;
         return 200 "We are open:\nSun 6am-3pm\nMon Closed\nTue 6am-3pm\nWed 6am-3pm\nThurs 6am-3pm\nFri 6am-3pm\nSat 6am-3pm\nSun 6am-3pm\nat cafe.example.com, path $uri\n";
     }
     
     location /hours/closed {
         
+        default_type text/html;
         return 200 "Sorry - We are Closed on Tuesdays\nat cafe.example.com, path $uri\n";
     }
 
@@ -567,21 +676,21 @@ server {
 1. Test your new /paths with curl, don't forget your Host Header:
 
     ```bash
-    curl 172.18.0.2 -H "Host: cafe.example.com"
+    curl 127.0.0.1 -H "Host: cafe.example.com"
 
     ```
     ```bash
-    curl 172.18.0.2/coffee -H "Host: cafe.example.com"
-
-    ```
-
-    ```bash
-    curl 172.18.0.2/tea -H "Host: cafe.example.com"
+    curl 127.0.0.1/coffee -H "Host: cafe.example.com"
 
     ```
 
     ```bash
-    curl 172.18.0.2/hours -H "Host: cafe.example.com"
+    curl 127.0.0.1/tea -H "Host: cafe.example.com"
+
+    ```
+
+    ```bash
+    curl 127.0.0.1/hours -H "Host: cafe.example.com"
 
     ```
 
@@ -609,7 +718,7 @@ server {
 
     ```
 
-    > NOTE:  You added an NGINX variable, `$uri` to the return directive, to echo back what the request URI path that was sent.  There are many more NGINX variables that can be used like this.  Let's use more of these `NGINX $variables` to build a simple `debug` page, that will echo back some of the important information you might need when working/testing NGINX:
+    > NOTE:  You added an NGINX variable, `$uri` to the return directive, to echo back what the request URI path that was received.  There are many more NGINX variables that can be used like this.  Let's use more of these `NGINX $variables` to build a simple `debug` page, that will echo back some of the important information you might need when working/testing NGINX:
 
 1. Using VI, add a new `location block` called `/debug` to your existing `cafe.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
@@ -634,7 +743,7 @@ server {
 1. Test your new /debug path with curl, did you remember your Host Header?
 
     ```bash
-    curl 172.18.0.2/debug -H "Host: cafe.example.com"
+    curl 127.0.0.1/debug -H "Host: cafe.example.com"
 
     ```
 
@@ -660,9 +769,19 @@ If you like this debug page, feel free to explore and ADD additional Request and
 
 <br/>
 
-Let try some HTML files and images.  You will create another new website, `cars.example.com`, that will have 3 new HTML files and some images of the cars, which will represent 3 high performance autos: the `Lexus RCF, Nissan GTR, and Acura NSX`.  Each car will have it's own URL and location block, and matching .html files on disk.
+Let try some HTML files and images.  You will create another new website, `cars.example.com`, that will have 3 new HTML files and some images of the cars, which will represent 3 high performance autos: the `Lexus RCF, Nissan GTR, and Acura NSX`.  Each car will have it's own URL and location block, and matching .html and .jpg files on disk.
 
 The default directory for serving HTML content with NGINX is `/usr/share/nginx/html`, so you will use that as the root of your new website.
+
+1. First, using VI or a text editor, update your local DNS resolver hosts file, usually `etc/hosts` on MacOS/Linux, to add these FQDN Hostnames used for these lab exercises. `cars.example.com`
+
+    ```bash
+    vi /etc/hosts
+
+    # NGINX Basics hostnames for labs
+    127.0.0.1	localhost www.example.com www2.example.com cafe.example.com cars.example.com
+
+    ```
 
 1. Using VI, create a new file called `cars.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
@@ -685,6 +804,7 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
         root /usr/share/nginx/html;      # Set the root folder for the HTML and JPG files
 
         location / {           
+            default_type text/html;
             return 200 "Let's go fast, you have reached cars.example.com, path $uri\n";
         }
 
@@ -711,7 +831,7 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 1. Test all three URLs, one for each car with curl, don't forget your Host Header!:
 
     ```bash
-    curl localhost/gtr -H "Host: cars.example.com"
+    curl localhost/gtr -H "Host: cars.example.com"   # or curl cars.example.com/gtr
     curl localhost/nsx -H "Host: cars.example.com"
     curl localhost/rcf -H "Host: cars.example.com"
 
@@ -744,11 +864,13 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 
     ```
 
-    Try them in a browser, like http://localhost/rcf.html :
+    Try them in a browser, like http://cars.example.com/rcf :
 
-    ![NGINX Welcome RCF](media/lab2_welcome_rcf.png)
+    ![NGINX Welcome RCF](media/lab2_welcome-rcf.png)
 
-    You will notice, this page has just a few simple modification to NGINX's default Welcome page.
+    You will notice, this page has just a few simple modification to NGINX's default Welcome page.  Feel free to try adding some of your favorite images, and create a new hostname, and location blocks to serve up your new content ... now that you have a couple examples to work with - it's easy with NGINX!
+
+< Do we want to add a directory/file browsing exercise here ? >
 
 <br/>
 
@@ -792,7 +914,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
     As a Best Practice, you should not modify this main log format, but rather copy this one and create a new one with your changes.  The `include` directive is also introduced here, because it makes your NGINX configurations more concise, uniform, and consistent.  As you will likely want to use the same access log format for multiple websites, you will define it ONCE, but use it for every server block, instead of duplicating the log format config for every website.  If you need to make a change to your log format, you can update it in one file, but it would apply to all your websites/server blocks.
 
-1. Create a new folder `/includes` under the /etc/nginx folder.  Then create a second folder called `log_formats` in the /etc/nginx/includes folder.  This is where the new log format files will be created.
+1. Create a new folder `/includes` under the /etc/nginx folder.  Then create a second folder called `/log_formats` in the /etc/nginx/includes folder.  This is where the new log format files will be created.
 
     ```bash
     /etc/nginx$ mkdir includes
@@ -825,7 +947,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
     Save the file and quit VI.
 
-    Notice we have added a few new fields using $variables, like the $server_name, $request_time, etc.  You can modify this as you like, I'm sure your organization already has an HTTP access log format you could use.
+    Notice we have added a few new fields using $variables, like the $server_name, $request_time, etc.  You can modify this as you like, it is likely your organization already has an HTTP access log format you should probably use.
 
 1. Now you need to tell NGINX where to find these new log format definitions. Using VI, edit your nginx.conf, to add your `/includes/log_formats` folder as a search location:
 
@@ -874,7 +996,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
     ```
 
-    Save your cars website file, and exit VI.
+    Save your cars.example.com.conf file, and exit VI.
 
     Test your nginx configuration, and reload nginx.  If all was correct, it will reload and now your cars.example.com website will be using a new access log.  Let's go check.
 
@@ -892,7 +1014,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
     ```
 
-    You see one request for the html page, and a second request for the rcf.jpg image.
+    You see one request for the rcf.html page, and a second request for the rcf.jpg image.
 
 <br/>
 
@@ -905,11 +1027,13 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 - [NGINX Beginner's Guide](https://nginx.org/en/docs/beginners_guide.html)
 - [NGINX OSS](https://nginx.org/en/docs/)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
+- [Controlling NGINX](https://docs.nginx.com/nginx/admin-guide/basic-functionality/runtime-control/)
+- [NGINX Config Files](https://docs.nginx.com/nginx/admin-guide/basic-functionality/managing-configuration-files/)
 - [NIGNX Directives](https://nginx.org/en/docs/dirindex.html)
 - [NGINX Variables](https://nginx.org/en/docs/varindex.html)
-- [NGINC Logging](https://docs.nginx.com/nginx/admin-guide/monitoring/logging/)
+- [NGINX Logging](https://docs.nginx.com/nginx/admin-guide/monitoring/logging/)
 - [HTTP URL Overview](https://en.wikipedia.org/wiki/URL)
-- [NGINX on Floppy disk](https://www.youtube.com/watch?v=IjjiTD-1Cvg)
+- [Run NGINX off a Floppy disk](https://www.youtube.com/watch?v=IjjiTD-1Cvg)
 
 
 <br/>
