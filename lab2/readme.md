@@ -1,19 +1,29 @@
-# Introduction to NGINX Web Server
+# NGINX as a Web Server
 
 ## Introduction
 
+<br/>
+
 In this lab, NGINX as a web server will be introduced, basic web and content serving concepts will be covered.  A quick review of HTTP and URLs is presented, as your NGINX configurations will follow these HTTP principles.
 
+<br/>
+
 ## Learning Objectives 
+
+<br/>
 
 By the end of the lab you will be able to: 
 * Describe NGINX web server operations
 * Have a basic understanding of HTTP Requests and URLs
 * Create NGINX configurations for basic web content
 * Create and edit simple NGINX configs following best practices
-* Be proficient with NGINX logging files, formats, variables
+* Be familiar with NGINX logging files, formats, variables
 
-## Pre-Requisites
+<br/>
+
+## Prerequisites
+
+<br/>
 
 - You must have Docker installed and running
 - You must have Docker-compose installed
@@ -22,7 +32,11 @@ By the end of the lab you will be able to:
 - Familiarity with basic Docker concepts and commands
 - Familiarity with basic HTTP protocol
 
+<br/>
+
 ### HTTP URL Review
+
+<br/>
 
 In order to understand how NGINX works as web server, a basic understanding of the HTTP protocol, and how URLS work is neccessary.  This is not a lab on HTTP, but the principle objects and definitions are briefly reviewed here as they relate to NGINX.  You will find a link to more information on HTTP in the References section.
 
@@ -32,7 +46,9 @@ So what is a URL??  URL stands for `Uniform Resource Location` - an Internet sta
 
 Every URL consists of 4 or 5 distinct fields.
 
-Given:   http://www.example.com/application1?arg=123456
+Given the URL:   http://www.example.com/application1?arg=123456
+
+It is decoded as:
 
 Scheme  | Hostname        | URI           | Argument
 :------:|:---------------:|:-------------:|:-----------:
@@ -40,7 +56,9 @@ http:// | www.example.com | /application1 | ?arg=123456
 
 >If the TCP port used by the webserver is `not 80`, it must be included in the URL request, like this example using port 8080:
 
-Given:  http://www.example.com:8080/application1?arg=123456
+Given the URL:  http://www.example.com:8080/application1?arg=123456
+
+It is decoded with the extra `port`field:
 
 Scheme  | Hostname        | Port  | URI    | Argument
 :------:|:--------:|:--------:|:--------:|:--------:
@@ -57,7 +75,7 @@ As you configure NGINX, you will see that it uses these HTTP standards and defin
 
 Now you can configure the NGINX contexts to handle an HTTP request properly.  Let's overlay the NGINX configuration contexts with the example URL.
 
-Given:   http://www.example.com/application1
+Given the URL:   http://www.example.com/application1
 
 Scheme  | Hostname        | URI    
 :------:|:--------:|:--------:
@@ -89,7 +107,116 @@ http {
 
 ```
 
-### NGINX Configuration - Contexts, Includes, Directives, Blocks
+<br/>
+
+### Introduction to NGINX Commands
+
+<br/>
+
+NGINX runs as several Linux processes, so you must be familiar with the basic commands to control NGINX, and understand what happens when you issue commands to NGINX.  Like most Linux processes, the Host OS is responsible for starting/stopping/enable/disable the initial state of the nginx process when the Linux OS is booted.
+
+Here is a quick review of the NGINX commands you should be familiar with.  Depending on your Linux system, you may need to prefix these commands with `sudo`.
+
+```bash
+
+$ nginx -v                  #displays NGINX version detauls
+
+$ nginx -s quit             #graceful shutdown
+
+$ nginx -s stop             #terminates all NGINX processes
+
+$ nginx -t                  #test configuration syntax and files
+
+$ nginx -T                  #dumps the current running configurations
+
+$ nginx -s reload           #reloads NGINX with new configuration
+
+$ systemctl start nginx     #start nginx processes
+
+$ systemctl stop nginx      #stop nginx processes
+
+```
+
+<br/>
+
+### NGINX Reloads
+
+<br/>
+
+It is important to understand the details about what NGINX does, when you change the configuration and request an `nginx -s reload`.  At a high level, this is what happens:
+
+- The `nginx -s reload` command sends a SIGHUP signal to the Linux Kernel.
+- Example looks like this, from the `nginx error.log`:
+- - 2024/01/31 22:26:13 [notice] 1#1: signal 1 (SIGHUP) received from 155, reconfiguring
+- - 2024/01/31 22:26:13 [notice] 1#1: reconfiguring
+- The master process reads all the config files, and validates the syntax, configuration commands, variables, and many other dependencies.  It also validates that any dependent Linux system level objects are correct, like folder/file names and paths, file permissions, networking objects like IP addresses, sockets, etc.  If there are any errors, it prints out a `Configuration File /etc/nginx/nginx.conf Test Failed` error with the configuration filename and the line number where the error exists, and some helpful information, like "path /cahce not found" (you have a typo: /cahce should be spelled /cache).  The validation STOPS on the first error encountered.  So you must address the error, and run `nginx -t` again to further check for errors, until you get two successful test messages, like this:
+- - nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+- - nginx: configuration file /etc/nginx/nginx.conf test is successful
+- Once the master process configuration validation is successful, then NGINX will do the following:
+1. With NGINX OSS, new Workers are created, and the old Worker processes are immediately shutdown, along with all existing TCP connections.  After the master process spawns new Worker processes, and they begin handling new connections and traffic based on the new configuration.  Any traffic in flight is usually dropped.
+2. With NGINX Plus, new Worker processes are created, and begin using the new configuration immediately for all new connections and requests.  The old Workers are allowed to complete their previous task, and then close their TCP connections naturally, traffic in flight is not dropped!  The master process terminates the old Workers after they finish their work and close all their connections.  This is called Dynamic Reconfiguration in NGINX Plus documentation.
+- The nginx master process writes log information about the reload to the error.log so you can see what happened when, like this:
+
+```bash
+#Sample output for "nginx -s reload" command
+
+2024/02/02 00:27:21 [notice] 1#1: signal 1 (SIGHUP) received from 81, reconfiguring
+2024/02/02 00:27:21 [notice] 1#1: reconfiguring
+2024/02/02 00:27:21 [notice] 1#1: using the "epoll" event method
+2024/02/02 00:27:21 [notice] 1#1: start worker processes
+2024/02/02 00:27:21 [notice] 1#1: start worker process 82
+2024/02/02 00:27:21 [notice] 1#1: start worker process 83
+2024/02/02 00:27:21 [notice] 1#1: signal 29 (SIGIO) received
+2024/02/02 00:27:21 [notice] 1#1: signal 17 (SIGCHLD) received from 76
+2024/02/02 00:27:21 [notice] 1#1: worker process 76 exited with code 0
+2024/02/02 00:27:21 [notice] 1#1: signal 29 (SIGIO) received
+2024/02/02 00:27:21 [notice] 1#1: signal 17 (SIGCHLD) received from 69
+2024/02/02 00:27:21 [notice] 1#1: worker process 69 exited with code 0
+
+```
+
+You can easily see the nginx master and worker processes in Linux with `top`, it would look something like this:
+
+```bash
+# Sample output
+
+Mem: 1221044K used, 6916284K free, 1460K shrd, 15872K buff, 505096K cached
+CPU:   0% usr   0% sys   0% nic  99% idle   0% io   0% irq   0% sirq
+Load average: 0.00 0.00 0.00 1/568 95
+  PID  PPID USER     STAT   VSZ %VSZ CPU %CPU COMMAND
+    1     0 root     S     8976   0%   6   0% nginx: master process nginx -g daemon off;
+   88     1 nginx    S     9440   0%   8   0% nginx: worker process
+   89     1 nginx    S     9440   0%  11   0% nginx: worker process
+...
+   60     0 root     S     3404   0%  10   0% /bin/bash
+   34     0 root     S     1676   0%   3   0% /bin/sh
+   66    60 root     S     1604   0%  10   0% top
+
+```
+
+By default, nginx Master process will create a Worker process for every CPU core in the system.  If you reload NGINX while watching top, you will see the new Workers created with new PIDs, and old Workers disappear as they are terminated.
+
+Or use can use another Linux command `ps |grep nginx` to see the nginx processes:
+
+```bash
+#Sample output
+
+    1 root      0:00 nginx: master process nginx -g daemon off;
+   82 nginx     0:00 nginx: worker process
+   83 nginx     0:00 nginx: worker process
+  100 root      0:00 grep nginx
+
+```
+
+<br/>
+
+### NGINX Configuration Overview
+
+<br/>
+
+Now that you can see and control NGINX, a review of the configuration details is required. There are many things to understand about how to configure NGINX, you learn this step by step from top to bottom.
+
+NGINX Configurations are made up from 4 common elements:
 
 - Contexts
 - Includes
@@ -102,11 +229,11 @@ http {
 
 `Directives` refer to NGINX configurations consisting of 2 types:
 
-- Simple directives - these are single line commands with some parameters that end in a semi-colon;
+- Simple directives - these are single line commands with some parameters that end in a **semi-colon `;`**
 
 - Block directives - these are multiple line commands, with an opening and closing curly brace **`{}`**.   A block directive will contain single line directives, and also can contain other block directives, called nested blocks.
 
-Let's take a look at some examples, using the default `nginx.conf` that comes installed with NGINX.
+Let's take a look at some examples, by inspecting the default `nginx.conf` that comes installed with NGINX.
 
 Inspect the nginx.conf file, here are some explanations:
 
@@ -116,7 +243,7 @@ Inspect the nginx.conf file, here are some explanations:
 #
 
 user  nginx;                               #Linux user
-worker_processes  auto;                    #Number of Workers
+worker_processes  auto;                    #Number of Workers, 1 per CPU core
 
 error_log  /var/log/nginx/error.log warn;  #set NGINX error log path and name and level
 pid        /var/run/nginx.pid;             #set NGINX master process PID file
@@ -205,7 +332,11 @@ maps to:
 
 >NOTE:  The lab exercises will focus on the HTTP, Server, and Location contexts and blocks.  The Stream context is for Layer4 TCP/UDP traffic, which is not covered in these labs.
 
+<br/>
+
 ### NGINX on Linux File Structure
+
+<br/>
 
 The hierarchy of these contexts also maps to the folders/files layout on disk. This is how the folders and files are laid out for this lab exercise, following NGINX guidelines and best practices.
 
@@ -234,11 +365,19 @@ nginx
 
 It is considered an NGINX best practice to follow this folder and file layout, so you will learn and use this in the lab exercises.
 
+<br/>
+
 ## NGINX as a Webserver Exercises
+
+<br/>
 
 Now that you have a basic understanding of the NGINX binary, contexts, and configuration files, let's configure NGINX as a web server following HTTP standards.  You will configure some websites, URI paths, HTML pages, and create NGINX configs to correctly serve some content based on the Full URL in the HTTP request.
 
+<br/>
+
 ### NGINX Host based Routing
+
+<br/>
 
 In this exercise, you will create 2 new HTTP configurations, for 2 different web sites.  You will use `www.example.com` and `www2.example.com` as the two hostnames.
 
@@ -365,7 +504,11 @@ Now you see that the `Host Based Routing` is working correctly, because you prov
 - The `return` directive used in the exercises above is a quick and easy way to test Server and Location blocks in NGINX, it can be used to verify NGINX is routing your requests to the proper block.
 - The HTTP Host Header is required for HTTP/1.1 and later protocols, so the `server_name directive` will be a common element of your NGINX configurations that must be correct!
 
+<br/>
+
 ### NGINX Path based Routing
+
+<br/>
 
 Now that you have a basic understand of how NGINX routes requests based on the Host Header matching an HTTP hostname, let's look deeper at the next component of the URL, the `URI path`.
 
@@ -511,7 +654,11 @@ server {
 
 If you like this debug page, feel free to explore and ADD additional Request and Response variables, to make the page display the data that is interesting to you.
 
+<br/>
+
 ### NGINX Static HTML pages
+
+<br/>
 
 Let try some HTML files and images.  You will create another new website, `cars.example.com`, that will have 3 new HTML files and some images of the cars, which will represent 3 high performance autos: the `Lexus RCF, Nissan GTR, and Acura NSX`.  Each car will have it's own URL and location block, and matching .html files on disk.
 
@@ -603,177 +750,151 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 
     You will notice, this page has just a few simple modification to NGINX's default Welcome page.
 
-
-### Introduction to NGINX Commands
-
-```bash
-
-#displays NGINX version detauls
-$ nginx -v
-
-#graceful shutdown
-$ nginx -s quit
-
-#terminates all NGINX processes
-$ nginx -s stop
-
-#configuration syntax and file test
-$ nginx -t
-
-#dumps the current running configurations
-$ nginx -T
-
-#reloads configurations
-$ nginx -s reload
-
-#start nginx
-$ systemctl start nginx
-
-```
-
-### NGINX Reloads
-
-What does NGINX do, when you change the configuration and request a reload?  At a high level, this is what happens:
-
-- The `nginx -s reload` command sends a SIGHUP signal to the Linux Kernel.
-- The master process reads all the config files, and validates the syntax, configuration commands, variables, and many other dependencies.  It also validates that any dependent Linux system level objects are correct, like folder/file names and paths, file permissions, networking objects like IP addresses, sockets, etc.  If there are any errors, it prints out the configuration filename and the line number where the error exists, and some helpful information, like "path /cahce not found" (you have a typo: /cahce should be spelled /cache).  The validation STOPS on the first error encountered.  So you must address the error, and run `nginx -t` again to further check for errors.
-- Once the master process configuration validation is successful, then NGINX will do the following:
-1. With NGINX OSS, the Worker processes are immediately shutdown, along with all existing TCP connections.  The master process then spawns new Worker processes, and they begin handling new connections and traffic based on the new configuration.  Any traffic in flight is dropped.
-2. With NGINX Plus, new Worker processes are created, and begin using the new configuration immediately for all new connections and requests.  The old Workers are allowed to complete their previous task, and then close their TCP connections naturally, traffic in flight is not dropped!  The master process terminates the old Workers after they close all their connections.  This is called Dynamic Reconfiguration in NGINX Plus documentation.
-- The nginx master process writes log information about the reload to the error.log so you can see what happened when.
-
-< NGINX start, stop, reload while watching the error.log lab exercises here - top, ps aux, etc >
+<br/>
 
 ### NGINX Logging
 
-In this exercise, you will learn about NGINX logging.  There are only 2 logs that you need to worry about.  The NGINX error.log, and the Access.log.
+<br/>
 
-The NGINX `error.log`, despite it's name, is also used to record start/stop/reload events, and other important messages when NGINX boots up.   It is also the `FIRST` place you should look if you suspect a problem with your website or NGINX configurations.  It will record any DNS, TCP, HTTP, or HTTPS errors it encounters with processing traffic in realtime. It also records issues with the Linux Host system during runtime, like running out of memory or disk, etc.  You will drastically reduce the time required to find and address issues if you start your troubleshooting process with the NGINX error.log.  There is only one NGINX error.log file, but you can change the name and folder if you like.
+In this exercise, you will learn about NGINX logging.  There are only 2 logs that you need to worry about.  The NGINX error.log, and the access.logs.
 
-The NGINX `access.log`, is where the HTTP request/response metadata is recorded.  It is a Best Practice to have a separate unique access log file for each website/server block, and sometimes you might even want an access.log for a uri/location block.  You will configure these in the following exercises, using many of the hundreds of available NGINX $variables.  The access logging is very flexible, allowing you to configure a `log format` that meets your needs.
+1. The NGINX `error.log`, despite it's name, is also used to record start/stop/reload events, and other important messages when NGINX boots up.   It is also the `FIRST` place you should look if you suspect a problem with your website or NGINX configurations.  It will record any DNS, TCP, HTTP, or HTTPS errors it encounters with processing traffic in realtime. It also records issues with the Linux Host system during runtime, like running out of memory or disk, file not found, etc.  You will drastically reduce the time required to find and address issues if you start your troubleshooting process with the NGINX error.log.  There is only one NGINX error.log file, but you can change the name and folder if you like.
 
-For reference, this is the default NGINX logging format, called `main` or combined, which is always found in `/etc/nginx/nginx.conf` in the http context, is enabled by default, and can be found at `/var/log/nginx/access.log`:  
+    For example, here is what the nginx error.log shows when NGINX is started:
 
-```nginx
+    ```bash
+    2024/02/02 00:11:28 [notice] 1#1: using the "epoll" event method
+    2024/02/02 00:11:28 [notice] 1#1: nginx/1.25.3
+    2024/02/02 00:11:28 [notice] 1#1: built by gcc 12.2.1 20220924 (Alpine 12.2.1_git20220924-r10)
+    2024/02/02 00:11:28 [notice] 1#1: OS: Linux 6.4.16-linuxkit
+    2024/02/02 00:11:28 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1048576:1048576
+    2024/02/02 00:11:28 [notice] 1#1: start worker processes
+    2024/02/02 00:11:28 [notice] 1#1: start worker process 22
+    2024/02/02 00:11:28 [notice] 1#1: start worker process 23
 
-    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                      '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';
-    
-    access_log  /var/log/nginx/access.log  main;   # default name and location
+    ```
 
-```
+    You see that it contains useful information about the version, build, platform, Linux OS, and even some Linux parameters like `RLIMIT_NOFILE`.
 
-As a Best Practice, you should not modify this main log format, but rather copy this one and create a new one with your changes.  The `include` directive is also introduced here, because it makes your NGINX configurations more concise, uniform, and consistent.  As you will likely want to use the same access log format for multiple websites, you will define it ONCE, but use it for every server block, instead of duplicating the log format config for every website.  If you need to make a change to your log format, you can update it in one file, but it would apply to all your websites/server blocks.
+1. The NGINX `access.log`, is where the HTTP request/response metadata is recorded.  It is a Best Practice to have a separate unique access log file for each website/server block, and sometimes you might even want an access.log for a uri/location block.  You will configure these in the following exercises, using many of the hundreds of available NGINX $variables.  The access logging is very flexible, allowing you to configure a `log format` that meets your needs.
+
+    For reference, this is the default NGINX logging format, called `main` or combined, which is always found in `/etc/nginx/nginx.conf` in the http context, is enabled by default, and can be found at `/var/log/nginx/access.log`:  
+
+    ```nginx
+
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for"';
+        
+        access_log  /var/log/nginx/access.log  main;   # default name and location
+
+    ```
+
+    As a Best Practice, you should not modify this main log format, but rather copy this one and create a new one with your changes.  The `include` directive is also introduced here, because it makes your NGINX configurations more concise, uniform, and consistent.  As you will likely want to use the same access log format for multiple websites, you will define it ONCE, but use it for every server block, instead of duplicating the log format config for every website.  If you need to make a change to your log format, you can update it in one file, but it would apply to all your websites/server blocks.
 
 1. Create a new folder `/includes` under the /etc/nginx folder.  Then create a second folder called `log_formats` in the /etc/nginx/includes folder.  This is where the new log format files will be created.
 
-```bash
-/etc/nginx$ mkdir includes
+    ```bash
+    /etc/nginx$ mkdir includes
 
-cd includes
-mkdir log_format
+    cd includes
+    mkdir log_format
 
-cd log_format
+    cd log_format
 
-```
+    ```
 
-Now using VI, create a new file called `main_ext.conf`, and add this following log format to it:
+1. Now using VI, create a new file called `main_ext.conf`, and add this following log format to it:
 
-```nginx
-# Extended Metrics Log Format
-log_format  main_ext    'remote_addr="$remote_addr", '
-                        '[time_local=$time_local], '
-                        'request="$request", '
-                        'status="$status", '
-                        'http_referer="$http_referer", '
-                        'body_bytes_sent="$body_bytes_sent", '
-                        'Host="$host", '
-                        'sn="$server_name", '
-                        'request_time=$request_time, '
-                        'http_user_agent="$http_user_agent", '
-                        'http_x_forwarded_for="$http_x_forwarded_for", '
-                        'request_length="$request_length", ';
+    ```nginx
+    # Extended Metrics Log Format
+    log_format  main_ext    'remote_addr="$remote_addr", '
+                            '[time_local=$time_local], '
+                            'request="$request", '
+                            'status="$status", '
+                            'http_referer="$http_referer", '
+                            'body_bytes_sent="$body_bytes_sent", '
+                            'Host="$host", '
+                            'sn="$server_name", '
+                            'request_time=$request_time, '
+                            'http_user_agent="$http_user_agent", '
+                            'http_x_forwarded_for="$http_x_forwarded_for", '
+                            'request_length="$request_length", ';
 
-```
+    ```
 
-Save the file and quit VI.
+    Save the file and quit VI.
 
-Notice we have added a few new fields using $variables, like the $server_name, $request_time, etc.  You can modify this as you like, I'm sure your organization already has an HTTP access log format you could use.
+    Notice we have added a few new fields using $variables, like the $server_name, $request_time, etc.  You can modify this as you like, I'm sure your organization already has an HTTP access log format you could use.
 
-Now you need to tell NGINX where to find these new log format definitions. Using VI, edit your nginx.conf, to add your `/includes/log_formats` folder as a search location:
+1. Now you need to tell NGINX where to find these new log format definitions. Using VI, edit your nginx.conf, to add your `/includes/log_formats` folder as a search location:
 
-```nginx
-http {
-    include       /etc/nginx/mime.types;
-    default_type  application/octet-stream;
+    ```nginx
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
 
-    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                      '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for"';
 
-    access_log  /var/log/nginx/access.log  main;
+        access_log  /var/log/nginx/access.log  main;
 
-    include /etc/nginx/includes/log_formats/*.conf; # Custom Access logs formats found here
+        include /etc/nginx/includes/log_formats/*.conf; # Custom Access logs formats found here
 
-    sendfile        on;
-    #tcp_nopush     on;
+        sendfile        on;
+        #tcp_nopush     on;
 
-    keepalive_timeout  65;
+        keepalive_timeout  65;
 
-    #gzip  on;
+        #gzip  on;
 
-    include /etc/nginx/conf.d/*.conf;
-}
-```
+        include /etc/nginx/conf.d/*.conf;
+    }
+    ```
 
-Save your nginx.conf, quit VI, and test your config with `nginx -t`.
+    Save your nginx.conf, quit VI, and test your config with `nginx -t`.
 
-Next, modify your `cars.example.com` website to use this new log format:
+1. Next, modify your `cars.example.com` website to use this new log format:
 
-```bash
-vi /etc/nginx/conf.d/cars.example.com.conf
+    ```bash
+    vi /etc/nginx/conf.d/cars.example.com.conf
 
-```
+    ```
 
-```nginx
+    ```nginx
 
-server {
-    
-    listen 80;      # Listening on port 80 on all IP addresses on this machine
+    server {
+        
+        listen 80;      # Listening on port 80 on all IP addresses on this machine
 
-    server_name cars.example.com;   # Set hostname to match in request
+        server_name cars.example.com;   # Set hostname to match in request
 
-    access_log  /var/log/nginx/cars.example.com.log main_ext;  # Change log format to main_ext
+        access_log  /var/log/nginx/cars.example.com.log main_ext;  # Change log format to main_ext
 
-```
+    ```
 
-Save your cars website file, and exit VI.
+    Save your cars website file, and exit VI.
 
-Test your nginx configuration, and reload nginx.  If all was correct, it will reload and now your cars.example.com website will be using a new access log.  Let's go check.
+    Test your nginx configuration, and reload nginx.  If all was correct, it will reload and now your cars.example.com website will be using a new access log.  Let's go check.
 
-Open the /var/log/nginx/cars.example.com.log file, and watch as you send a couple requests.
+1. Watch the nginx-oss container's log file, and watch as you send a couple requests.
 
-```bash
-docker logs <nginx-oss ContainerID> --follow
+    ```bash
+    docker logs <nginx-oss ContainerID> --follow
 
-```
-It should look similar to this:
+    ```
+    It should look similar to this:
 
-```bash
-192.168.65.1 - - [01/Feb/2024:20:27:46 +0000] "GET /rcf.html HTTP/1.1" 200 462 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" "-"
-192.168.65.1 - - [01/Feb/2024:20:27:46 +0000] "GET /rcf.jpg HTTP/1.1" 200 132435 "http://localhost/rcf.html" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" "-"
+    ```bash
+    192.168.65.1 - - [01/Feb/2024:20:27:46 +0000] "GET /rcf.html HTTP/1.1" 200 462 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" "-"
+    192.168.65.1 - - [01/Feb/2024:20:27:46 +0000] "GET /rcf.jpg HTTP/1.1" 200 132435 "http://localhost/rcf.html" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" "-"
 
-```
+    ```
 
-You see one request for the html page, and a second request for the rcf.jpg image.
+    You see one request for the html page, and a second request for the rcf.jpg image.
 
-
-
-
-
-
-
+<br/>
 
 **This completes this Lab.**
 
