@@ -870,7 +870,38 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 
     You will notice, this page has just a few simple modification to NGINX's default Welcome page.  Feel free to try adding some of your favorite images, and create a new hostname, and location blocks to serve up your new content ... now that you have a couple examples to work with - it's easy with NGINX!
 
-< Do we want to add a directory/file browsing exercise here ? >
+### NGINX Directory Browsing
+
+Now that you have some hot cars in your garage to show off, you might want to let users browse images without knowing all the names or links.  Or, you might want to know what files are in different folders on your webserver, either for yourself or for your visitors, so a File Manager type of user interface would be nice.  NGINX can provide this for you with a module called `http_auto_index`, that can provide this feature.  You will now create a new `/location block` called `/browse` that will perform `Directory Browsing` using this feature module:
+
+1. Using VI, edit your `cars.example.com.conf` file, and add this new Location Block:
+
+    ```bash
+    vi /etc/nginx/conf.d/cars.example.com.conf
+
+    ```
+
+    Add this location block, change the URL path if you like:
+
+    ```nginx
+
+        location /browse {                   # new URL path
+        
+            alias /usr/share/nginx/html;     # Browse this folder
+            index index.html;                # Use this file, but if it does *not* exist
+            autoindex on;                    # Perform directory/file browsing
+        }
+
+    ```
+
+    Save your file and quit VI.  
+    
+1. Test and Reload your new NGINX config.
+
+1. To see this in action, open your browser to http://cars.example.com/browse , you should see something similar to this.  If you click on one of the .jpg files, you will see the image; or the webpage if you click on the .html files.  This is a handy feature for presenting images, downloading files from directories, PDFs for documents, etc.
+
+    ![NGINX Directory Browse](media/lab2_directory-browse.png)
+
 
 <br/>
 
@@ -947,7 +978,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
     Save the file and quit VI.
 
-    Notice we have added a few new fields using $variables, like the $server_name, $request_time, etc.  You can modify this as you like, it is likely your organization already has an HTTP access log format you should probably use.
+    Notice we have added a few new fields using $variables, like the $server_name, $request_time, etc.  You can modify this as you like to suit your needs.
 
 1. Now you need to tell NGINX where to find these new log format definitions. Using VI, edit your nginx.conf, to add your `/includes/log_formats` folder as a search location:
 
