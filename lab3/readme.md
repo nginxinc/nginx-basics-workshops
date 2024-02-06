@@ -30,14 +30,14 @@ By the end of the lab you will be able to:
 
 ## Create TLS Self Signed Certificate and Key
 
-In this exercise, you will use `openssl` to create a Self Signed certificate and key to use for these exercises.  However, it should be clearly understood, that Self-Signed certificates are exactly that - they are created and signed by you or someone else.  `They are not signed by any official Certificate Management Entity`, so they are not recommended for any use other than local lab exercises.  Most Modern Internet Browsers will display Security Warnings when they receive a Self-Signed certificate from a Server.  In some environments, the Browser will block access entirely.  So use Self-Signed certificates with `CAUTION`.
+In this exercise, you will use `openssl` to create a Self Signed certificate and key to use for these exercises.  However, it should be clearly understood, that Self-Signed certificates are exactly that - they are created and signed by you or someone else.  `They are not signed by any official Certificate Authority`, so they are not recommended for any use other than testing in local lab exercises.  Most Modern Internet Browsers will display Security Warnings when they receive a Self-Signed certificate from a webserver.  In some environments, the Browser will block access completely.  So use Self Signed certificates with `CAUTION`.
 
 1. Ensure you are in the `lab3` folder.  Using a Terminal, use Docker Compose to build and run the `nginx-oss` container.  This is a new image, based on the Dockerfile in the lab3 folder.  The `openssl` libraries have been added, so you can use them to build, configure, and test TLS.
 
 1. After the Docker Compose has completed, and the lab3/nginx-oss container is running, Docker Exec into the nginx-oss container.
 
     ```bash
-    docker exec -it < lab3 nginx-oss Container ID > /bin/bash
+    docker exec -it <lab3 nginx-oss Container ID> /bin/bash
 
     ```
 
@@ -112,7 +112,7 @@ In this exercise, you will use `openssl` to create a Self Signed certificate and
 
 ## NGINX webserver with TLS
 
-Now that you a TLS cert and key for testing, you will configure NGINX to use them. 
+Now that you have a TLS cert and key for testing, you will configure NGINX to use them. 
 
 *NOTE:*  If you have a real TLS cert and key issued by a Certificate Authority, you can use those files in this exercise if you like, just copy them to the docker container, and use the configuration commands below.
 
