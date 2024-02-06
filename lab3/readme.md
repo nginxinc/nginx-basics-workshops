@@ -30,7 +30,7 @@ By the end of the lab you will be able to:
 
 ## Create TLS Self Signed Certificate and Key
 
-In this exercise, you will use `openssl` to create a self-signed certificate and key to use for these exercises.  However, it should be clearly understood, that Self-Signed certificates are exactly that - they are created and signed by you or someone else.  `They are not signed by any official Certificate Management Entity`, so they are not recommended for any use other than local lab exercises.  Most Modern Internet Browsers will display Security Warnings when they receive a Self-Signed certificate from a Server.  In some environments, the Browser will block access entirely.  So use Self-Signed certificates with `CAUTION`.
+In this exercise, you will use `openssl` to create a Self Signed certificate and key to use for these exercises.  However, it should be clearly understood, that Self-Signed certificates are exactly that - they are created and signed by you or someone else.  `They are not signed by any official Certificate Management Entity`, so they are not recommended for any use other than local lab exercises.  Most Modern Internet Browsers will display Security Warnings when they receive a Self-Signed certificate from a Server.  In some environments, the Browser will block access entirely.  So use Self-Signed certificates with `CAUTION`.
 
 1. Ensure you are in the `lab3` folder.  Using a Terminal, use Docker Compose to build and run the `nginx-oss` container.  This is a new image, based on the Dockerfile in the lab3 folder.  The `openssl` libraries have been added, so you can use them to build, configure, and test TLS.
 
@@ -49,7 +49,7 @@ In this exercise, you will use `openssl` to create a self-signed certificate and
 
     ```
 
-1. Change directory to this nginx folder.  Using openssl, create a new self-signed TLS certificate and key files.  You will be using these to provide TLS for your `cars.example.com` website:
+1. Change directory to this new nginx folder.  Using openssl, create a new self-signed TLS certificate and key files.  You will be using these to provide TLS for your `cars.example.com` website:
 
     ```bash
     cd nginx
@@ -82,7 +82,6 @@ In this exercise, you will use `openssl` to create a self-signed certificate and
     ```
 
     ```bash
-
     /etc/ssl/nginx $ cat cars.example.com.crt
 
     ```
@@ -91,21 +90,7 @@ In this exercise, you will use `openssl` to create a self-signed certificate and
     #Sample output
     -----BEGIN CERTIFICATE-----
     MIIDDTCCAfWgAwIBAgIUdPfXtRGjRfM9H72saPaB0iFxfukwDQYJKoZIhvcNAQEL
-    BQAwFjEUMBIGA1UEAwwLTmdpbnhCYXNpY3MwHhcNMjQwMjA1MTk0MDMyWhcNMjUw
-    MjA0MTk0MDMyWjAWMRQwEgYDVQQDDAtOZ2lueEJhc2ljczCCASIwDQYJKoZIhvcN
-    AQEBBQADggEPADCCAQoCggEBANzx4g4ex8Y6inUMfDZf+kmcJzQvy+i1iK4zG9eE
-    QXMRcSVCkxto/nC5FE6V10vGHjgxlNO6TbwviH0cJgkmQwRmZsPHcm7ikeyFvSFb
-    uL7F+6Sgks/81ktQJEJwn6VkKdUPsZbkn0oAycXOHuqrPzvTbaohjp24sHQ1GKDP
-    F6ZvDAxlENYftMvH5zuWgUbPOFbYeUchTYdL7rPT1oQo5Iw0OXGvBxUbvl7XW0k/
-    0ia9KPVRG0xwrxAad0pRHI4DfNZrW0bh8Ig7LA5YBIXArwJRYQOdxGZaeXUDB3RF
-    dfFbLMVt1yVh4SdtRoYFXmZRjTZHv0tNYQjXjYb29LWabBMCAwEAAaNTMFEwHQYD
-    VR0OBBYEFAee4uyOPkYzO0yyhYEfZGtepKsuMB8GA1UdIwQYMBaAFAee4uyOPkYz
-    O0yyhYEfZGtepKsuMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEB
-    AJf5p7rjN2x7ZCU1dO2T1M9SDxQ8xCMKGIti2BqAWfW4VIhN9iMA7EpDiVtByC70
-    A1lKY/YsSxP6+r9wxh4AYBvWbIqfdNYfUovW8QMArLrfVDbFYTj40ahpfnIX5/Xy
-    zy/Hz7a6ReM9NQPWDUimQY+3erw85KEhz/Z0x6I9rv5OlcpaHBnz/BnVgZbK99Wm
-    1LhXWp4xHm2eaH6gaydrQhOl30I0sU9Iu2jgPsoykywZd2oy2CL3aCwIyCLqgHTc
-    65zShPveWiVLMicUs2LuiU3WypUIpXPs66u5EJXFZVIZ3/PpP2VgpIlXVWMfpN6O
+    ...snip
     FEW+0L1jGJzuvVtP0LwIywc=
     -----END CERTIFICATE-----
 
@@ -119,36 +104,19 @@ In this exercise, you will use `openssl` to create a self-signed certificate and
     #Sample output
     -----BEGIN PRIVATE KEY-----
     MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDc8eIOHsfGOop1
-    DHw2X/pJnCc0L8votYiuMxvXhEFzEXElQpMbaP5wuRROlddLxh44MZTTuk28L4h9
-    HCYJJkMEZmbDx3Ju4pHshb0hW7i+xfukoJLP/NZLUCRCcJ+lZCnVD7GW5J9KAMnF
-    zh7qqz87022qIY6duLB0NRigzxembwwMZRDWH7TLx+c7loFGzzhW2HlHIU2HS+6z
-    09aEKOSMNDlxrwcVG75e11tJP9ImvSj1URtMcK8QGndKURyOA3zWa1tG4fCIOywO
-    WASFwK8CUWEDncRmWnl1Awd0RXXxWyzFbdclYeEnbUaGBV5mUY02R79LTWEI142G
-    9vS1mmwTAgMBAAECggEAL7lfpsUnSb4jYh0MR4J7waKlJTSdyupLV7VacjbzHDPM
-    SMwUknsfWqHfrQnYs1lb9a9gAkvftqJdzQhjft5w42ZrFCbkpObzti89JxN02GBT
-    dr/odlyavTHWYzOIiGUWVBtLtNg1P/rjmoJnUzEiO33z1ifhclgOZUuCwll5Nk2n
-    bf+33/em/9mK/HgrrDFVtO/+tYGncexUPDt/SDtxVF6/N7mkuWNUGVi4oC8YDQ1c
-    J+fIeZwWApfSlLf5L9uJl+xAdRTCvxILLWPsA0rfe5RBvbOPObN28KUA8FYMt0B1
-    Q6u5vct3LtXoVj9xUhecI3XU5xMNah9Sy6/bWwVQgQKBgQD3XwISb/b+3clAzCk2
-    jsi8gLQbvsDoiE+Fqmgz6kIJ2ABwFJuO09E/eb3clrX6TYputJ01lisvO0gnLXdD
-    okmpVOislFkfmQCzwqdBVw59OIp3vESN1MqMEMpCyiL0JyOGK1oTGx2LYDDN3rh2
-    IUf0Wg8cHNIrSXRIOKHPhBlbsQKBgQDkpuRMT74/4o5CgHD6faGcouWVWX7nSERr
-    Ml4wdWUNxu+nGoK3NKGP9EaGa8xRAoye0G/k0ZrKlEOSOADf8Ma/jPqJowhG2Lek
-    8A5XRSQAoIy6g4JbJfLfWy5AMQ+uLmH1X9QC8hWo/w9+JfdXNOO5gD7aEZ6lahbd
-    z1VhLk8pAwKBgQCvcZnVm8VxU7mWFHaydChY0WtsNik5gtvrsEWBdIbr1l/RHjyJ
-    2x8QRvbqiZV9dhtVkxHg3KW6NPBioPNya5qU11zCceCX8Xs3Azp+tBDZrQ1ACK4S
-    bbZOCuZ44kZSJaQjV4HmBRg6LrnOeUUYu1f+LRWEWciR3OH1Cv1wYX9esQKBgQCS
-    iKImhbRXHMoutEGzRnAcAgk//WrmrdmrGUxjodhxS9yqKsM6xfAEYXgRDWSTRh74
-    aHxNGEcrLHlha6Kj4Zp9h8vICUN0o86NVYrbQuQfwsRtg3o3D8rmeXjaipaR+get
-    SQyGFr7q3wr+vTYWHT8T0qx09HXHbIXbANSmwxbYIQKBgQDoOdL6wetqagldWzAL
-    /lo+dJvG65nUUijYZdbE5Qk5Y5l4CvI64ypJXiOgS07Ii2qDjyaVg4XlfLwGtTrP
-    8DKq4rEpRdUst/ehjJA+ptxLr/mqmjAuHsfhimNDr+YDb2JkW7TqhAJ71nwVNqos
+    ...snip
     SHa8zigyl3iYJAenhMSat74Rng==
     -----END PRIVATE KEY-----
 
     ```
 
-1. Now that you a TLS cert and key, you can configure NGINX to use them.  Change to the `/etc/nginx/conf.d` folder, and make a copy of your existing cars.example.com.conf file.  You will edit this new file, to add and change NGINX parameters for TLS:
+## NGINX webserver with TLS
+
+Now that you a TLS cert and key for testing, you will configure NGINX to use them. 
+
+*NOTE:*  If you have a real TLS cert and key issued by a Certificate Authority, you can use those files in this exercise if you like, just copy them to the docker container, and use the configuration commands below.
+
+1. Docker Exec into your nginx-oss container as before. Change to the `/etc/nginx/conf.d` folder, and make a copy of your existing cars.example.com.conf file.  Keep both files for your reference for later if needed.  You will edit this new file, to add and change NGINX parameters to use TLS:
 
     ```bash
     cd /etc/nginx/conf.d
@@ -158,11 +126,11 @@ In this exercise, you will use `openssl` to create a self-signed certificate and
 
 1. Using VI, make the following changes to your tls-cars.example.com.conf file:
 
-    - On line #1, change the comment from HTTP to HTTPS
-    - On line #7, change the `listen 80` directive to `listen 443 ssl`.
-    - Insert 2 new lines, between the server_name and access_log lines:
-    - - ssl_certificate /etc/ssl/nginx/cars.example.com.crt;
-    - - ssl_certificate_key /etc/ssl/nginx/cars.example.com.key;
+    1. On line #1, change the comment from HTTP to HTTPS
+    1. On line #7, change the `listen 80` directive to `listen 443 ssl`.
+    1. Insert 2 new lines, between the server_name and access_log lines:
+    - ssl_certificate /etc/ssl/nginx/cars.example.com.crt;
+    - ssl_certificate_key /etc/ssl/nginx/cars.example.com.key;
 
 1. Your updated `tls-cars.example.com.conf` should look similar to this:
 
@@ -226,8 +194,8 @@ In this exercise, you will use `openssl` to create a self-signed certificate and
 1. Now give a try with curl, using a Terminal on your local machine. 
 
     ```bash
-
     curl https://cars.example.com
+
     ```
 
     ```bash
@@ -255,18 +223,21 @@ In this exercise, you will use `openssl` to create a self-signed certificate and
 
     ```
 
-1. Now try it with a browser, go to https://cars.example.com.  YIKES - same thing!  Most modern browsers will display an `Error or Security Warning`:
+    > Congrats!  You have just enabled TLS on your webserver with only 3 NGINX commands (smiling emoji here!).
+
+
+1. Now try it with a browser, go to https://cars.example.com.  YIKES - what's this??  Most modern browsers will display an `Error or Security Warning`:
 
     ![Certificate Invalid](media/lab3_cert-invalid.png)
 
-1. You can use Chrome's built-in Certificate Viewer to look at the details of the TLS certificate that was sent from NGINX to your browser.  In the address bar, click on the `Not Secure` icon, then `Cerificate is not valid`, and it will display the certificate.
+1. You can use Chrome's built-in Certificate Viewer to look at the details of the TLS certificate that was sent from NGINX to your browser.  In the address bar, click on the `Not Secure` icon, then `Cerificate is not valid`, and it will display the certificate.  Who provided this Invalid Certificate ??  - well, you did.
 
     ![Certificate Details](media/lab3_cert-details.png)
 
 
 1. With Chrome, Close the Certificate Viewer, and then you have to click on the Advanced button, and then the Proceed link, to bypass the Warning and continue.  
 
-    >CAUTION:  Ignoring Browser Warnings is **Dangerous**, only Ignore these warnings if you are sure it is safe to proceed!!
+    >>CAUTION:  Ignoring Browser Warnings is **Dangerous**, only Ignore these warnings if you are 100% sure it is safe to proceed!!
 
 1. After you safely Proceed, you should see the cars.example.com `Let's go fast` message.  
 
