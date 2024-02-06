@@ -110,7 +110,15 @@ In this exercise, you will use `openssl` to create a Self Signed certificate and
 
     ```
 
+<br/>
+
+NGINX | TLS
+:----:|:----:
+![NGINX](media/nginx-icon.png) | ![Padlock](media/padlock-icon.png)
+
 ## NGINX webserver with TLS
+
+<br/>
 
 Now that you have a TLS cert and key for testing, you will configure NGINX to use them. 
 
@@ -135,7 +143,7 @@ Now that you have a TLS cert and key for testing, you will configure NGINX to us
 1. Your updated `tls-cars.example.com.conf` should look similar to this:
 
     ```nginx
-    # cars.example.com HTTPS                - updated comment
+    # cars.example.com HTTPS                # updated comment
     # NGINX Basics Workshop
     # Jan 2024, Chris Akker, Shouvik Dutta
     #
@@ -245,6 +253,92 @@ Now that you have a TLS cert and key for testing, you will configure NGINX to us
 
 1. Re-test all your cars.example.com URLs using HTTPS, ( /gtr, /nsx, /rcf, /browse ) they should all work the same as before, but now NGINX is using TLS to encrypt the traffic.
 
+### Enable HTTP > HTTPS redirect
+
+Now that you have a working TLS configuration, you decide to use the for every users.  However, sometimes they forget to type the `S` with `http`, and come to your NGINX server with an HTTP request on port 80.  You will configure an HTTP re-direct, to send all users over to your HTTPS configuration.
+
+1. Rename your existing cars.example.com.conf file, so NGINX will `not` use the next time your reload NGINX:
+
+```bash
+/etc/nginx/conf.d $ mv cars.example.com.conf cars.example.com.conf.bak
+
+```
+
+This keeps a copy of your old Port 80 HTTP configuration, but NGINX will not use it if the file does not have the `.conf` extension... remember ?
+
+1. Edit your `tls-cars.example.com.conf` file, and add make these changes:
+
+- Update Line #1 comment, to include both HTTP and HTTPS configurations
+- Insert a new server block, for port 80, with the re-direct enabled for all URLs
+
+```nginx
+
+# cars.example.com HTTP > HTTPS              # updated comment
+# NGINX Basics Workshop
+# Jan 2024, Chris Akker, Shouvik Dutta
+#
+# New Server block for port 80
+server {
+    
+    listen 80;      # Listening on port 80 on all IP addresses on this machine
+
+    server_name cars.example.com;   # Set hostname to match in request
+
+    location / {
+        
+        return 301 https://$host$request_uri;        # Send 301 redirect to HTTPS
+    }
+}
+# End of new Server block
+
+    server {
+    
+    listen 443 ssl;   # change to port 443, add "ssl" parameter for terminating TLS on all IP addresses on this machine
+
+    server_name cars.example.com;   # Set hostname to match in request
+
+# Add the following 2 lines for NGINX cert and key directives and file locations
+
+    ssl_certificate /etc/ssl/nginx/cars.example.com.crt;
+    ssl_certificate_key /etc/ssl/nginx/cars.example.com.key;
+
+    access_log  /var/log/nginx/cars.example.com.log main; 
+    error_log   /var/log/nginx/cars.example.com_error.log notice;
+
+    root /usr/share/nginx/html;         # Set the root folder for the HTML and JPG files
+
+    location / {
+        
+        default_type text/html;
+        return 200 "Let's go fast, you have reached cars.example.com, path $uri\n";
+    }
+    
+    location /gtr {
+        
+        try_files $uri $uri.html;         # Look for filename that matches the URI requested
+    }
+    
+    location /nsx {
+        
+        try_files $uri $uri.html;
+    }
+    
+    location /rcf {
+        
+        try_files $uri $uri.html;
+    }
+
+    location /browse {                   # new URL path
+        
+        alias /usr/share/nginx/html;     # Browse this folder
+        index index.html;                # Use this file, but if it does *not* exist
+        autoindex on;                    # Perform directory/file browsing
+    }
+
+} 
+
+
+```
 
 <br/>
 
