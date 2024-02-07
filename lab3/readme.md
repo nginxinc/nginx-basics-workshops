@@ -124,13 +124,7 @@ Now that you have a TLS cert and key for testing, you will configure NGINX to us
 
 *NOTE:*  If you have a real TLS cert and key issued by a Certificate Authority, you can use those files in this exercise if you like, just copy them to the docker container, and use the configuration commands below.
 
-1. Docker Exec into your nginx-oss container as before. Change to the `/etc/nginx/conf.d` folder, and make a copy of your existing cars.example.com.conf file.  Keep both files for your reference for later if needed.  You will edit this new file, to add and change NGINX parameters to use TLS:
-
-    ```bash
-    cd /etc/nginx/conf.d
-    cp cars.example.com.conf tls-cars.example.com.conf
-
-    ```
+1. Docker Exec into your nginx-oss container as before. 
 
 1. Using VI, make the following changes to your tls-cars.example.com.conf file:
 
@@ -255,90 +249,167 @@ Now that you have a TLS cert and key for testing, you will configure NGINX to us
 
 ### Enable HTTP > HTTPS redirect
 
-Now that you have a working TLS configuration, you decide to use the for every users.  However, sometimes they forget to type the `S` with `http`, and come to your NGINX server with an HTTP request on port 80.  You will configure an HTTP re-direct, to send all users over to your HTTPS configuration.
+Now that you have a working TLS configuration, you decide to use it for every user.  However, sometimes users forget to type the `S` with `http`, or saved the URL as a bookmark, and come to your NGINX server with an HTTP request on port 80.  You will configure a helpful HTTP to HTTPS re-direct, to automagically send all users over to your HTTPS configuration.
 
-1. Rename your existing cars.example.com.conf file, so NGINX will `not` use the next time your reload NGINX:
+1. Change to the `/etc/nginx/conf.d` folder, and edit your existing `cars.example.com.conf file`.  On line #7, Change the `listen 80` directive to `listen 81`.  This will change the listen port, so it won't have a conflict, like this:
 
-```bash
-/etc/nginx/conf.d $ mv cars.example.com.conf cars.example.com.conf.bak
-
-```
-
-This keeps a copy of your old Port 80 HTTP configuration, but NGINX will not use it if the file does not have the `.conf` extension... remember ?
-
-1. Edit your `tls-cars.example.com.conf` file, and add make these changes:
-
-- Update Line #1 comment, to include both HTTP and HTTPS configurations
-- Insert a new server block, for port 80, with the re-direct enabled for all URLs
-
-```nginx
-
-# cars.example.com HTTP > HTTPS              # updated comment
-# NGINX Basics Workshop
-# Jan 2024, Chris Akker, Shouvik Dutta
-#
-# New Server block for port 80
-server {
-    
-    listen 80;      # Listening on port 80 on all IP addresses on this machine
-
-    server_name cars.example.com;   # Set hostname to match in request
-
-    location / {
-        
-        return 301 https://$host$request_uri;        # Send 301 redirect to HTTPS
-    }
-}
-# End of new Server block
-
+    ```nginx
+    # cars.example.com HTTP on port 81              # Did you update your comments?
+    # NGINX Basics Workshop
+    # Jan 2024, Chris Akker, Shouvik Dutta
+    #
     server {
     
-    listen 443 ssl;   # change to port 443, add "ssl" parameter for terminating TLS on all IP addresses on this machine
+       listen 81;      ### Change only this line to port 81 ###
 
-    server_name cars.example.com;   # Set hostname to match in request
-
-# Add the following 2 lines for NGINX cert and key directives and file locations
-
-    ssl_certificate /etc/ssl/nginx/cars.example.com.crt;
-    ssl_certificate_key /etc/ssl/nginx/cars.example.com.key;
-
-    access_log  /var/log/nginx/cars.example.com.log main; 
-    error_log   /var/log/nginx/cars.example.com_error.log notice;
-
-    root /usr/share/nginx/html;         # Set the root folder for the HTML and JPG files
-
-    location / {
-        
-        default_type text/html;
-        return 200 "Let's go fast, you have reached cars.example.com, path $uri\n";
-    }
+       server_name cars.example.com;   # Set hostname to match in request
     
-    location /gtr {
-        
-        try_files $uri $uri.html;         # Look for filename that matches the URI requested
-    }
+    # Rest of the config snipped
+    ...
+
+    ```
+
+    Save your file.  Test and Reload NGINX.
     
-    location /nsx {
-        
-        try_files $uri $uri.html;
-    }
+    This will move `cars.example.com` from Port 80 to Port 81, so that you can use Port 80 in the tls-cars.example.com config without a port 80 conflict.  NGINX will not let you use `listen 80` in two different config files with the same server name.  If you try this, the `nginx -t` test will give you a [warn] message. 
     
-    location /rcf {
+    (*NOTE:  Normally, you could just rename the cars.example.com.conf file to a different name so NGIINX would not use it, but Docker will not let you do that here because you mounted this file as a volume in docker-compose for this exercise.*)
+
+    >BONUS:  If you test this website http://cars.example.com:81 on port 81, you will discover that it works fine while you are `inside` the Docker Exec of the container, but does not work from a Terminal `outside` the container.  Can you explain why??
+
+   <details><summary>Click for Answer!</summary>
+   <br/>
+   <p>
+   <strong>Answer</strong> – the nginx-oss Docker Container is not open on Port 81!  You would need to update your docker-compose file, and add port 81 to the list, and rebuild your nginx-oss container.  Remember, that networking with Docker can require some inside/outside matching configurations.  As a stretch goal, you could update your container and give it a try.
+   </p>
+   </details>
+   </br>
+
+1. Edit your `tls-cars.example.com.conf` file, and make these changes:
+
+    - Update Line #1 comment, to include both HTTP and HTTPS configurations
+    - Insert a new server block, for port 80, with the re-direct enabled for all URLs
+
+    ```nginx
+
+    # cars.example.com with HTTP > HTTPS                 # updated comment
+    # NGINX Basics Workshop
+    # Jan 2024, Chris Akker, Shouvik Dutta
+    #
+    ### New Server block for port 80
+    server {
         
-        try_files $uri $uri.html;
+        listen 80;      # Listening on port 80 on all IP addresses on this machine
+
+        server_name cars.example.com;   # Set hostname to match in request
+
+        location / {
+            
+            return 301 https://$host$request_uri;        # Send 301 redirect to HTTPS
+        }
     }
 
-    location /browse {                   # new URL path
+    ### End of new Server block for port 80
+
+        server {
         
-        alias /usr/share/nginx/html;     # Browse this folder
-        index index.html;                # Use this file, but if it does *not* exist
-        autoindex on;                    # Perform directory/file browsing
-    }
+        listen 443 ssl;   # change to port 443, add "ssl" parameter for terminating TLS on all IP addresses on this machine
 
-} 
+        server_name cars.example.com;   # Set hostname to match in request
 
+    # Add the following 2 lines for NGINX cert and key directives and file locations
+
+        ssl_certificate /etc/ssl/nginx/cars.example.com.crt;
+        ssl_certificate_key /etc/ssl/nginx/cars.example.com.key;
+
+        access_log  /var/log/nginx/cars.example.com.log main; 
+        error_log   /var/log/nginx/cars.example.com_error.log notice;
+
+        root /usr/share/nginx/html;         # Set the root folder for the HTML and JPG files
+
+        location / {
+            
+            default_type text/html;
+            return 200 "Let's go fast, you have reached cars.example.com, path $uri\n";
+        }
+        
+        location /gtr {
+            
+            try_files $uri $uri.html;         # Look for filename that matches the URI requested
+        }
+        
+        location /nsx {
+            
+            try_files $uri $uri.html;
+        }
+        
+        location /rcf {
+            
+            try_files $uri $uri.html;
+        }
+
+        location /browse {                   # new URL path
+            
+            alias /usr/share/nginx/html;     # Browse this folder
+            index index.html;                # Use this file, but if it does *not* exist
+            autoindex on;                    # Perform directory/file browsing
+        }
+
+    } 
+
+    ```
+
+    Save your file.  Test and reload NGINX.
+
+1. Test out your redirect with curl, adding the `-I` parameter to show just the Headers:
+
+    ```bash
+    curl -I http://cars.example.com
+
+    ```
+
+    It should look something like this:
+
+    ```
+    #Sample output
+    HTTP/1.1 301 Moved Permanently
+    Server: nginx/1.25.3
+    Date: Tue, 06 Feb 2024 23:22:06 GMT
+    Content-Type: text/html
+    Content-Length: 169
+    Connection: keep-alive
+    Location: https://cars.example.com/
+
+    ```
+
+    Now let's follow the re-direct, with `-L`, and `-k` for insecure - does that work?
+
+    ```bash
+    curl -ILk http://cars.example.com
+    
+    ```
 
 ```
+#Sample output
+HTTP/1.1 301 Moved Permanently
+Server: nginx/1.25.3
+Date: Wed, 07 Feb 2024 00:09:41 GMT
+Content-Type: text/html
+Content-Length: 169
+Connection: keep-alive
+Location: https://cars.example.com/    # Redirected to here
+
+HTTP/1.1 200 OK
+Server: nginx/1.25.3
+Date: Wed, 07 Feb 2024 00:09:41 GMT
+Content-Type: text/html
+Content-Length: 57
+Connection: keep-alive
+
+```
+
+Let's check it with your browser.  These instructions are for Chrome, they will differ slightly for other browsers.
+
 
 <br/>
 
