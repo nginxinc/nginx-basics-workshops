@@ -3,7 +3,7 @@ Lab1: Build Lab env - single Docker OSS image, Stub status, Nginx History and Ar
 
 Lab2:  Nginx configs - contexts, file structure,  hostnames, location blocks, commands, logging, HTTP URL review
 
-Lab3: Nginx Webserver, add SSL, client-side and mTLS configs, Includes, Self-signed and ???
+Lab3: Nginx Webserver, add SSL, SSL Parameters - Protocol and Ciphers, Includes, Self-signed and ???
 Redirect 80>443
 
 Lab4: Compose OSS + three backends.  Proxy_pass, add/remove proxy_headers request/response - $host, XFF, $remote_addr.  Proxy_pass direct, http and stream upstreams,  map blocks, Regex location block. - Compose Down required here to avoid port conflct on next Lab.
