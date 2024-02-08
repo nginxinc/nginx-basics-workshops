@@ -372,6 +372,7 @@ Now that you have a working TLS configuration, you decide to use it for every us
 
     ```
     #Sample output
+
     HTTP/1.1 301 Moved Permanently
     Server: nginx/1.25.3
     Date: Tue, 06 Feb 2024 23:22:06 GMT
@@ -389,26 +390,324 @@ Now that you have a working TLS configuration, you decide to use it for every us
     
     ```
 
-```
-#Sample output
-HTTP/1.1 301 Moved Permanently
-Server: nginx/1.25.3
-Date: Wed, 07 Feb 2024 00:09:41 GMT
-Content-Type: text/html
-Content-Length: 169
-Connection: keep-alive
-Location: https://cars.example.com/    # Redirected to here
+    It should look something like this:
 
-HTTP/1.1 200 OK
-Server: nginx/1.25.3
-Date: Wed, 07 Feb 2024 00:09:41 GMT
-Content-Type: text/html
-Content-Length: 57
-Connection: keep-alive
+    ```
+    #Sample output
 
-```
+    HTTP/1.1 301 Moved Permanently
+    Server: nginx/1.25.3
+    Date: Wed, 07 Feb 2024 00:09:41 GMT
+    Content-Type: text/html
+    Content-Length: 169
+    Connection: keep-alive
+    Location: https://cars.example.com/    # Redirected to here
 
-Let's check it with your browser.  These instructions are for Chrome, they will differ slightly for other browsers.
+    HTTP/1.1 200 OK
+    Server: nginx/1.25.3
+    Date: Wed, 07 Feb 2024 00:09:41 GMT
+    Content-Type: text/html
+    Content-Length: 57
+    Connection: keep-alive
+
+    ```
+
+1. Let's check it with your browser.  This example is from Chrome, they will differ slightly for other browsers.
+
+    Open Chrome, and then using the 3-dot menu, select More Tools, then Developer Tools.  Now type http://cars.example.com in the address bar.  You should see Chrome Dev Tools record and display the 301 redirect, if you click on the first URL Name:
+
+    ![Chrome Redirect](media/lab3_chrome-redirect.png)
+
+    *NOTE:  Like cURL, Chrome built-in security features also refuse to display content from web servers using Self Signed certificates - until you Refresh, and then click Advanced and Proceed to bypass these warnings.*
+
+### NGINX TLS Settings
+
+In this exercise, you will add some additional NGINX TLS settings to control the TLS protocol.  This will show you the flexibility in supporting both Modern and Legacy TLS / SSL protocols for a variety of HTTP clients.  It is considered a Best Practice to always use the Highest version of Protocol and Highest strength encryption Ciphers at all times.  However, given the vast variety of HTTP clients, you may have to "downgrade" your NGINX web server TLS configurations to accomodate less secure environments.  Always consult security experts with TLS experience for advice, as older protocols and ciphers can expose your webserver to Common Vulnerabilities and Exploits (CVEs).
+
+>CAUTION:  TLS/SSL Security is a serious topic, and should only be used by those familar with the products, terminology, and concepts.  
+>>NONE of the examples in this lab should ever be used in Production or Public facing websites, without verification and the approval from Security Professionals.
+
+1. You will start by adding a High Security TLS configuration to your cars.example.com website.  You will configure and use the following components:
+
+    - 4K TLS key length, 4096 bit
+    - High Security Encryption Ciphers, Hashes, and other settings
+    - TLS version 1.3
+
+1. Inspect the /etc/ssl/dhparam/ folder. The 4096/dhparam.pem file contains the TLS Prime at 4,096 bits.  (And the 2048/dhparam.pem file sets the TLS Prime to 2,048 bits).  You will be using the 4,096 bit Prime for maximum security.  Normally you would create these Prime files yourself, but as they take some time to create, these files have been provided for you here.  See the References section for Links to more information on TLS/dhparams.
+
+1. Inspect the `/nginx/includes/ssl_strong.conf` file.  Notice you are using TLS version 1.3, and very high strength ciphers, rated `A+` by SSL Labs, a third party TLS testing and information website.  You notice there are also 4 HTTP Headers being added, to help with additional security settings.
+
+1. Docker Exec into your `nginx-oss` Container, and using VI, edit your `tls-cars.example.com.conf` as shown, just add one line for the `include` directive on line #18:
+
+    ```nginx
+    # cars.example.com HTTPS
+    # NGINX Basics Workshop
+    # Jan 2024, Chris Akker, Shouvik Dutta
+    #
+    server {
+        
+        listen 443 ssl;   # change to port 443, add "ssl" parameter for terminating TLS on all IP addresses on this machine
+
+        server_name cars.example.com;   # Set hostname to match in request
+
+    # Add the following 2 lines for NGINX cert and key directives and file locations
+
+        ssl_certificate /etc/ssl/nginx/cars.example.com.crt;
+        ssl_certificate_key /etc/ssl/nginx/cars.example.com.key;
+
+    >>> ### Add the following for Strong TLS Security ###
+
+        include /etc/nginx/includes/ssl/ssl_strong.conf;
+
+    ...snip
+
+    ```
+
+    Save your file and reload NGINX.
+
+1. Test with curl.  First, let's see if the new HTTP Headers are added:
+
+    ```bash
+    curl -kI https://cars.example.com
+
+    ```
+
+    Should look something like this, you should see 4 new HTTP Headers added to the Response:
+
+    ```bash
+    #Sample output
+    HTTP/1.1 200 OK
+    Server: nginx/1.25.3
+    Date: Thu, 08 Feb 2024 00:01:25 GMT
+    Content-Type: text/html
+    Content-Length: 57
+    Connection: keep-alive
+    Strict-Transport-Security: max-age=63072000; includeSubDomains; preload   # Yes, 4 new Headers
+    X-Frame-Options: DENY
+    X-Content-Type-Options: nosniff
+    X-XSS-Protection: 1; mode=block
+
+    ```
+
+    Next, try curl again, but this time add `-vv` for Verbose output, and it will show the TLS Handshake metadata.  Note the TLS Version and Cipher settings being used.
+
+    ```bash
+    curl -kI -vv https://cars.example.com
+
+    ```
+
+    Should look something like this,  # Comments added
+
+    ```bash
+    #Sample output
+    *   Trying [::1]:443...
+    * Connected to cars.example.com (::1) port 443 (#0)
+    * ALPN: offers h2,http/1.1
+    * (304) (OUT), TLS handshake, Client hello (1):
+    * (304) (IN), TLS handshake, Server hello (2):
+    * (304) (OUT), TLS handshake, Client hello (1):
+    * (304) (IN), TLS handshake, Server hello (2):
+    * (304) (IN), TLS handshake, Unknown (8):
+    * (304) (IN), TLS handshake, Certificate (11):
+    * (304) (IN), TLS handshake, CERT verify (15):
+    * (304) (IN), TLS handshake, Finished (20):
+    * (304) (OUT), TLS handshake, Finished (20):
+    * SSL connection using TLSv1.3 / AEAD-AES256-GCM-SHA384         # TLSv1.3, Cipher
+    * ALPN: server accepted http/1.1
+    * Server certificate:
+    *  subject: CN=NginxBasics                                   
+    *  start date: Feb  6 23:08:20 2024 GMT
+    *  expire date: Feb  5 23:08:20 2025 GMT
+    *  issuer: CN=NginxBasics
+    *  SSL certificate verify result: self signed certificate (18), continuing anyway.  # Self Signed
+    * using HTTP/1.1
+    > HEAD / HTTP/1.1
+    > Host: cars.example.com
+    > User-Agent: curl/8.1.2
+    > Accept: */*
+    >
+
+    ```
+
+    Now try it again, but this time set the Max TLS version to 1.2, which is older and less secure:
+
+    ```bash
+    curl -kI -v --tls-max 1.2 https://cars.example.com
+
+    ```
+
+    Should look something like this,  # Comments added
+
+    ```bash
+    #Sample output
+    *   Trying [::1]:443...
+    * Connected to cars.example.com (::1) port 443 (#0)
+    * ALPN: offers h2,http/1.1
+    * (304) (OUT), TLS handshake, Client hello (1):
+    * LibreSSL/3.3.6: error:1404B42E:SSL routines:ST_CONNECT:tlsv1 alert protocol version  # Version mismatch error
+    * Closing connection 0       # NGINX closes the connection immediately
+    curl: (35) LibreSSL/3.3.6: error:1404B42E:SSL routines:ST_CONNECT:tlsv1 alert protocol version
+
+    ```
+
+1. Try with openssl, using its built-in `s_client` SSL client feature.  After all, it is Security, two sources are better than one, right ?
+
+    ```bash
+    openssl s_client cars.example.com:443
+
+    ```
+
+    ```bash
+    #Sample output,                                      # Comments Added
+    CONNECTED(00000006)
+    depth=0 CN = NginxBasics
+    verify error:num=18:self-signed certificate          # Here's our Self Signed Cert
+    verify return:1
+    depth=0 CN = NginxBasics
+    verify return:1
+    ---
+    Certificate chain
+    0 s:CN = NginxBasics
+    i:CN = NginxBasics
+    a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
+    v:NotBefore: Feb  6 23:08:20 2024 GMT; NotAfter: Feb  5 23:08:20 2025 GMT
+    ---
+    Server certificate
+    -----BEGIN CERTIFICATE-----
+    MIIDDTCCAfWgAwIBAgIUPQE5kNK6wbnXQcT5Ksv6FOamWDQwDQYJKoZIhvcNAQEL
+    BQAwFjEUMBIGA1UEAwwLTmdpbnhCYXNpY3MwHhcNMjQwMjA2MjMwODIwWhcNMjUw
+    MjA1MjMwODIwWjAWMRQwEgYDVQQDDAtOZ2lueEJhc2ljczCCASIwDQYJKoZIhvcN
+    AQEBBQADggEPADCCAQoCggEBAPA+UGG3bwoo30OHaOGvQStbiiFnuc3wm/SDYnzR
+    gCaYB5nRJ+2qZMOEc989sFWxw4Drq93Z+m+9mMUQnjInONrf/qA+UOAvYYK9jBsN
+    wjFxZeMGIDOqXvp7I4tCf+dpxAD5rsMyUXXiU9ksjzNaUOFWLtCmfUQ9mgxTcKnS
+    NBt2LkNrAp6u72DQdbUyS+BAoOGEhj69rUuQfDLr7qpctjZ3mTzfIncbnnYzrXKW
+    u+Vh2tmZJAk0EAk+IcvcrYjCysH+Kn50Invf4NigHD9+yxT9t7DHhiB9/2xw93BJ
+    cyH+kc2N+w6ijgV994UXUzkSs5Q2X//oBHtkr3Xoi8rk95sCAwEAAaNTMFEwHQYD
+    VR0OBBYEFDepAa0rVUhD/uHYJKm1/8rDVHqNMB8GA1UdIwQYMBaAFDepAa0rVUhD
+    /uHYJKm1/8rDVHqNMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEB
+    ALAP4dpXOBht9O4aSMFAwkD3j7pupGZYjo/UXnsdQhv8rCAEBouHcTnlpkd2YB4x
+    VcPgm8P02C+uKqu93WRXeD49kvxh33pdwsp922X0ekfjb1sQ9yOnsGEZPYRbyFVp
+    bs+KSo/J+HerPDirX3xX8oQQ+CtAGpfzSK7Pp7vT6L1rxHyors8bTUfpzxyR8zoP
+    OSnfmZD9aIYfL/Qm9zN1X1YKKIZpWWMtKqMGzAQEDk/PKwdxfBnSzd5WeNKZze2t
+    VlM1vlSf04fUV/jATaYWVUDO5kA89Hj0Brde3OsFDTczsaRAoJb+FEqTXoQH0zKs
+    uMBDBpsCnwqjtB27MguwbAk=
+    -----END CERTIFICATE-----
+    subject=CN = NginxBasics
+    issuer=CN = NginxBasics
+    ---
+    No client certificate CA names sent
+    Peer signing digest: SHA256
+    Peer signature type: RSA-PSS
+    Server Temp Key: ECDH, secp384r1, 384 bits
+    ---
+    SSL handshake has read 1503 bytes and written 781 bytes
+    Verification error: self-signed certificate
+    ---
+    New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384                    # TLS Version and Cipher
+    Server public key is 2048 bit
+    This TLS version forbids renegotiation.
+    Compression: NONE
+    Expansion: NONE
+    No ALPN negotiated
+    Early data was not sent
+    Verify return code: 18 (self-signed certificate)
+    ---
+    ---
+    Post-Handshake New Session Ticket arrived:
+    SSL-Session:
+        Protocol  : TLSv1.3                                          # Session TLS Version and Cipher
+        Cipher    : TLS_AES_256_GCM_SHA384
+        Session-ID: DA3908C086B9930AFAB543538D1658188A94E8FEFA394CC8C2C0FE13740D63A9
+        Session-ID-ctx:
+        Resumption PSK: FB16F5F833A191CB184B162B82D2B07E1BEA491D7D153FEFF9748272CD424D40A6CF8A27B3CF37355883CA69E8A5F3F7
+        PSK identity: None
+        PSK identity hint: None
+        SRP username: None
+        TLS session ticket lifetime hint: 600 (seconds)
+        TLS session ticket:
+        0000 - 79 db ac 04 8a 2e b2 59-d6 18 b6 d4 2c 62 d2 0e   y......Y....,b..
+        0010 - 38 74 e8 7c 26 e4 d0 ec-fb a7 ee 56 1f f1 ea 6f   8t.|&......V...o
+
+        Start Time: 1707352054
+        Timeout   : 7200 (sec)
+        Verify return code: 18 (self-signed certificate)
+        Extended master secret: no
+        Max Early Data: 0
+    ---
+    read R BLOCK
+    ---
+    Post-Handshake New Session Ticket arrived:
+    SSL-Session:                                                   # Session TLS Version and Cipher
+        Protocol  : TLSv1.3
+        Cipher    : TLS_AES_256_GCM_SHA384
+        Session-ID: 1C2FB400E5C083A72F0A89FD193C0DC3D3F56A1378168611E7598260E030D53F
+        Session-ID-ctx:
+        Resumption PSK: 21B18DAC31528E7494B569588353909DEA0FE18893E98368DE51E7003EB04C8D86129670E2939B034F2A00BA7201262D
+        PSK identity: None
+        PSK identity hint: None
+        SRP username: None
+        TLS session ticket lifetime hint: 600 (seconds)
+        TLS session ticket:
+        0000 - 5e 5d 84 c8 74 cb 6c 18-24 dc 6e d8 b3 4e 6d d8   ^]..t.l.$.n..Nm.
+        0010 - 40 7b 4b fd 3f 1d d7 39-9b 31 61 00 d9 4b 59 45   @{K.?..9.1a..KYE
+
+        Start Time: 1707352054
+        Timeout   : 7200 (sec)
+        Verify return code: 18 (self-signed certificate)
+        Extended master secret: no
+        Max Early Data: 0
+    ---
+    read R BLOCK
+    closed
+
+    ```
+
+1. Try with openssl, again with `TLS version set to 1.2`.  What do you expect ?
+
+    ```bash
+    openssl s_client --tls1_2 cars.example.com:443
+
+    ```
+
+    Should look something like this:
+
+    ```bash
+    #Sample output, Comments added
+    CONNECTED(00000006)
+    80973A4FF87F0000:error:0A00042E:SSL routines:ssl3_read_bytes:tlsv1 alert protocol version:ssl/record/rec_layer_s3.c:1586:SSL alert number 70    # Openssl Alert = 70, protocol_version mismatch error 
+    ---
+    no peer certificate available                     # No cert is even sent to the client
+    ---
+    No client certificate CA names sent
+    ---
+    SSL handshake has read 7 bytes and written 213 bytes
+    Verification: OK
+    ---
+    New, (NONE), Cipher is (NONE)
+    Secure Renegotiation IS NOT supported
+    Compression: NONE
+    Expansion: NONE
+    No ALPN negotiated
+    SSL-Session:
+        Protocol  : TLSv1.2
+        Cipher    : 0000
+        Session-ID:
+        Session-ID-ctx:
+        Master-Key:
+        PSK identity: None
+        PSK identity hint: None
+        SRP username: None
+        Start Time: 1707352533
+        Timeout   : 7200 (sec)
+        Verify return code: 0 (ok)
+        Extended master secret: no
+    ---
+
+    ```
+
+As you can see, using the `ssl_strong.conf` file, with only TLS v1.3 enabled, will make any lower TLS version handshake FAIL.  If you like, try a couple other TLS versions, like 1.1 or 1.0 - you should expect the same results.
+
+
 
 
 <br/>
