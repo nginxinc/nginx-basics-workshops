@@ -6,13 +6,13 @@ Lab2:  Nginx configs - contexts, file structure,  hostnames, location blocks, co
 Lab3: Nginx Webserver, add SSL, SSL Parameters - Protocol and Ciphers, Includes, Self-signed and ???
 Redirect 80>443
 
-Lab4: Compose OSS + three backends.  Proxy_pass, add/remove proxy_headers request/response - $host, XFF, $remote_addr.  Proxy_pass direct, http and stream upstreams,  map blocks, Regex location block. - Compose Down required here to avoid port conflct on next Lab.
+Lab4: Compose OSS + three backends.  Proxy_pass, add/remove proxy_headers request/response - $host, XFF, $remote_addr.  Proxy_pass direct, http and stream upstreams,  map blocks - Compose Down required here to avoid port conflct on next Lab.
 
-Lab5: Compose Plus + three backends. Dashboard, KV store, API, Plus metrics, LB algorithms
+Lab5: Compose Plus + three backends. Dashboard, API, Plus metrics, LB algorithms
 
-Lab6: Security topics - Rate Limits, IP allow/block, HTTP Auth, Secure headers
+Lab6: Security topics - KV store, IP allow/block, Rate Limits,  HTTP Auth, Secure headers
 
-Lab6: Nginx Caching, juiceshop container
+Lab6: Regex intro, Nginx Caching, juiceshop container
 
 Lab8: Prom and Grafana
 
