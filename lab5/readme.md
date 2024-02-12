@@ -1,25 +1,25 @@
-# Build and Run NGINX Plus with Docker
+# Build and Run NGINX Plus on Docker
 
 ## Introduction
 
 You will now build the Plus version of NGINX, using a license.  You will need a subscription license, and both SSL .crt and .key files.  These files provide access to the `NGINX Plus repository` where the Plus binary files are located.  These are not publicly accessible, you must have a valid Certificate and Key for repo access.  This new NGINX Plus container will be used for the rest of the Lab exercises, adding Plus features and options to your environment.
 
-## Learning Objectives 
+## Learning Objectives
 
-By the end of the lab you will be able to: 
- * Build an `NGINX Plus Docker` image
- * Run this NGINX Plus image, adding it to your lab environment
- * Test the Plus container
- * Migrate NGINX OSS configurations to NGINX Plus
- 
-<br/>
-   
+By the end of the lab you will be able to:
+
+- Build an `NGINX Plus Docker` image
+- Run this NGINX Plus image, adding it to your lab environment
+- Test the Plus container
+- Migrate NGINX OSS configurations to NGINX Plus
+
 NGINX Plus | Docker
 :-------------------------:|:-------------------------:
 ![NGINX Plus](media/nginx-plus-icon.png)  |![Docker](media/docker-icon2.png)
 
+## What is NGINX Plus?  
 
-> What is NGINX Plus?  Plus is the `Commercial version of NGINX`, adding additional Enterprise features on top of the base NGINX OSS build.  Here is a Summary list of the Plus features:
+NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise features on top of the base NGINX OSS build. Here is a Summary list of the Plus features:
 
 - Dynamic reconfiguration reloads with no downtime
 - Dynamic NGINX software updates with no downtime
@@ -32,7 +32,7 @@ NGINX Plus | Docker
 - NGINX Clustering for High Availability
 - JWT processing with OIDC for user authentication
 - App Protect Firewall WAF
- 
+
 ## Pre-Requisites
 
 - You must have a license for NGINX Plus
@@ -42,37 +42,7 @@ NGINX Plus | Docker
 
 ## Build and Run NGINX Plus with Docker
 
-1. In a new folder, Git clone the NGINX Docker repo.  This will download all the files needed to build and run NGINX Plus as a Docker container:
-
-    ```bash
-    sudo su -
-    mkdir plus
-    cd plus
-    git clone https://github.com/nginxinc/docker-nginx.git
-
-    ```
-
-1. Edit the Dockerfile to add some common Linux tools to the Docker image, to make it easier to see/edit and test various NGINX features:
-
-    ```bash
-    cd docker-nginx
-    cd mainline
-    cd alpine
-    vi Dockerfile
-    ```
-
-    Add the following block below the ENV variables:
-
-    ```bash
-    # install tools
-    RUN apk update && \
-    apk upgrade && \
-    apk add bash bash-completion curl jq wget vim net-tools   # added tools 
-
-    ```
-
-<< should we EXPOSE more ports here: 80, 443, 9000, 9113, so we don't have to rebuild later ? >>
-
+1. Open the Workshop folder with Visual Studio Code, or an IDE / text editor of your choice, so you can read and edit the files provided.
 
 1. Download or copy your NGINX Plus license files to your computer.  There are 3 files provided, you only need the .crt and .key files for this Workshop:
 
@@ -86,255 +56,288 @@ NGINX Plus | Docker
 
     >After submitting the Trial Request form, you will receive an Email in a few minutes with links to download your three license files.  The links are only good for a one time download.
 
+1. Copy your subscription license into `lab5/nginx-plus/etc/ssl/nginx` folder within your workshop folder.
 
-1. Copy your Plus TLS nginx-repo.* license files to the Plus Docker build folder, which should be `plus` if you made a new folder in Step1.
+1. Copy your Plus TLS nginx-repo.* license files to the `lab5/nginx-plus/etc/ssl/nginx` folder within your workshop folder.
 
     ```bash
-    cp /user/home/nginx-repo.* /user/plus/
+    cp /user/home/nginx-repo.* /user/workshop/lab5/nginx-plus/etc/ssl/nginx
 
     ```
 
-1. Build the Plus NGINX Docker image based on Debian Linux:
+1. Inspect the `docker-compose.yml` file, located in the /lab5 folder. Notice you are building the NGINX-Plus container.
+
+   ```bash
+    nginx-plus:              # NGINX Plus Web / Load Balancer
+        hostname: nginx-plus
+        container_name: nginx-plus
+        build: nginx-plus    # Build new container, using /nginx-plus/Dockerfile
+        volumes:
+            - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d        # Copy these folders to container
+            - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
+            - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+        ports:
+            - 80:80       # Open for HTTP
+            - 443:443     # Open for HTTPS
+            - 9000:9000   # Open for status api
+        restart: always 
+   ```
+
+1. Also in the `docker-compose.yml` file you will run three other Docker NGINX webserver containers. These will be your upstream backend webservers for this lab.
 
     ```bash
-    docker build --no-cache -t nginx-plus:debian-stretch_v1.0 .
-
+    web1:
+      hostname: web1
+      container_name: web1
+      image: nginxinc/ingress-demo   # Image from Docker Hub
+      ports:
+        - "80"                       # Open for HTTP
+        - "443"                      # Open for HTTPS
+    web2:
+        hostname: web2
+        container_name: web2
+        image: nginxinc/ingress-demo
+        ports:
+            - "80"
+            - "433"
+    web3:
+        hostname: web3
+        container_name: web3
+        image: nginxinc/ingress-demo
+        ports:
+            - "80"
+            - "443"
     ```
 
-1. List the Docker images
+1. Build and run all the above containers by using docker compose.
+
+   ```bash
+    docker compose up
+   ```
+
+1. Verify all four containers are running:
 
     ```bash
-    docker images
+    docker ps
     ```
 
     ```bash
-    #Sample output
-    REPOSITORY          TAG                   IMAGE ID            CREATED             SIZE
-    nginx-plus          debian-stretch_v1.0   40fa0df93949        52 seconds ago      78.9MB
-    nginx               alpine_v1.0           b5a01460bac3        3 hours ago         50.8MB
-    debian              stretch-slim          49ec158b9895        7 days ago          55.3MB
-    alpine              3.9                   055936d39205        5 weeks ago         5.53MB
-
+    ###Sample output###
+    CONTAINER ID   IMAGE                   COMMAND                  CREATED          STATUS          PORTS                                                                        NAMES
+    717e1d8ff899   nginxinc/ingress-demo   "/docker-entrypoint.…"   13 seconds ago   Up 12 seconds   0.0.0.0:61344->80/tcp, 0.0.0.0:61343->443/tcp                                lab5-web3-1
+    031354257db7   nginxinc/ingress-demo   "/docker-entrypoint.…"   13 seconds ago   Up 12 seconds   443/tcp, 0.0.0.0:61342->80/tcp, 0.0.0.0:61341->433/tcp                       lab5-web2-1
+    a54a6e1fcda1   nginxinc/ingress-demo   "/docker-entrypoint.…"   13 seconds ago   Up 12 seconds   0.0.0.0:61346->80/tcp, 0.0.0.0:61345->443/tcp                                lab5-web1-1
+    8dff0d9e7dce   lab5-nginx-plus         "nginx -g 'daemon of…"   13 seconds ago   Up 12 seconds   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:9000->9000/tcp, 8080/tcp   lab5-nginx-plus-1
     ```
 
-1. Run the NGINX Plus container
+1. Test the NGINX Plus load balancing to the containers for the default webpage.
+
+   **Note:** Run this command atleast 3 times. You can see in output that the response is coming from `web1`,`web2` and `web3` backend servers respectively.
 
     ```bash
-    docker run --name nginx-plus -d -p 80:80 --mount\
-    type=bind,source="/root/training/etc/nginx","target=/etc/nginx/",readonly\
-    nginx-plus:debian-stretch_v1.0
-
-    ```
-
-1. Verify it is running
-
-    ```bash
-    docker ps -a
-
+    curl -is http://localhost |  grep "Server Name"
     ```
 
     ```bash
-    #Sample output
-    CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                NAMES
-    41ec967f9f9f        nginx:alpine_v1.0        "nginx -g 'daemon of..."   20 seconds ago      Up 19 seconds       0.0.0.0:80->80/tcp   nginx-plus
-
-    ```
-
-1. Test the NGINX Plus container for the default Welcome page
-
-    ```bash
-    curl -I http://localhost
-
-    ```
-
-    ```bash
-    #Sample output
-
-    HTTP/1.1 200 OK
-    Server: nginx/1.17.0
-    Date: Tue, 25 Dec 2024 18:17:17 GMT
-    Content-Type: text/html
-    Content-Length: 612
-    Last-Modified: Tue, 21 May 2019 15:33:12 GMT
-    Connection: keep-alive
-    ETag: "5ce41a38-264"
-    Accept-Ranges: bytes
-
+    ###Sample output###
+    # Output of 1st run
+    <p class="smaller"><span>Server Name:</span> <span>web1</span></p>
+    # Output of 2nd run
+    <p class="smaller"><span>Server Name:</span> <span>web2</span></p>
+    # Output of 3rd run
+    <p class="smaller"><span>Server Name:</span> <span>web3</span></p>
     ```
 
 1. Test NGINX Plus container with a browser:
 
-    Launch your browser, go to http://localhost
+    Launch your browser, go to <http://localhost>
 
-    You should see the default NGINX Welcome web page.
+    You should see the default Cafe App web page.
 
-    ![NGINX Welcome](media/lab5_nginx-welcome.png)
+    ![NGINX Welcome](media/lab5_cafe-default.png)
 
-1. Test access to NGINX container with Docker Exec:
+1. Test access to NGINX Plus container with Docker Exec command:
 
     ```bash
-    docker exec -it <CONTAINER ID> /bin/bash
-
+    export CONTAINER_ID=$(docker ps -q --filter "name=nginx-plus")
+    
+    docker exec -it $CONTAINER_ID /bin/bash
     ```
 
-1. Run some commands inside the NGINX Container:
+1. Run some commands inside the NGINX Plus Container:
 
     ```bash
     # Look around the nginx folders
     ls -l /etc/nginx
 
-    ls -l /etc/nginx/.conf
+    ls -l /etc/nginx/conf.d
+    ```
 
+    ```bash
     # Check for nginx packages installed
-    apk info -vv |grep nginx
+    dpkg-query -l | grep nginx
+    
+    dpkg -s nginx-plus
+    ```
 
+    ```bash
+    ##Sample Output
+    ii  nginx-plus                 31-1~focal                   amd64        NGINX Plus, provided by Nginx, Inc.
+
+    Package: nginx-plus
+    Status: install ok installed
+    Priority: optional
+    Section: httpd
+    Installed-Size: 7062
+    Maintainer: NGINX Packaging <nginx-packaging@f5.com>
+    Architecture: amd64
+    Version: 31-1~focal
+    Replaces: nginx, nginx-core, nginx-plus-debug
+    Provides: httpd, nginx, nginx-plus-r31
+    Depends: libc6 (>= 2.28), libcrypt1 (>= 1:4.1.0), libpcre2-8-0 (>= 10.22), libssl1.1 (>= 1.1.1), zlib1g (>= 1:1.1.4), lsb-base (>= 3.0-6)
+    Recommends: logrotate
+    Conflicts: nginx, nginx-common, nginx-core
+    Conffiles:
+     /etc/init.d/nginx 0b8cb35c30e187ff9bdfd5d9e7d79631
+    /etc/init.d/nginx-debug ed610161bfa49f021f5afa483a10eac5
+    /etc/logrotate.d/nginx a4da44b03e39926b999329061770362b
+    /etc/nginx/conf.d/default.conf 5e054c6c3b2901f98e0d720276c3b20c
+    /etc/nginx/fastcgi_params 4729c30112ca3071f4650479707993ad
+    /etc/nginx/mime.types 754582375e90b09edaa6d3dbd657b3cf
+    /etc/nginx/nginx.conf 563e30e020178f0db80bd2a87d6232a6
+    /etc/nginx/scgi_params df8c71e25e0356ffc539742f08fddfff
+    /etc/nginx/uwsgi_params 88ac833ee8ea60904a8b3063fde791de
+    Description: NGINX Plus, provided by Nginx, Inc.
+     NGINX Plus extends NGINX open source to create an enterprise-grade Application Delivery Controller, Accelerator and Web Server. Enhanced features include: Layer 4 and Layer 7 load balancing with health checks,session persistence and on-the-fly configuration; Improved content caching;Enhanced status and monitoring information; Streaming media delivery.
+    Homepage: https://www.nginx.com/    
+    ```
+
+    ```bash
     # What nginx processes are running?
     ps aux |grep nginx
+    ```
 
+    ```bash
+    ##Sample Output##
+    root         1  0.0  0.0  10544  7040 ?        Ss   18:27   0:00 nginx: master process nginx -g daemon off;
+    nginx        7  0.0  0.0  92924  4312 ?        S    18:27   0:00 nginx: worker process
+    root        50  0.0  0.0   3312  1792 pts/0    S+   19:00   0:00 grep --color=auto nginx
+    ```
+
+    ```bash
     # Check Linux TOP for resource usage
     top -n 1
+    ```
 
+    ```bash
+    ##Sample Output##
+    top - 19:02:10 up 10 days, 20:41,  0 users,  load average: 0.00, 0.00, 0.00
+    Tasks:   4 total,   1 running,   3 sleeping,   0 stopped,   0 zombie
+    top - 19:02:26 up 10 days, 20:42,  0 users,  load average: 0.00, 0.00, 0.00
+    Tasks:   4 total,   1 running,   3 sleeping,   0 stopped,   0 zombie
+    %Cpu(s):  0.6 us,  0.6 sy,  0.0 ni, 98.9 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+    MiB Mem :   7846.6 total,   5467.4 free,    788.3 used,   1590.9 buff/cache
+    MiB Swap:   1024.0 total,   1024.0 free,      0.0 used.   6785.1 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND                                                                
+      1 root      20   0   10544   7040   6144 S   0.0   0.1   0:00.02 nginx                                                                  
+      7 nginx     20   0   92924   4312   2944 S   0.0   0.1   0:00.51 nginx                                                                  
+      9 root      20   0    4252   3328   2816 S   0.0   0.0   0:00.05 bash                                                                   
+     53 root      20   0    5972   3200   2816 R   0.0   0.0   0:00.00 top 
+    ```
+
+    ```bash
     # Which TCP Ports are being used by NGINX ?
     netstat -alpn
-
     ```
 
     ```bash
-    #Sample outputs
-
-    #apk
-
-    nginx-1.17.0-r1 - High performance web server
-    nginx-module-geoip-1.17.0-r1 - nginx GeoIP dynamic modules
-    nginx-module-image-filter-1.17.0-r1 - nginx image filter dynamic module
-    nginx-module-njs-1.17.0.0.3.2-r1 - nginx njs dynamic modules
-    nginx-module-xslt-1.17.0-r1 - nginx xslt dynamic module
-
-    #ps
-
-    1 root      0:00 nginx: master process nginx -g daemon off;
-    6 nginx     0:00 nginx: worker process
-    13 root      0:00 grep nginx
-
-    #top
-
-    Mem: 808920K used, 205464K free, 3396K shrd, 53072K buff, 513860K cached
-    CPU:   0% usr   0% sys   0% nic 100% idle   0% io   0% irq   0% sirq
-    Load average: 0.00 0.00 0.00 2/187 30
-    PID  PPID USER     STAT   VSZ %VSZ CPU %CPU COMMAND
-    23     1 nginx    S     6460   1%   0   0% nginx: worker process
-    1     0 root     S     6104   1%   0   0% nginx: master process nginx -g daemon off;
-    7     0 root     S     2308   0%   0   0% /bin/bash
-    30     7 root     R     1528   0%   0   0% top -n 1
-
-    #netstat
-
+    ##Sample output##
     Active Internet connections (servers and established)
     Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
-    tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      1/nginx: master pro
+    tcp        0      0 127.0.0.11:41055        0.0.0.0:*               LISTEN      -                   
+    tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      1/nginx: master pro 
+    tcp        0      0 192.168.32.5:57614      185.125.190.36:80       TIME_WAIT   -                   
+    udp        0      0 127.0.0.11:38617        0.0.0.0:*                           -                   
     Active UNIX domain sockets (servers and established)
-    Proto RefCnt Flags       Type       State         I-Node PID/Program name    Path
-    unix  3      [ ]         STREAM     CONNECTED      97546 1/nginx: master pro
-    unix  3      [ ]         STREAM     CONNECTED      97545 1/nginx: master pro
-
+    Proto RefCnt Flags       Type       State         I-Node   PID/Program name     Path
+    unix  3      [ ]         STREAM     CONNECTED     1446456  1/nginx: master pro  
+    unix  3      [ ]         STREAM     CONNECTED     1446455  1/nginx: master pro  
     ```
 
-    - Ask NGINX for help ( with NGINX, not your romance ):
-
     ```bash
-    /usr/sbin/nginx -h
-
+    # Check NGINX help page
+    nginx -h
     ```
+
     ```bash
-    #Sample output
-    nginx version: nginx/1.17.0
-    Usage: nginx [-?hvVtTq] [-s signal] [-c filename] [-p prefix] [-g directives]
+    ##Sample Output##
+    nginx version: nginx/1.25.3 (nginx-plus-r31)
+    Usage: nginx [-?hvVtTq] [-s signal] [-p prefix]
+             [-e filename] [-c filename] [-g directives]
 
     Options:
-    -?,-h         : this help
-    -v            : show version and exit
-    -V            : show version and configure options then exit
-    -t            : test configuration and exit
-    -T            : test configuration, dump it and exit
-    -q            : suppress non-error messages during configuration testing
-    -s signal     : send signal to a master process: stop, quit, reopen, reload
-    -p prefix     : set prefix path (default: /etc/nginx/)
-    -c filename   : set configuration file (default: /etc/nginx/nginx.conf)
-    -g directives : set global directives out of configuration file
-
-    ```
-
-    - Verify what version of NGINX is running:
-
-    ```bash
-    /usr/sbin/nginx -V
-
+      -?,-h         : this help
+      -v            : show version and exit
+      -V            : show version and configure options then exit
+      -t            : test configuration and exit
+      -T            : test configuration, dump it and exit
+      -q            : suppress non-error messages during configuration testing
+      -s signal     : send signal to a master process: stop, quit, reopen, reload
+      -p prefix     : set prefix path (default: /etc/nginx/)
+      -e filename   : set error log file (default: /var/log/nginx/error.log)
+      -c filename   : set configuration file (default: /etc/nginx/nginx.conf)
+      -g directives : set global directives out of configuration file
     ```
 
     ```bash
-    #Sample output
-    nginx version: nginx/1.17.0
-    built by gcc 8.2.0 (Alpine 8.2.0)
-    built with OpenSSL 1.1.1b  26 Feb 2019
+    # Verify what version of NGINX is running:
+    nginx -V
+    ```
+
+    ```bash
+    ##Sample Output##
+    nginx version: nginx/1.25.3 (nginx-plus-r31)
+    built by gcc 9.4.0 (Ubuntu 9.4.0-1ubuntu1~20.04.2) 
+    built with OpenSSL 1.1.1f  31 Mar 2020
     TLS SNI support enabled
-    configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-cc-opt='-Os -fomit-frame-pointer' --with-ld-opt=-Wl,--as-needed
-
-    ```
-
-1. Test the current NGINX configuration
-
-    ```bash
-    /usr/sbin/nginx -t
-
+    configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-http_v3_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --build=nginx-plus-r31 --mgmt-id-path=/var/lib/nginx/nginx.id --with-http_auth_jwt_module --with-http_f4f_module --with-http_hls_module --with-http_proxy_protocol_vendor_module --with-http_session_log_module --with-mgmt --with-stream_mqtt_filter_module --with-stream_mqtt_preread_module --with-stream_proxy_protocol_vendor_module --with-cc-opt='-g -O2 -fdebug-prefix-map=/data/builder/debuild/nginx-plus-1.25.3/debian/debuild-base/nginx-plus-1.25.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
     ```
 
     ```bash
-    #Sample output
+    # Test the current NGINX configuration
+    nginx -t
+    ```
+
+    ```bash
+    ##Sample Output##
     nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
     nginx: configuration file /etc/nginx/nginx.conf test is successful
-
     ```
-
-1. Display the entire NGINX configuration, includes all files
 
     ```bash
-    more /usr/sbin/nginx -T
-
+    # Display the entire NGINX configuration, includes all files
+    nginx -T
     ```
 
-1. When you are done looking around, Exit the container.
+    When you are done looking around, Exit the container by typing `exit` in the shell.
 
     ```bash
     exit
-
     ```
 
 1. Check the logs for the NGINX container
 
     ```bash
-    docker logs <CONTAINER ID>
-
+    export CONTAINER_ID=$(docker ps -q --filter "name=nginx-plus")
+    docker logs $CONTAINER_ID
     ```
-
-    ```bash
-    #Sample output
-    172.17.0.1 - - [18/Jun/2019:18:41:32 +0000] "GET / HTTP/1.1" 200 612 "-" "curl/7.47.0" "-"
-    172.17.0.1 - - [18/Jun/2019:18:41:45 +0000] "HEAD / HTTP/1.1" 200 0 "-" "curl/7.47.0" "-"
-    35.240.46.11 - - [18/Jun/2019:18:46:13 +0000] "GET / HTTP/1.1" 200 612 "-" "Mozilla/5.0 zgrab/0.x" "-"
-    127.0.0.1 - - [18/Jun/2019:19:07:12 +0000] "GET / HTTP/1.1" 200 612 "-" "curl/7.64.0" "-"
-    127.0.0.1 - - [18/Jun/2019:19:07:16 +0000] "HEAD / HTTP/1.1" 200 0 "-" "curl/7.64.0" "-"
-
-    ```
-
->**Congratulations, you are now a member of Team NGINX Plus !**
-
-![NGINX Logo](media/nginx-logo.png)
 
 **This completes this Lab.**
 
 <br/>
 
-## References:
+## References
 
 - [NGINX Plus](https://docs.nginx.com/nginx/)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
@@ -345,6 +348,7 @@ NGINX Plus | Docker
 <br/>
 
 ### Authors
+
 - Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
 - Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
 - Kevin Jones - Technical Evanglist - Community and Alliances @ F5, Inc.
