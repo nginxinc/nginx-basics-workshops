@@ -545,12 +545,12 @@ In this exercise, you will add some additional NGINX TLS settings to control the
     * ALPN: offers h2,http/1.1
     * (304) (OUT), TLS handshake, Client hello (1):
     * LibreSSL/3.3.6: error:1404B42E:SSL routines:ST_CONNECT:tlsv1 alert protocol version  # Version mismatch error
-    * Closing connection 0       # NGINX closes the connection immediately
+    * Closing connection 0                  # NGINX closes the connection immediately
     curl: (35) LibreSSL/3.3.6: error:1404B42E:SSL routines:ST_CONNECT:tlsv1 alert protocol version
 
     ```
 
-1. Try with openssl, using its built-in `s_client` SSL client feature.  After all, it is Security, two sources are better than one, right ?
+1. Try with OpenSSL, using its built-in `s_client` SSL client feature.  After all, it is Security, two sources of info are better than one, right ?
 
     ```bash
     openssl s_client cars.example.com:443
@@ -662,7 +662,7 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
     ```
 
-1. Try with openssl, again with `TLS version set to 1.2`.  What do you expect ?
+1. Try with OpenSSL, again with `TLS version set to 1.2`.  What do you expect ?
 
     ```bash
     openssl s_client --tls1_2 cars.example.com:443
@@ -705,10 +705,282 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
     ```
 
-As you can see, using the `ssl_strong.conf` file, with only TLS v1.3 enabled, will make any lower TLS version handshake FAIL.  If you like, try a couple other TLS versions, like 1.1 or 1.0 - you should expect the same results.
+    As you can see, using the `ssl_strong.conf` file, with only TLS v1.3 enabled, will make any lower TLS version handshake FAIL.  If you like, try a couple other TLS versions, like 1.1 or 1.0 - you should expect the same results.
+
+    However, we all live in a messy Internet world, and not all apps and clients are capable of running the latest and greatest software, so being able to handle older, less secure TLS traffic is likely a requirement that you will run into.  In this next exercise, we will downgrade the TLS parameters to "Medium" security settings, so your website will accomodate older versions of TLS, namely 1.1 and 1.2.
+
+1. Inspect the `/includes/ssl/ssl_intermediate.conf` file, you will see that the TLS version is set to 1.0, 1.1, 1.2 on line #19 with the `ssl_protocols` directive.  You can modify this to meet your needs if you like.
+
+1. Using VI, edit your `tls-cars.example.com.conf` configuration, and change the /include statement to use the `/includes/ssl/ssl_intermediate.conf`, instead of the ssl_strong.conf.
+
+    Test your config and reload NGINX.
+
+1. Check the HTTP Headers, what is different from `ssl_strong` ?
+
+    ```bash
+    curl -kI https://cars.example.com
+
+    ```
+
+    Should look something like this, you should see 1 new HTTP Header added to the Response:
+
+    ```bash
+    #Sample output
+    HTTP/1.1 200 OK
+    Server: nginx/1.25.3
+    Date: Thu, 08 Feb 2024 18:27:51 GMT
+    Content-Type: text/html
+    Content-Length: 57
+    Connection: keep-alive
+    Strict-Transport-Security: max-age=15768000      # Added a single HSTS Header
+
+    ```
+
+1. Test again using curl, will your website now accept TLS versions 1.2?
+
+    ```bash
+    curl -kI -v --tls-max 1.2 https://cars.example.com
+
+    ```
+
+    ```bash
+    #Sample output
+    *   Trying [::1]:443...
+    * Connected to cars.example.com (::1) port 443 (#0)
+    * ALPN: offers h2,http/1.1
+    * (304) (OUT), TLS handshake, Client hello (1):
+    * (304) (IN), TLS handshake, Server hello (2):
+    * TLSv1.2 (IN), TLS handshake, Certificate (11):
+    * TLSv1.2 (IN), TLS handshake, Server key exchange (12):
+    * TLSv1.2 (IN), TLS handshake, Server finished (14):
+    * TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
+    * TLSv1.2 (OUT), TLS change cipher, Change cipher spec (1):
+    * TLSv1.2 (OUT), TLS handshake, Finished (20):
+    * TLSv1.2 (IN), TLS change cipher, Change cipher spec (1):
+    * TLSv1.2 (IN), TLS handshake, Finished (20):
+    * SSL connection using TLSv1.2 / ECDHE-RSA-CHACHA20-POLY1305      # Yes - TLS v1.2 now works
+    * ALPN: server accepted http/1.1
+    * Server certificate:
+    *  subject: CN=NginxBasics
+    *  start date: Feb  6 23:08:20 2024 GMT
+    *  expire date: Feb  5 23:08:20 2025 GMT
+    *  issuer: CN=NginxBasics
+    *  SSL certificate verify result: self signed certificate (18), continuing anyway.  # Self Signed cert
+    * using HTTP/1.1
+    > HEAD / HTTP/1.1
+    > Host: cars.example.com
+    > User-Agent: curl/8.1.2
+    > Accept: */*
+    >
+    < HTTP/1.1 200 OK
+    HTTP/1.1 200 OK
+    < Server: nginx/1.25.3
+    Server: nginx/1.25.3
+    < Date: Thu, 08 Feb 2024 18:32:07 GMT
+    Date: Thu, 08 Feb 2024 18:32:07 GMT
+    < Content-Type: text/html
+    Content-Type: text/html
+    < Content-Length: 57
+    Content-Length: 57
+    < Connection: keep-alive
+    Connection: keep-alive
+    < Strict-Transport-Security: max-age=15768000
+    Strict-Transport-Security: max-age=15768000                    # One new HTTP Header added
+    
+    ```
+
+    >NOTE:  For testing with versions below TLS 1.2, you will likely need to modify your local OpenSSL Client's openssl.cnf file security parameters, which is outside the scope of this exerices.  FYI - many modern OpenSSL clients do not support TLS version below 1.2.  Curl may have similar restrictions with older TLS versions.
+
+    So after Peer Review, your Security team says `absolutely not!` to any TLS version older that 1.2.  So you will use the `ssl_modern.conf` configuration file instead.  It is set for TLS 1.2, and will support most of the modern browsers and HTTP clients.
+
+1. Inspect the `/includes/ssl/ssl_modern.conf` file, to confirm it only contains the TLS protocols and ciphers that are approved by your Security team.
+
+1. Using VI, edit your `tls-cars.example.com.conf` configuration, and change the /include statement to use the `/includes/ssl/ssl_modern.conf`.
+
+    ```nginx
+        # cars.example.com HTTPS
+        # NGINX Basics Workshop
+        # Jan 2024, Chris Akker, Shouvik Dutta
+        #
+        server {
+            
+            listen 443 ssl;   # change to port 443, add "ssl" parameter for terminating TLS on all IP addresses on this machine
+
+            server_name cars.example.com;   # Set hostname to match in request
+
+        # Add the following 2 lines for NGINX cert and key directives and file locations
+
+            ssl_certificate /etc/ssl/nginx/cars.example.com.crt;
+            ssl_certificate_key /etc/ssl/nginx/cars.example.com.key;
+
+        >>> ### Add the following for Modern TLS Security ###
+
+            include /etc/nginx/includes/ssl/ssl_modern.conf;
+
+        ...snip
+
+    ```
+
+    Test your config and reload NGINX.  You should now re-test and verify this these Modern TLS parameters will work well for your environment.
+
+### NGINX with TLS Ciphers
+
+Not all TLS Ciphers are the same, and not all Ciphers work with all versions of TLS.  They often go hand-in-hand, they must match correctly to work as expected.  In this exercise, you will test a couple different TLS Ciphers against your `Modern TLS Settings` from the previous exercise.
+
+1. Try a cipher that you know works with TLS1.2, `ECDHE-ECDSA-AES256-GCM-SHA384`, which is found first in the list in your `/includes/ssl/ssl_modern.conf` file:
+
+    ```bash
+    curl -kI -v --tlsv1.2 --tls-max 1.2 -cipher ECDHE-ECDSA-AES256-GCM-SHA384 https://cars.example.com
+
+    ```
+
+    That should have been a successful test.
+
+1. Next, try a TLS1.3 cipher, `ECDHE-RSA-AES256-GCM-SHA384`, which is found first in the list in your `/includes/ssl/ssl_strong.conf` file, which only uses TLS1.3:
+
+    ```bash
+    curl -kI -v --tlsv1.3 --tls-max 1.3 -cipher ECDHE-RSA-AES256-GCM-SHA512 https://cars.example.com
+
+    ```
+
+    Unfortunately, this should fail, because this Cipher will only work with TLS1.3, but your current NGINX TLS config is set for `Modern` with TLS1.2.
 
 
+>Final Security Warning !!
+>> It should also be noted, a very old SSL config file is provided for your review, `/includes/ssl_old.conf`, for clients older than TLS v1.0.  Hopefully you will never have to use these Legacy settings, but if you do, please consult with your Security team, perform extensive testing, and use other security measures before using it. 
 
+<br/>
+
+### NGINX TLS/SSL Logging
+
+In this next lab exercise, you will create a new NGINX Access Log format, and add some important `$ssl_` logging variables.  This will help you watch and understand what SSL paramenters are being used for the TLS handshake, SNI (Server Name Indication), ciphers, and other parameters.  This log format will extend the default `main` NGINX Access log format, and you will apply this to your TLS enabled website so you can see it working.
+
+As a Best Practice, you should not modify the main log format, but rather copy this one and create a new one with your changes.  The `include` directive is also use here, because it makes your NGINX configurations more concise, uniform, and consistent.  As you will likely want to use the same access log format for multiple websites, you will define it ONCE, but use it for every server block, instead of duplicating the log format config for every website.  If you need to make a change to your log format, you can update it in one file, but it would apply to all your websites/server blocks.
+
+1. If it does not already exist, create a new folder `/includes` under the /etc/nginx folder.  Then create a second folder called `/log_formats` in the /etc/nginx/includes folder.  This is where the new log format files will be created.
+
+    ```bash
+    /etc/nginx$ mkdir includes
+
+    cd includes
+    mkdir log_format
+
+    cd log_format
+
+    ```
+
+1. Now using VI, create a new file called `main_ssl.conf`, and add this following log format to it.  Notice the 4 new `$ssl` variables added - for the TLS Version, Cipher, SNI, and Session_ID.
+
+```nginx
+# Extended SSL Log Format
+# Nginx Basics
+  log_format  main_ssl    'remote_addr="$remote_addr", '
+                            '[time_local=$time_local], '
+                            'request="$request", '
+                            'status="$status", '
+                            'http_referer="$http_referer", '
+                            'body_bytes_sent="$body_bytes_sent", '
+                            'Host="$host", '
+                            'sn="$server_name", '
+                            'request_time=$request_time, '
+                            'http_user_agent="$http_user_agent", '
+                            'http_x_forwarded_for="$http_x_forwarded_for", '
+                            'request_length="$request_length", ' 'ssl_ver="$ssl_protocol", ' 'ssl_cipher="$ssl_cipher", ' 'ssl_sname="$ssl_server_name", ' 'ssl_sess_id="$ssl_session_id", '  ;
+
+```
+
+1. Now you need to tell NGINX where to find these new log format definitions. Using VI, edit your nginx.conf, to add your `/includes/log_formats` folder as a search location:
+
+    ```nginx
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for"';
+
+        access_log  /var/log/nginx/access.log  main;
+
+        include /etc/nginx/includes/log_formats/*.conf; # Custom Access logs formats found here
+
+        sendfile        on;
+        #tcp_nopush     on;
+
+        keepalive_timeout  65;
+
+        #gzip  on;
+
+        include /etc/nginx/conf.d/*.conf;
+    }
+    ```
+
+    Save your nginx.conf, quit VI, and test your config with `nginx -t`.
+
+1. Next, modify your `cars.example.com` TLS enabled website to use this new log format:
+
+    ```bash
+    vi /etc/nginx/conf.d/tls-cars.example.com.conf
+
+    ```
+
+    ```nginx
+    # cars.example.com HTTPS
+    # NGINX Basics Workshop
+    # Jan 2024, Chris Akker, Shouvik Dutta
+    #
+    server {
+        
+        listen 443 ssl;   # change to port 443, add "ssl" parameter for terminating TLS on all IP addresses on this machine
+
+        server_name cars.example.com;   # Set hostname to match in request
+
+    # Add the following 2 lines for NGINX cert and key directives and file locations
+
+        ssl_certificate /etc/ssl/nginx/cars.example.com.crt;
+        ssl_certificate_key /etc/ssl/nginx/cars.example.com.key;
+
+    # Add the following for TLS Security Profile #
+
+        include /etc/nginx/includes/ssl/ssl_modern.conf;
+
+        access_log  /var/log/nginx/cars.example.com.log main_ssl.conf;   # Change to SSL Logging Format
+        error_log   /var/log/nginx/cars.example.com_error.log notice; 
+
+    ```
+
+    Save your cars.example.com.conf file, and exit VI.
+
+    Test your nginx configuration, and reload nginx.  If all was correct, it will reload and now your cars.example.com website will be using a new access log.  Let's go check.
+
+1. Watch the `var/log/nginx/cars.example.com.log` log file, and watch as you send a couple requests.
+
+    ```bash
+    tail -f /var/log/nginx/cars.example.com.log
+
+    ```
+
+    It should look similar to this, comments and new lines added for clarity
+
+    ```bash
+    remote_addr="192.168.65.1", [time_local=12/Feb/2024:20:03:35 +0000], request="GET /browse/rcf.jpg HTTP/1.1", status="200", http_referer="https://cars.example.com/browse/rcf.html", body_bytes_sent="132435", Host="cars.example.com", sn="cars.example.com", request_time=0.000, http_user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36", http_x_forwarded_for="-", request_length="619", 
+
+    # New SSL logging details
+    ssl_ver="TLSv1.2", 
+    ssl_cipher="ECDHE-RSA-AES256-GCM-SHA384", 
+    ssl_sname="cars.example.com", ssl_sess_id="0d25f82bae148ce3b067f61bdae1b50eff21723e0616d3a8bf9ee0ba7a570ae3", 
+
+    ```
+
+    You should see the value in adding some SSL variables to your logs.
+
+    Type Ctrl-C when you are finished tailing the log.
+
+<br/>
+
+## Wrapup 
+
+Don't forget - Save any Docker containers, images, docker compose, NGINX config files and Notes you may want for future reference.
 
 <br/>
 

@@ -5,11 +5,14 @@ version: '3.3'
 services:
   nginx-oss:                  # NGINX OSS Webserver
     hostname: nginx-oss
+    container_name: nginx-oss
     build: nginx-oss          # Build new container, using /nginx-oss/Dockerfile
-    volumes:
-        - ./nginx-oss/etc/nginx/conf.d/stub_status.conf:/etc/nginx/conf.d/stub_status.conf            # Copy this file to container
-        - ./nginx-oss/etc/nginx/conf.d/cars.example.com.conf:/etc/nginx/conf.d/cars.example.com.conf            # Copy this file to container
-        - ./nginx-oss/usr/share/nginx/html/.:/usr/share/nginx/html/.           # Copy these files to container
+    volumes:                  # Copy these folders to container
+        - ./nginx-oss/etc/ssl/nginx/.:/etc/ssl/nginx/.
+        - ./nginx-oss/etc/nginx/conf.d/.:/etc/nginx/conf.d/.
+        - ./nginx-oss/etc/nginx/includes/.:/etc/nginx/includes/.            
+        - ./nginx-oss/etc/nginx/ssl/.:/etc/nginx/ssl/.   
+        - ./nginx-oss/usr/share/nginx/html/.:/usr/share/nginx/html/.    
     ports:
         - 80:80       # Open for HTTP
         - 443:443     # Open for HTTPS
