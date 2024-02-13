@@ -168,8 +168,8 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
   
     You would be using these urls in later sections/exercise. You should verify these are working correctly using curl or browser.
     /coffee | /tea
-    :-------:|:-------:
-    ![coffee-url](media/coffee-url.png)|![tea-url](media/tea-url.png)
+    :-------: | :-------:
+    ![coffee-url](media/coffee-url.png) | ![tea-url](media/tea-url.png)
 
 1. Test access to NGINX Plus container with Docker Exec command:
 
@@ -461,7 +461,14 @@ All of these metrics are available via NGINX Plus API as a Json object making it
 1. Open a browser and test access to your dashboard: [http://localhost:9000/dashboard.html](http://localhost:9000/dashboard.html).
 
    It should look something like below screenshot.
-   (Note: After screenshot, highlight and explain server and location zone and upstream block - 3 screenshot - server, upstreams and workers)
+   ![http-zones](media/dashboard-http-zones.png)
+   In the NGINX Plus dashboard, within the HTTP Zones tab, you should be able to see stats that are aggregrated at Server level as well as at Location level.
+
+   ![http-upstreams](media/dashboard-http-upstreams.png)
+   In the Http upsteams tab, you should be able to see stats that are aggregated at backend server level. Also this tab capture the Active health check stats for each backend server. Active health checks would be covered in depth in the next section.
+
+   ![workers](media/dashboard-workers.png)
+   In the Workers tab, you can see the stats like process id, active connections, idle connections, total request, request per second etc. for each worker process.
 
 ## Active HealthChecks
 
@@ -512,7 +519,7 @@ In this section, you will enable active Healthchecks. Active healthchecks basica
    ```
 
 1. Inspect your dashboard: [http://localhost:9000/dashboard.html](http://localhost:9000/dashboard.html). You will find the healthcheck status and metrics under the HTTP Upstreams tab.
-   (Add healthcheck screenshot here)  
+   ![health check](media/health-check-all-up.png)  
 
 1. Using terminal on your local machine, issue the following docker command to stop one of the backend nginx cafe containers to trigger a health check failure.
 
@@ -523,13 +530,13 @@ In this section, you will enable active Healthchecks. Active healthchecks basica
    ```
 
 1. Once you have stopped the container, switch back to the browser and check the status of the backend servers.
-   (Put failure screenshot)
+   ![health check one down](media/health-check-one-down.png)
 
 1. NGINX also records health check failures in the `/var/log/nginx/error.log` file, go take a look
 
    ```bash
    # docker exec -it $CONTAINER_ID more /var/log/nginx/error.log
-   docker log $CONTAINER_ID --follow
+   docker logs $CONTAINER_ID --follow
    ```
 
    ```bash
@@ -548,7 +555,7 @@ In this section, you will enable active Healthchecks. Active healthchecks basica
    ```
 
    NGINX health checks will detect `web3` container is healthy again after 2 successive checks, and will begin sending traffic to it again. Observe the NGINX Plus dashboard. You can see that the status of `web3` backend server is now green.
-   (Screenshot )
+   ![health check one up](media/health-check-one-up.png)
 
 ## NGINX Dynamic Reconfiguration
 
