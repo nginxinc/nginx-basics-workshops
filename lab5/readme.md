@@ -152,9 +152,22 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
 
     Launch your browser, go to <http://localhost>
 
-    You should see the default Cafe App web page.
+    You should see the default Cafe App web page. If you refresh 3-4 times then you will see server name change to `web1`,`web2` and `web3` as NGINX is load balancing between your three nginx cafe backends using round-robin algorithm. Notice the server address matches each backend container as well.
 
     ![NGINX Welcome](media/lab5_cafe-default.png)
+
+1. These backend application do have the following multiple paths which can also be used for testing:
+   - http://cafe.example.com/coffee
+   - http://cafe.example.com/tea
+   - http://cafe.example.com/icetea
+   - http://cafe.example.com/beer
+   - http://cafe.example.com/wine
+   - http://cafe.example.com/cosmo
+   - http://cafe.example.com/mojito
+   - http://cafe.example.com/daiquiri
+  
+    You would be using these urls in later sections/exercise. You should verify these are working correctly using curl or browser.
+    (screenshots of coffee and tea)
 
 1. Test access to NGINX Plus container with Docker Exec command:
 
@@ -338,7 +351,23 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
 
 ## NGINX Plus Dashboard
 
-In this lab exercise you will enable NGINX Plus status dashboard and watch it for status changes and matrics while you perform various test on NGINX as a proxy.
+In this section, you will enable NGINX Plus status dashboard and watch it for status changes and metrics while you perform various tests on NGINX as a proxy.
+
+The NGINX Plus Dashboard and statistics API provide over 240 metrics about the request and responses flowing through NGINX Plus proxy. This is a great feature to allow you to watch and triage any potential issues with NGINX Plus as well as any issues with your backend applications. Some of metrics provided include the following:
+
+- TCP throughput and connections
+- HTTP request and response stats and all status codes
+- Virtual Server and Location context metrics
+- Upstream context metrics
+- Healthcheck success/failures
+- SSL handshakes, sessions and reuse
+- NGINX caching metrics
+- DNS resolver
+- NGINX clustering
+- NGINX Worker Metrics
+- Ratelimit Metrics
+
+All of these metrics are available via NGINX Plus API as a Json object making it easy to import these stats/metrics into your choice of Monitoring tools.
 
 1. Inspect the `dashboard.conf` file and look into the `server` block that enables access to NGINX Plus dashboard. You will find the following:
     - Dashboard is listening on port 9000
@@ -366,7 +395,7 @@ In this lab exercise you will enable NGINX Plus status dashboard and watch it fo
     }
     ```
 
-1. Edit `example.com.conf` file and uncomment `status_zone` directive on line 9 to capture matrics from the server block.
+1. Edit `cafe.example.com.conf` file and uncomment `status_zone` directive on line 9 to capture matrics from the server block.
 
     ```nginx
     # cafe.example.com HTTP
@@ -416,9 +445,150 @@ In this lab exercise you will enable NGINX Plus status dashboard and watch it fo
 1. Open a browser and test access to your dashboard: [http://localhost:9000/dashboard.html](http://localhost:9000/dashboard.html).
 
    It should look something like below screenshot.
-   (Note: After screenshot, highlight and explain zone and http upstream task - 3 screenshot - server, upstreams and workers)
+   (Note: After screenshot, highlight and explain server and location zone and upstream block - 3 screenshot - server, upstreams and workers)
 
+## Active HealthChecks
 
+In this section, you will enable active Healthchecks. Active healthchecks basically probe your backend applications in a timely fashion to check if they are healthy. These checks can be completely customized to match the backend application.
+
+1. Inspect and edit the `cafe.example.com.conf` file. Uncomment lines 55-66 to enable the active healthchecks.
+
+   ```nginx
+    # cafe.example.com HTTP
+    server {
+        ...
+
+        # Active Healthchecks
+        location @health_check {
+                internal;            # Requests by NGINX only
+                proxy_set_header Host cafe.example.com;
+                proxy_pass http://nginx_cafe;
+                health_check interval=5s fails=3 passes=2 uri=/ match=status_ok;    
+
+                # Health check logs are boring but errors are interesting
+                access_log off;
+                error_log  /var/log/nginx/error.log error;
+        }
+    }
+   ```
+
+   In the above config, the health_check directive mean the following:
+
+   - interval=5s : check every 5 secs
+   - fails=3 :  mark server down after 3 failures
+   - passes=2 : mark server up after 2 success
+   - uri=/ : uri to check is root (/)
+   - match=status_ok : match condition is using a custom response check that is defined in `status_ok.conf` file.
+
+        ```nginx
+        # Simple health check expecting http 200 and correct Content-Type
+        match status_ok {
+            status 200;
+            header Content-Type = "text/html; charset=utf-8"; # For the nginx-cafe html
+        }
+        ```
+
+1. Once you have edited the config file, reload your NGINX config:
+
+   ```bash
+   nginx -t
+   nginx -s reload
+   ```
+
+1. Inspect your dashboard: [http://localhost:9000/dashboard.html](http://localhost:9000/dashboard.html). You will find the healthcheck status and metrics under the HTTP Upstreams tab.
+   (Add healthcheck screenshot here)  
+
+1. Using terminal on your local machine, issue the following docker command to stop one of the backend nginx cafe containers to trigger a health check failure.
+   ```bash
+   docker ps
+   export WEB3=$(docker ps -q --filter "name=web3")
+   docker stop $WEB3 
+   ```
+
+1. Once you have stopped the container, switch back to the browser and check the status of the backend servers.
+   (Put failure screenshot)
+
+1. NGINX also records health check failures in the `/var/log/nginx/error.log` file, go take a look
+
+   ```bash
+   # docker exec -it $CONTAINER_ID more /var/log/nginx/error.log
+   docker log $CONTAINER_ID --follow
+   ```
+
+   ```bash
+   ##Sample Output##
+   2024/02/13 17:16:07 [error] 70#70: upstream timed out (110: Connection timed out) while connecting to upstream, health check "status_ok" of peer 192.168.96.4:80 in upstream "nginx_cafe"
+
+    2024/02/13 17:16:15 [error] 70#70: connect() failed (113: No route to host) while connecting to upstream, health check "status_ok" of peer 192.168.96.4:80 in upstream "nginx_cafe"
+   ```
+
+   Notice there are two errors. One for TCP connections and the other one is for failed HTTP health check.
+
+1. Once you have investigated and resolved the issues with `web3` container you can start it again using below command.
+
+   ```bash
+    docker start $WEB3
+   ```
+
+   NGINX health checks will detect `web3` container is healthy again after 2 successive checks, and will begin sending traffic to it again. Observe the NGINX Plus dashboard. You can see that the status of `web3` backend server is now green.
+   (Screenshot )
+
+## NGINX Dynamic Reconfiguration
+
+In this section, you will explore how NGINX Plus can be reconfigured without dropping any traffic. You will run an HTTP load generation tool(wrk) that would simulate a live website with a high volume of traffic. You will make several changes and reload NGINX while observing the NGINX Plus real-time dashboard.
+
+1. Keep NGINX Plus dashboard open in your browser. You would be looking at this dashboard often in this section.
+
+1. Start the `wrk` load generation tool by downloading and running the following docker container.
+
+   ```bash
+    docker run --network=lab5_default --rm williamyeh/wrk -t4 -c200 -d20m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
+   ```
+
+    The above command would run the wrk load generation tool for 20 minutes with 200 active connections hitting `/coffee` path.
+
+1. Inspect and edit the `upstreams.conf` file, uncomment the `least_time last_byte` load balancing algorithm which is an advance algorithm available in NGINX Plus, that monitors the response time of each backend application server and then selects the fastest backend server for serving new request coming to NGINX proxy. This is a popular feature when there is a large difference in response time for your backend servers, like when you are using different performant hardware types.
+
+   ```nginx
+    # nginx-cafe servers 
+    upstream nginx_cafe {
+
+        # Load Balancing Algorithms supported by NGINX
+        # - Round Robin (Default if nothing specified)
+        # - Least Connections
+        # - IP Hash
+        # - Hash (Any generic Hash)     
+        # - Least Time (NGINX Plus only)
+        
+        # Uncomment to enable least_time load balancing algorithm
+        least_time last_byte; # Other Options: header|last_byte|last_byte inflight
+
+        ...
+    }
+   ```
+
+1. Once you have edited the config file save and test your NGINX config:
+
+   ```bash
+   nginx -t
+   ```
+
+1. While watching the NGINX Plus dashboard, reload NGINX:
+
+   ```bash
+   nginx -s reload
+   ```
+
+   What did you observe?
+   - You will observe that no traffic is dropped. The statistics are reset to zero. Using the new algorithm, NGINX should now be sending more traffic to faster backend.
+
+        (**NOTE:** In lab environment, this is difficult to demonstrate as all the containers are on the same network with same resource allocation)
+
+    There is detailed explaination of what happens when you perform a reload in lab2. To recap, with NGINX Plus, new Worker processes are created, and begin using the new configuration immediately for all new connections and requests. The old Workers are **allowed to complete their previous task**, and then close their TCP connections naturally, **traffic in flight is not dropped!** The master process terminates the old Workers after they finish their work and close all their connections.
+
+## NGINX Dynamic Upstream Management
+
+In this section, you
 
 **This completes this Lab.**
 
