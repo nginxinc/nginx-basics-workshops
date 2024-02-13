@@ -157,17 +157,19 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
     ![NGINX Welcome](media/lab5_cafe-default.png)
 
 1. These backend application do have the following multiple paths which can also be used for testing:
-   - http://cafe.example.com/coffee
-   - http://cafe.example.com/tea
-   - http://cafe.example.com/icetea
-   - http://cafe.example.com/beer
-   - http://cafe.example.com/wine
-   - http://cafe.example.com/cosmo
-   - http://cafe.example.com/mojito
-   - http://cafe.example.com/daiquiri
+   - [http://cafe.example.com/coffee](http://cafe.example.com/coffee)
+   - [http://cafe.example.com/tea](http://cafe.example.com/tea)
+   - [http://cafe.example.com/icetea](http://cafe.example.com/icetea)
+   - [http://cafe.example.com/beer](http://cafe.example.com/beer)
+   - [http://cafe.example.com/wine](http://cafe.example.com/wine)
+   - [http://cafe.example.com/cosmo](http://cafe.example.com/cosmo)
+   - [http://cafe.example.com/mojito](http://cafe.example.com/mojito)
+   - [http://cafe.example.com/daiquiri](http://cafe.example.com/daiquiri)
   
     You would be using these urls in later sections/exercise. You should verify these are working correctly using curl or browser.
-    (screenshots of coffee and tea)
+    /coffee | /tea
+    :-------:|:-------:
+    ![coffee-url](media/coffee-url.png)|![tea-url](media/tea-url.png)
 
 1. Test access to NGINX Plus container with Docker Exec command:
 
@@ -395,7 +397,7 @@ All of these metrics are available via NGINX Plus API as a Json object making it
     }
     ```
 
-1. Edit `cafe.example.com.conf` file and uncomment `status_zone` directive on line 9 to capture matrics from the server block.
+1. Edit `cafe.example.com.conf` file and uncomment `status_zone` directive on line 9 and line 22 to capture matrics from the server block and location block respectively.
 
     ```nginx
     # cafe.example.com HTTP
@@ -407,6 +409,20 @@ All of these metrics are available via NGINX Plus API as a Json object making it
 
         # Uncomment to capture metrics for this server block
         status_zone cafe.example.com_http;
+
+        ...
+
+        location / {
+            
+            # Including best-practice headers are bonus points
+            # include includes/proxy_headers.conf;
+            # include includes/keepalive.conf;
+            
+            # Uncomment to capture metrics for this location block
+            status_zone /;
+
+            proxy_pass http://nginx_cafe;
+        }
 
         ...
     }
@@ -499,6 +515,7 @@ In this section, you will enable active Healthchecks. Active healthchecks basica
    (Add healthcheck screenshot here)  
 
 1. Using terminal on your local machine, issue the following docker command to stop one of the backend nginx cafe containers to trigger a health check failure.
+
    ```bash
    docker ps
    export WEB3=$(docker ps -q --filter "name=web3")
