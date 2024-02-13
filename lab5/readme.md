@@ -320,18 +320,105 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
     nginx -T
     ```
 
+    ```bash
+    # Check any server specific access logs
+    tail -f /var/log/nginx/www.example.com.log
+    ```
+
+    ```bash
+    # Check any server specific error logs
+    tail -f /var/log/nginx/www.example.com_error.log
+    ```
+
     When you are done looking around, Exit the container by typing `exit` in the shell.
 
     ```bash
     exit
     ```
 
-1. Check the logs for the NGINX container
+## NGINX Plus Dashboard
 
-    ```bash
-    export CONTAINER_ID=$(docker ps -q --filter "name=nginx-plus")
-    docker logs $CONTAINER_ID
+In this lab exercise you will enable NGINX Plus status dashboard and watch it for status changes and matrics while you perform various test on NGINX as a proxy.
+
+1. Inspect the `dashboard.conf` file and look into the `server` block that enables access to NGINX Plus dashboard. You will find the following:
+    - Dashboard is listening on port 9000
+    - Url is [http://localhost:9000/dashboard.html](http://localhost:9000/dashboard.html)
+  
+    ```nginx
+    server {
+        # Conventional port for the NGINX Plus API is 9000
+        listen 9000;
+        access_log off; # reduce noise in access logs
+
+        location /api/ {
+        # Enable in read-write mode
+        api write=on;
+        }
+        # Conventional location of the NGINX Plus dashboard
+        location = /dashboard.html {
+            root /usr/share/nginx/html;
+        }
+
+        # Redirect requests for "/" to "/dashboard.html"
+        location / {
+            return 301 /dashboard.html;
+        }
+    }
     ```
+
+1. Edit `example.com.conf` file and uncomment `status_zone` directive on line 9 to capture matrics from the server block.
+
+    ```nginx
+    # www.example.com HTTP
+    server {
+        # Listening on port 80 on all IP addresses on this machine
+        listen 80 default_server;
+
+        server_name www.example.com "";
+
+        # Uncomment to capture metrics for this server block
+        status_zone www.example.com_http;
+
+        ...
+    }
+    ```
+
+1. Edit `upstreams.conf` file and uncomment `zone` directive on line 20 to capture matrics from the upstream block.
+
+    ```nginx
+    # nginx-cafe servers 
+    upstream nginx_cafe {
+
+        # Load Balancing Algorithms supported by NGINX
+        # - Round Robin (Default if nothing specified)
+        # - Least Connections
+        # - IP Hash
+        # - Hash (Any generic Hash)     
+        # - Least Time (NGINX Plus only)
+        
+        # Uncomment to enable least_time load balancing algorithm
+        # least_time header; # Other Options: header|last_byte|last_byte inflight
+
+        # Uncomment to capture metrics for upstream block
+        zone nginx_cafe 64k;
+        
+        ...
+    }
+    ```
+
+1. Once you have edited the two config files, reload your NGINX config:
+
+   ```bash
+   nginx -t
+   nginx -s reload
+   ```
+
+1. Open a browser and test access to your dashboard: [http://localhost:9000/dashboard.html](http://localhost:9000/dashboard.html).
+
+   It should look something like below screenshot.
+   (Note: After screenshot, highlight and explain zone and http upstream task)
+
+6. 
 
 **This completes this Lab.**
 
