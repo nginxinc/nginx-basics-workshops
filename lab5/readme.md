@@ -322,12 +322,12 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
 
     ```bash
     # Check any server specific access logs
-    tail -f /var/log/nginx/www.example.com.log
+    tail -f /var/log/nginx/cafe.example.com.log
     ```
 
     ```bash
     # Check any server specific error logs
-    tail -f /var/log/nginx/www.example.com_error.log
+    tail -f /var/log/nginx/cafe.example.com_error.log
     ```
 
     When you are done looking around, Exit the container by typing `exit` in the shell.
@@ -369,15 +369,15 @@ In this lab exercise you will enable NGINX Plus status dashboard and watch it fo
 1. Edit `example.com.conf` file and uncomment `status_zone` directive on line 9 to capture matrics from the server block.
 
     ```nginx
-    # www.example.com HTTP
+    # cafe.example.com HTTP
     server {
         # Listening on port 80 on all IP addresses on this machine
         listen 80 default_server;
 
-        server_name www.example.com "";
+        server_name cafe.example.com "";
 
         # Uncomment to capture metrics for this server block
-        status_zone www.example.com_http;
+        status_zone cafe.example.com_http;
 
         ...
     }
@@ -418,7 +418,7 @@ In this lab exercise you will enable NGINX Plus status dashboard and watch it fo
    It should look something like below screenshot.
    (Note: After screenshot, highlight and explain zone and http upstream task)
 
-6. 
+
 
 **This completes this Lab.**
 
