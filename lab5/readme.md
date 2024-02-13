@@ -416,7 +416,7 @@ In this lab exercise you will enable NGINX Plus status dashboard and watch it fo
 1. Open a browser and test access to your dashboard: [http://localhost:9000/dashboard.html](http://localhost:9000/dashboard.html).
 
    It should look something like below screenshot.
-   (Note: After screenshot, highlight and explain zone and http upstream task)
+   (Note: After screenshot, highlight and explain zone and http upstream task - 3 screenshot - server, upstreams and workers)
 
 
 
