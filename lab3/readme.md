@@ -978,13 +978,25 @@ As a Best Practice, you should not modify the main log format, but rather copy t
 
 <br/>
 
-## Wrapup 
+## Wrapup
 
-Don't forget - Save any Docker containers, images, docker compose, NGINX config files and Notes you may want for future reference.
+>Don't forget - Save any Docker containers/images, docker compose, NGINX config files and Notes you may want for future reference.
+
+### Summary
+
+In this lab, you learned the following NGINX / Docker topics.
+ * Create a Self Signed TLS certificate and key
+ * Configure NGINX webserver to use a TLS cert and key
+ * Configure TLS settings
+ * Add some TLS Best Practice configurations
+ * Test and validate TLS traffic components and settings
+
 
 <br/>
 
 **This completes this Lab.**
+
+NOTE: The `answers` to all the lab exercises are in the lab3/final folder, where you will find the final NGINX configs for each exercise in this lab.  They are provided for you in case you delete or break your nginx-oss container ;-)
 
 <br/>
 
