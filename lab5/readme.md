@@ -38,6 +38,8 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
 - You must have a license for NGINX Plus
 - You must have Docker installed and running
 - You must have Docker-compose installed
+- (Optional) You should have Postman API tool to make calls to NGINX Plus API.
+- (Optional) You should have Visual Studio Code installed to work through the NGINX configuration files.
 - See `Lab0` for instructions on setting up your system for this Workshop
 
 ## Build and Run NGINX Plus with Docker
@@ -462,10 +464,19 @@ All of these metrics are available via NGINX Plus API as a Json object making it
 
    It should look something like below screenshot.
    ![http-zones](media/dashboard-http-zones.png)
-   In the NGINX Plus dashboard, within the HTTP Zones tab, you should be able to see stats that are aggregrated at Server level as well as at Location level.
+
+   In the NGINX Plus dashboard, within the HTTP Zones tab, you should see the aggregated statistics that comes from all the clients connecting to your virtual servers. Beneath the Server Zones are the Location zones which provides aggregated statistics for your location blocks.
 
    ![http-upstreams](media/dashboard-http-upstreams.png)
-   In the Http upsteams tab, you should be able to see stats that are aggregated at backend server level. Also this tab capture the Active health check stats for each backend server. Active health checks would be covered in depth in the next section.
+   In the Http upsteams tab, you should be able to see stats that are unique for each backend server. It also provides the following detailed metrics:
+    - Total and per second HTTP request
+    - All HTTP response codes
+    - Active TCP connections
+    - Total and per second Bytes sent and received
+    - Health checks success and failures
+    - HTTP Header and full response times
+    - SSL Handshake success and failure, session counters
+    These upstream metrics are very valuable to monitor your backend servers to troubleshoot issues.
 
    ![workers](media/dashboard-workers.png)
    In the Workers tab, you can see the stats like process id, active connections, idle connections, total request, request per second etc. for each worker process.
@@ -474,7 +485,7 @@ All of these metrics are available via NGINX Plus API as a Json object making it
 
 In this section, you will enable active Healthchecks. Active healthchecks basically probe your backend applications in a timely fashion to check if they are healthy. These checks can be completely customized to match the backend application.
 
-1. Inspect and edit the `cafe.example.com.conf` file. Uncomment lines 55-66 to enable the active healthchecks.
+1. Inspect and edit the `cafe.example.com.conf` file. Uncomment lines 56-66 to enable the active healthchecks.
 
    ```nginx
     # cafe.example.com HTTP
@@ -532,11 +543,13 @@ In this section, you will enable active Healthchecks. Active healthchecks basica
 1. Once you have stopped the container, switch back to the browser and check the status of the backend servers.
    ![health check one down](media/health-check-one-down.png)
 
+    In the above screenshot, `DT` column specifies the down time for a particular backend server. `x` in `Last` column within the `Health monitors` section indicate that the last health check failed and nginx is not sending any active traffic to this backend server.
+
 1. NGINX also records health check failures in the `/var/log/nginx/error.log` file, go take a look
 
    ```bash
-   # docker exec -it $CONTAINER_ID more /var/log/nginx/error.log
-   docker logs $CONTAINER_ID --follow
+   export CONTAINER_ID=$(docker ps -q --filter "name=nginx-plus")
+   docker exec -it $CONTAINER_ID more /var/log/nginx/error.log
    ```
 
    ```bash
@@ -548,13 +561,13 @@ In this section, you will enable active Healthchecks. Active healthchecks basica
 
    Notice there are two errors. One for TCP connections and the other one is for failed HTTP health check.
 
-1. Once you have investigated and resolved the issues with `web3` container you can start it again using below command.
+1. Once you have investigated and resolved the issues with `web3` backend server you can start it again using below command.
 
    ```bash
     docker start $WEB3
    ```
 
-   NGINX health checks will detect `web3` container is healthy again after 2 successive checks, and will begin sending traffic to it again. Observe the NGINX Plus dashboard. You can see that the status of `web3` backend server is now green.
+   After 2 successive health checks, NGINX will detect `web3` backend server is healthy again and begin sending active traffic to it. Observe the NGINX Plus dashboard. You can see that the status of `web3` backend server is now green.
    ![health check one up](media/health-check-one-up.png)
 
 ## NGINX Dynamic Reconfiguration
@@ -612,21 +625,118 @@ In this section, you will explore how NGINX Plus can be reconfigured without dro
 
 ## NGINX Dynamic Upstream Management
 
-In this section, you
+In this section, you will manage your backend servers dynamically using NGINX Plus API. `Web3` server in your workshop environment needs to undergo a scheduled maintainance. But it is currently handling active traffic. In this section you are tasked to remove it from load balancing without dropping any active traffic. And once maintainance is done, add it back so that it can handle active traffic again.
 
-**This completes this Lab.**
+1. Keep NGINX Plus dashboard open in your browser. You would be looking at this dashboard often in this section.
 
-<br/>
+1. Start the `wrk` load generation tool by downloading and running the following docker container.
+
+   ```bash
+    docker run --network=lab5_default --rm williamyeh/wrk -t4 -c200 -d20m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
+   ```
+
+    The above command would run the wrk load generation tool for 20 minutes with 200 active connections hitting `/coffee` path.
+
+1. If you look at the `HTTP Upstreams` tab within NGINX Plus dashboard you can clearly see all three backend servers are serving the incoming request from the load generation tool.
+   ![dashboard with equal load](media/dashboard_with_load.png)
+
+1. Open `Postman` tool and look into the `NGINX_Basics` collection.
+
+   (**Note:** If you are not familiar with postman and would rather prefer running command on terminal then please use the `curl` equivalent command provided in each step)
+
+1. Open `Check nginx_cafe servers` request and execute the call by clicking on `Send` button. You can confirm from the response that the upstream, nginx_cafe, has three backend servers. Also note that server `web3` has `id=2`. You will use this `id` in subsequent API calls in this section.
+    ![postman check server](media/postman_check_servers.png)
+
+    ```bash
+     #[Optional] curl command if not using postman
+     curl 'http://localhost:9000/api/9/http/upstreams/nginx_cafe' | jq
+    ```
+
+1. You will now set `web3` server as `down` which would inform the NGINX master process to not direct any traffic to that server. Within postman, open `Disable web3 server` request and execute the call by clicking on `Send` button.
+    ![postman disable server](media/postman_disable_server.png)
+
+    ```bash
+     #[Optional] curl command if not using postman
+     curl --request PATCH 'http://localhost:9000/api/9/http/upstreams/nginx_cafe/servers/2' \
+    --header 'Content-Type: application/json' \
+    --data '{
+        "down": true
+    }' | jq
+    ```
+
+1. If you check your NGINX Plus Dashboard, you will notice the `web3` server is not taking any active traffic.
+   ![disabled web3](media/dashboard_disabled_web3.png)
+  
+1. You are notified that the `web3` server has been patched and the maintenance has finished. It can now be added back to the load balancer to serve client traffic. You will now set `web3` server as `down=false` which would inform the NGINX master process to again resume sending traffic to that server. Within postman, open `Enable web3 server` request and execute the call by clicking on `Send` button.
+   ![postman enable server](media/postman_enable_server.png)
+
+   ```bash
+     #[Optional] curl command if not using postman
+     curl --request PATCH 'http://localhost:9000/api/9/http/upstreams/nginx_cafe/servers/2' \
+    --header 'Content-Type: application/json' \
+    --data '{
+        "down": false
+    }' | jq
+    ```
+
+1. If you check your NGINX Plus Dashboard, you will notice the `web3` server is now again taking equal amount of active traffic.
+   ![disabled web3](media/dashboard_enabled_web3.png)
+
+## NGINX Live Activity Monitoring JSON feed
+
+In this section, you will make use of NGINX Plus API to get current statistics returned in a JSON-formatted document. You can request complete statistics at `/api/[api-version]/`, where `[api-version]` is the version number of the NGINX Plus API. This API is extremely useful if you would like to pull NGINX statistics into a central monitoring tool of your choice
+
+1. Open `Postman` tool and look into the `NGINX_Basics` collection.
+
+   (**Note:** If you are not familiar with postman and would rather prefer running commands on terminal then please use the `curl` equivalent command provided in each step)
+
+1. Open `NGINX Info` request and execute the call by clicking on `Send` button.`/api/[api-version]/nginx` is used to retrieve basic version, uptime and identification information.
+    ![postman NGINX Info](media/postman_nginx_info.png)
+
+    ```bash
+     #[Optional] curl command if not using postman
+     curl 'http://localhost:9000/api/9/nginx' | jq
+    ```
+
+1. Open `NGINX Connections` request and execute the call by clicking on `Send` button.`/api/[api-version]/connections` is used to retrieve total active and idle connections
+    ![postman NGINX Connections](media/postman_connections.png)
+
+    ```bash
+     #[Optional] curl command if not using postman
+     curl 'http://localhost:9000/api/9/connections' | jq
+    ```
+
+1. Open `NGINX Server Zones` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/server_zones` is used to retrieve request and response counts for each HTTP Server group.
+    ![postman NGINX Server Zones](media/postman_serverzones.png)
+
+    ```bash
+     #[Optional] curl command if not using postman
+     curl 'http://localhost:9000/api/9/http/server_zones' | jq
+    ```
+
+1. Open `NGINX Location Zones` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/location_zones` is used to retrieve request and response counts for each HTTP Location group.
+    ![postman NGINX Location Zones](media/postman_locationzones.png)
+
+    ```bash
+     #[Optional] curl command if not using postman
+     curl 'http://localhost:9000/api/9/http/location_zones' | jq
+    ```
+
+2. Open `NGINX Upstreams` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/upstreams` is used to retrieve request and response counts, response time, health‑check status, and uptime statistics per server in each HTTP upstream group.
+    ![postman NGINX Upstreams](media/postman_upstreams.png)
+
+    ```bash
+     #[Optional] curl command if not using postman
+     curl 'http://localhost:9000/api/9/http/upstreams' | jq
+    ```
+
+**This completes Lab 5.**
 
 ## References
 
 - [NGINX Plus](https://docs.nginx.com/nginx/)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
 - [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
-- [Docker](https://www.docker.com/)
-- [Docker Compose](https://docs.docker.com/compose/)
-
-<br/>
 
 ### Authors
 
