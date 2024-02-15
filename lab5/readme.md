@@ -688,9 +688,9 @@ In this section, you will make use of NGINX Plus API to get current statistics r
 
 1. Open `Postman` tool and look into the `NGINX_Basics` collection.
 
-   (**Note:** If you are not familiar with postman and would rather prefer running commands on terminal then please use the `curl` equivalent command provided in each step)
+   (**Note:** You can find the `postman collection.json` file within the `lab5` directory. If you are not familiar with postman tool and would rather prefer running commands on terminal then please use the `curl` equivalent command provided in each step.)
 
-1. Open `NGINX Info` request and execute the call by clicking on `Send` button.`/api/[api-version]/nginx` is used to retrieve basic version, uptime and identification information.
+2. Open `NGINX Info` request and execute the call by clicking on `Send` button.`/api/[api-version]/nginx` is used to retrieve basic version, uptime and identification information.
     ![postman NGINX Info](media/postman_nginx_info.png)
 
     ```bash
@@ -698,7 +698,7 @@ In this section, you will make use of NGINX Plus API to get current statistics r
      curl 'http://localhost:9000/api/9/nginx' | jq
     ```
 
-1. Open `NGINX Connections` request and execute the call by clicking on `Send` button.`/api/[api-version]/connections` is used to retrieve total active and idle connections
+3. Open `NGINX Connections` request and execute the call by clicking on `Send` button.`/api/[api-version]/connections` is used to retrieve total active and idle connections
     ![postman NGINX Connections](media/postman_connections.png)
 
     ```bash
@@ -706,7 +706,7 @@ In this section, you will make use of NGINX Plus API to get current statistics r
      curl 'http://localhost:9000/api/9/connections' | jq
     ```
 
-1. Open `NGINX Server Zones` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/server_zones` is used to retrieve request and response counts for each HTTP Server group.
+4. Open `NGINX Server Zones` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/server_zones` is used to retrieve request and response counts for each HTTP Server group.
     ![postman NGINX Server Zones](media/postman_serverzones.png)
 
     ```bash
@@ -714,7 +714,7 @@ In this section, you will make use of NGINX Plus API to get current statistics r
      curl 'http://localhost:9000/api/9/http/server_zones' | jq
     ```
 
-1. Open `NGINX Location Zones` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/location_zones` is used to retrieve request and response counts for each HTTP Location group.
+5. Open `NGINX Location Zones` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/location_zones` is used to retrieve request and response counts for each HTTP Location group.
     ![postman NGINX Location Zones](media/postman_locationzones.png)
 
     ```bash
@@ -722,7 +722,7 @@ In this section, you will make use of NGINX Plus API to get current statistics r
      curl 'http://localhost:9000/api/9/http/location_zones' | jq
     ```
 
-2. Open `NGINX Upstreams` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/upstreams` is used to retrieve request and response counts, response time, health‑check status, and uptime statistics per server in each HTTP upstream group.
+6. Open `NGINX Upstreams` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/upstreams` is used to retrieve request and response counts, response time, health‑check status, and uptime statistics per server in each HTTP upstream group.
     ![postman NGINX Upstreams](media/postman_upstreams.png)
 
     ```bash
