@@ -8,13 +8,13 @@ Redirect 80>443
 
 Lab4: Compose OSS + three backends.  Sticky cookie, Proxy_pass, add proxy_headers request/response, custom header with overwrite - $host, XFF, $remote_addr.  Proxy_pass direct, http upstreams,  map blocks - Compose Down required here to avoid port conflct on next Lab.
 
-Lab5: Compose Plus + three backends. Dashboard, API, Plus metrics, LB algorithms, health-checks, wrk load tool with Reloads, Dynamic upstream with drain, delete, add upstream back.
+Lab5: Compose Plus + three backends. Dashboard, API, Plus metrics, LB algorithms, health-checks, wrk load tool with Reloads, Dynamic upstream with disable/enable server.
 
-Lab6: Security topics - KV store, IP allow/block, Rate Limits,  HTTP Auth, JWT token ?, Secure headers
+Lab6: Regex intro, Nginx Caching, juiceshop container
 
-Lab7: Regex intro, Nginx Caching, juiceshop container
+Lab7: Prom and Grafana
 
-Lab8: Prom and Grafana
+Lab8: Security topics - KV store, IP allow/block, Rate Limits,  HTTP Auth, JWT token ?, Secure headers
 
 *****
 

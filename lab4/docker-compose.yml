@@ -1,11 +1,13 @@
 # NGINX OSS Proxy with tools build
 # NGINX webservers with ingress-demo pages
-# NGINX Basics, Jan 2024
+# NGINX Basics, Feb 2024
 # Chris Akker, Shouvik Dutta
+#
 version: '3.3'
 services:
   nginx-oss:                  # NGINX OSS Web / Load Balancer
     hostname: nginx-oss
+    container_name: nginx-oss
     build: nginx-oss          # Build new container, using /nginx-oss/Dockerfile
     links:
         - web1:web1
@@ -22,18 +24,21 @@ services:
     restart: always     
   web1:
       hostname: web1
+      container_name: web1
       image: nginxinc/ingress-demo            # Image from Docker Hub
       ports:
         - "80"                                # Open for HTTP
         - "443"                               # Open for HTTPS
   web2:
       hostname: web2
+      container_name: web2
       image: nginxinc/ingress-demo
       ports:
         - "80"
         - "433"
   web3:
       hostname: web3
+      container_name: web3
       image: nginxinc/ingress-demo
       ports:
         - "80"

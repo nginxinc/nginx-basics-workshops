@@ -2,7 +2,7 @@
 
 ## Introduction
 
-In this lab, you will build a test lab environment using NGINX and Docker.  This will require that you build and run NGINX Opensource as a `Reverse Proxy Load Balancer` in a Docker container.  Then you will run several NGINX demo web servers.  After all the containers are running, you will test and verify each container, the NGINX Proxy and the web servers.  All of these NGINX containers will be used as a learning platform for this Workshop to complete the remaining Lab Exercises.  It is important to build and run these NGINX containers correctly to complete the exercises and receive the most benefit from the Workshop.
+In this lab, you will build a test lab environment using NGINX and Docker.  This will require that you build and run NGINX Opensource as a `Reverse Proxy Load Balancer` in a Docker container.  Then you will run three NGINX demo web servers, to be used as your `backend` web servers.  After all the containers are running, you will test and verify each container, the NGINX Proxy and the web servers.  All of these NGINX containers will be used as a learning platform to complete the remaining Lab Exercises.  It is important to build and run these NGINX containers correctly to complete the exercises and receive the most benefit from the Workshop.
 
 NGINX OSS | Docker
 :-------------------------:|:-------------------------:
@@ -34,38 +34,38 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
 ### Build and Run NGINX OSS with Docker
 
-1. Inspect the Dockerfile, located in the `/lab4/nginx-oss folder`.  Notice the `FROM` directive uses the NGINX Alpine base image, and also the `RUN apk add` command, which installs additional tool libraries to the image.  These tools are needed for copy/edit of files, and to run various tests while using the container in the exercises.
+1. Inspect the Dockerfile, located in the `/lab4/nginx-oss folder`.  Notice the `FROM` directive uses the `NGINX Alpine mainline` image, and also the `RUN apk add` command, which installs additional tool libraries in the image.  These tools are needed for copy/edit of files, and to run various tests while using the container in the exercises.  Note - you can choose a different NGINX base image if you like, but these lab exercises are written to use the Alpine image.
 
-```bash
-FROM nginx:mainline-alpine                                                     # use the Alpine base image
-RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   # Add common tools
+    ```bash
+    FROM nginx:mainline-alpine                                                     # use the Alpine base image
+    RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   # Add common tools
 
-```
+    ```
 
-1. Inspect the `docker-compose.yml` file, located in the /lab4 folder.  Notice you are building the NGINX-OSS web and Proxy container, (using the modified `/nginx-oss/Dockerfile` from the previous step).  
+1. Inspect the `docker-compose.yml` file, located in the /lab4 folder.  Notice you are building and running the NGINX-OSS web and Proxy container, (using the modified `/nginx-oss/Dockerfile` from the previous step).  
 
     ```bash
     ...
     nginx-oss:                  # NGINX OSS Web / Load Balancer
         hostname: nginx-oss
-        build: nginx-oss        # Build new container, using /nginx-oss/Dockerfile
+        build: nginx-oss          # Build new container, using /nginx-oss/Dockerfile
         links:
-        - web1:web1
-        - web2:web2
-        - web3:web3
+            - web1:web1
+            - web2:web2
+            - web3:web3
         volumes:
-            - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d   # Copy these folders to container
+            - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d        # Copy these folders to container
             - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
             - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
         ports:
-            - 9000:9000        # Open for stub status page
-            - 80:80            # Open for HTTP
-            - 443:443          # Open for HTTPS
-        restart: always
+            - 80:80       # Open for HTTP
+            - 443:443     # Open for HTTPS
+            - 9000:9000   # Open for stub status page
+        restart: always 
 
     ```
 
-    Also in the `docker-compose.yml` you are running three Docker NGINX webserver containers, using an image from Docker Hub.  These will be your upstream, backend webservers for the exercises.
+    Also notice in the `docker-compose.yml` you are running three Docker NGINX webserver containers, using an image from Docker Hub.  These will be your upstream, backend webservers for the exercises.
 
     ```bash
     ...
@@ -101,7 +101,7 @@ RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   #
     #Sample output
 
     CONTAINER ID   IMAGE                   COMMAND                  CREATED          STATUS          PORTS                                                              NAMES
-    28df738bd4bb   lab1-nginx-oss          "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:9000->9000/tcp   lab1-nginx-oss-1
+    28df738bd4bb   nginx-oss          "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:9000->9000/tcp   lab1-nginx-oss-1
     49c0ffe31abf   nginxinc/ingress-demo   "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   0.0.0.0:56906->80/tcp, 0.0.0.0:56907->443/tcp                      lab1-web1-1
     f600f082cae3   nginxinc/ingress-demo   "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   0.0.0.0:56902->80/tcp, 0.0.0.0:56903->443/tcp                      lab1-web3-1
     642129dd20fc   nginxinc/ingress-demo   "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   443/tcp, 0.0.0.0:56905->80/tcp, 0.0.0.0:56904->433/tcp             lab1-web2-1
