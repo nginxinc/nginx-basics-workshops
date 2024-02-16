@@ -1,53 +1,119 @@
-# Under Construction
-This workshop is under a re-write.  Use at your own risk.
+![NGINX Basics Workshop Banner](media/basics-workshop-banner.png)
 
-# NGINX-Basics
+<br/>
 
-Implement NGINX Plus as an HTTP and HTTPS (SSL terminating) load balancer for
-two or more HTTP services
+# Under Construction - This workshop is under a re-write.  Use at your own risk.
 
-### Goals 
+<br/>
 
- * Provide a variety of NGINX Plus demonstrations
- * Teach the process and meaning of each step setting up NGINX Plus
+# NGINX Basics Workshop
+
+## Welcome!
+
+<br/>
+
+> ><strong>Welcome to the NGINX OSS and Plus Basics Workshop!</strong>
+
+<br/>
+
+This Workshop will introduce `NGINX Webserver and Reverse Proxy` with hands-on practice through self-paced lab exercises.
+
+You will learn about `NGINX` Opensource Software (OSS) and `NGINX Plus`, the Commerical version of NGINX, with no prior experience required.  The lab exercises provided will teach you by example how to install, configure, test, operate, troubleshoot, and fix NGINX; using common commands, tools, and applications.  There are dozens of use cases for NGINX, this Basics Workshop will focus on the most common ones for new users and deployments.  This Workshop content is designed to run in almost any environment that can host Docker and Linux containers, for broad appeal and consumption by users. 
+
+You will learn how to configure NGINX Webserver, deploy it with Docker, configure basic and some advanced NGINX features, loadtest it, and monitor it in realtime. You will deploy new apps and services, terminate SSL, route HTTP traffic, configure redirects, set up healthchecks, and load balance traffic to running servers.  You will add some Security features, follow Best Practices, and become proficient with basic NGINX configurations.  These Hands-On Lab Exercises are designed to be independent, with later labs adding additional services and features as you progress through them. Completing the labs in sequential order is highly recommended. 
+
+By the end of this Workshop, you will have a working, operational NGINX OSS or Plus Docker environment, routing traffic to and from backend web application servers, with the necessary skills to deploy and operate NGINX for your own Modern Applications. Thank You for taking the time to attend this NGINXpert Workshop!
+
+<br/>
+
+![NGINXpert Desk](media/nginx-workshop-desk.png)
+
+<br/>
+
+## Goals 
+
+ * Overview of NGINX History and Architecture
+ * How to build and setup NGINX OSS and NGINX Plus on Docker
+ * How to configure NGINX for basic web server functions
+ * How to configure NGINX for Proxy functions
+ * How to monitor, log, troubleshoot, and fix common issues
  * Provide examples of NGINX configurations best practices
- * Give you a feel for what it is like to work with NGINX Plus
+ * Provide an overview of NGINX Plus
+ * Introduction to third party integrations like Prometheus and Grafana
+ * Introduction to more Advanced Topics
 
-### How to use this document
+## Prerequisites
 
-To ensure understanding of every step, every line which is to be entered by the
-user is preceded by `$>`. This is by design to pace the exercises and prevent
-the ability to bulk copy and paste multiple lines at once.
+To successfully complete the Hands On exercises for this Workshop, there are both knowledge and technical requirements.
 
-## The Demo environment
+### Knowledge Requirements
 
-This demo requires four docker containers for the NGINX demos: an NGINX Plus
-ADC/load balancer, `nginx-plus,` and webservers, `nginx1`, `nginx2` and
-`nginx3`:
+- You should be familiar with the Linux command line, copying, editing, and saving files.
+- You should be familiar with TCP, HTTP, SSL, and basic networking concepts.
+- You should be familiar with basic Docker and container commands and concepts.
+- You should be familiar with Computer Desktop apps like Chrome, Visual Studio Code, Postman, Terminal.
+- Optional, you should be familiar with load balancing concepts and terminology.
 
-An additional container is used for the lab guide and is available on **Port
-9000**
+### Technical Requirements
 
-Details of the containers:
+The Hands On lab exercises are written for users with a host running multiple Docker containers.  These containers are quite small, and should all run easily on most modern computer hardware.  You will need to provide the following components, prior to starting the exercises:
 
- * **NGINX Plus** `(Latest)` based on ubuntu 18.04 (and a sample centos 7
-   Dockerfile is provided).
- * **NGINX OSS** `(Latest)` is based on
-   [**nginx-hello**](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello).
-   NGINX web servers that serve simple pages containing its hostname, IP address
-   and port as wells as the request URI and the local time of the webserver.
- * **Lab Guide** can be read from the [`docs/labs` folder](docs/labs/README.md)
-   or in a web browser on [http://localhost:9000](http://localhost:9000).
+1. A Docker host, with [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed and running.
 
-**Note:**[NGINX Plus Documentation](https://docs.nginx.com/nginx/),
-[resources](https://www.nginx.com/resources/) and
-[blog](https://www.nginx.com/blog/) are your best source of information for
-addtional technical information. There are many detailed examples found on the
-internet too!
+2. Admin access to your local computer to install and run various software packages.  See the `lab0 folder` for details on setting up your computer for this Workshop.
+
+3. Admin access to your local /etc/hosts file.  The lab uses the FQDN hostnames: `www.example.com` and `www2.example.com`. For hostname resolution you will need to add these hostnames to your local DNS hosts file.
+
+   For example, on Linux/macOS the host file is located at `/etc/hosts`:
+
+   ```bash
+   # NGINX Plus Basics lab hostnames (local docker hosts)
+   127.0.0.1 example.com www.example.com www2.example.com nginx-plus-1 web1 web2 web3
+
+   ```
+
+> **Note on Docker DNS:**
+>
+> DNS resolution between containers is provided by default using the bridged network by docker networking, and NGINX has been pre-configured to use the Docker internal DNS server (127.0.0.11) to provide DNS resolution between the containers.  Your Docker environment may be different.
+
+4. An NGINX Plus subscription or Trial license will be required to complete the NGINX PLUS lab exercises. You can request a free 30-day Trial from [NGINX Plus Trial](https://www.nginx.com/free-trial-request/).  An email with download links to the license files will normally arrive within a few hours of submitting a request.
+
+### How to use the Lab Guides
+
+To ensure understanding of every step, every line which is to be entered by the user is preceded by `$>`. This is intentional so the user must type and enter each line, instead of bulk copy/paste. It is highly recommended that you type ALL the commands yourself, to facilitate better understanding and retention of this content.  (Insert Mavin typing memory retention study results here).
+
+## The Workshop environment
+
+1. This Workshop is built to only require the user's computer, no servers or VMs are needed.
+
+1. The user's computer, which will host all the Docker containers, and provide a Desktop UI for using various apps, like Chrome, Visual Studio Code, Postman, Terminal.
+
+1. `See Lab0, for details on installing the required software for your platform.`  You will likely need full administrative privleges to properly install and configure the software.
+
+1. As you progress thru the lab exercises, you will be adding more containers, and more features and options to NGINX.  **It is important that you complete the lab exercises in the order presented in this Workshop, so that you can see and learn how to configure NGINX properly, and complete all exercises successfully.**
+
+1. The docker containers used are as follows:
+- NGINX Opensource ADC/load balancer, named `nginx-oss,`
+- NGINX Plus ADC/load balancer, named `nginx-plus,`
+- Web servers #1, 2, and 3; named `web1`, `web2` and `web3` respectively.
+
+1. List and details of the containers:
+
+  * **NGINX OSS** `(Latest)` based on Alpine Linux. 
+  * **NGINX Plus** `(Latest)` based on Debian Linux. 
+  * **NGINX Web#** `(Latest)` is based on
+   [**nginxinc/ingress-demo**](https://hub.docker.com/r/nginxinc/ingress-demo).
+   NGINX web servers that serve simple HTML pages containing the Hostname, IP address
+   and port, request URI, local time, request id, and other metadata.
+ * **Lab Guide** can be read with a web browser starting at [LabGuide](https://github.com/nginxinc/nginx-basics-workshop/LabGuide.md).
+
+>NOTE:  All the container images are built on your computer, so they will be available `after` the Workshop, so you can use them for further learning, testing and as reference material. All the documentation and sample config files, including the Lab Guides, will also be available on NGINX's `GitHub` repo.  As you make changes to your config files, you will need to make copies or back them up yourself.
 
 ### Topology
 
-The base Docker Compose environment the lab is build on
+This is the workshop Docker Compose environment for the lab exercises:
+
+< Need Diagram here >
 
 ```
                                              (nginx-hello upstream: 
@@ -78,7 +144,7 @@ HTTPS/Port 443        |               |
 +-------------------->|               |       +-----------------+         
 NGINX Dashboard/      |               |       |                 |
 API                   |               +------>|                 |
-HTTP/Port 8080        |               |       |        *        |
+HTTP/Port 9000        |               |       |        *        |
                       |               |       |                 |
                       |               |       +-----------------+
                       +---------------+                                                                                    
@@ -95,6 +161,8 @@ HTTP/PORT 90                                  |                 |
 
 ## File Structure
 
+This is how the folders and files are laid out for these lab exercises, following NGINX guidelines and best practices.
+
 ```
 /
 ├── etc/
@@ -104,7 +172,7 @@ HTTP/PORT 90                                  |                 |
 │    │    │   ├── www2.example.com.conf.......HTTPS www2.example.com Virtual Server configuration
 │    │    │   ├── upstreams.conf..............Upstream configurations
 │    │    │   ├── stub_status.conf............NGINX Open Source basic status information available http://localhost/nginx_status only
-│    │    │   └── status_api.conf.............NGINX Plus Live Activity Monitoring available on port 8080 - [Source](https://gist.github.com/nginx-gists/│a51 341a11ff1cf4e94ac359b67f1c4ae)
+│    │    │   └── status_api.conf.............NGINX Plus Live Activity Monitoring available on port 9000 - [Source](https://gist.github.com/nginx-gists/│a51 341a11ff1cf4e94ac359b67f1c4ae)
 │    │    ├── includes
 │    │    │    ├── add_headers/ # Headers to attach to client response
 │    │    │    │   └── security.conf_ ........Recommended response headers for security
@@ -146,44 +214,18 @@ HTTP/PORT 90                                  |                 |
                └── state/ # The recommended path for storing state files on Linux distributions
 ```
 
-## Prerequisites:
+## Build and run the Workshop environment
 
-1. NGINX evaluation license file. You can get it from
-   [here](https://www.nginx.com/free-trial-request/)
-
-2. A Docker host. With [Docker](https://docs.docker.com/get-docker/) and
-   [Docker Compose](https://docs.docker.com/compose/install/)
-
-3. **Optional**: The demo uses hostnames: `www.example.com` and
-   `www2.example.com`. For hostname resolution you will need to add hostname
-   bindings to your hosts file:
-
-For example, on Linux/Unix/macOS the host file is `/etc/hosts`
-
-```bash
-# NGINX Plus demo system (local docker host)
-127.0.0.1 example.com www.example.com www2.example.com nginx-plus-1
-```
-
-> **Note:**
-> DNS resolution between containers is provided by default using a new 
-> bridged network by docker networking and NGINX has been preconfigured 
-> to use the Docker DNS server (127.0.0.11) to provide DNS resolution 
-> between NGINX and upstream servers
-
-## Build and run the demo environment
-
-Provided the Prerequisites have been met before running the stpes below, this is
+Provided the Prerequisites have been met before running the steps below, this is
 a **working** environment.
 
-### Build the demo
+### Build the Lab containers
 
-In this demo, we will have a one NGINX Plus ADC/load balancer (`nginx-plus`) and
-three NGINX OSS webserver (`web1`, `web2` and `web3`)
+As outlined above, you will have a one NGINX Plus ADC/load balancer (`nginx-plus`) and
+three NGINX OSS webservers (`web1`, `web2` and `web3`)
 
-Before we can start, we need to copy our NGINX Plus repo key and certificate
-(`nginx-repo.key` and `nginx-repo.crt`) into the directory,
-`nginx-plus/etc/ssl/nginx/`, then build our stack:
+Before you start the build, you need to copy your NGINX Plus repo key and certificate files
+(`nginx-repo.key` and `nginx-repo.crt`) into the proper directory,  `nginx-plus/etc/ssl/nginx/`.  Docker will use these files to download the appropriate NGINX Plus files, then build your stack:
 
 ```bash
 # Enter working directory
@@ -212,15 +254,14 @@ terminal:
 $> docker-compose up
 ```
 
-Or, if you made changes to any of the Docker containers or NGINX configurations,
-run:
+Or, if you made changes to any of the Docker containers or NGINX configurations, run:
 
 ```bash
 # Recreate containers and start demo
 $> docker-compose up --force-recreate
 ```
 
-**Confirm** the containers are running. You should see three containers running:
+**Confirm** all the containers are running. You should see three containers running:
 
 ```bash
 $> docker ps
@@ -243,71 +284,28 @@ The NGINX API is available on **HTTP / Port 8080**
 
 The lab guide is available on [http://localhost:9000](http://localhost:9000). 
 
-#### Upload to UDF
+<br/>
 
-This demo system can also be ported to UDF
+**This completes the Introduction.**
 
-1. Get the UDF Address (URL and Port) for the target NGINX Plus Load Balancer
-   Instance
+<br/>
 
-![UDF ssh info](docs/labs/intro/media/2020-06-25_15-29.png)
+## References:
 
-2. `scp` the NGINX Plus Load Balancer configurations: 
+- [NGINX Plus](https://docs.nginx.com/nginx/)
+- [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
+- [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
+- [NGINX Resources](ttps://www.nginx.com/resources/)
+- [NGINX Blogs](https://www.nginx.com/blog/)
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
 
-```bash
-# Enter working directory
-$> cd nginx-basics
-# Set variables
-USER=ubuntu
-HOST=bb56acb6-d774-4bed-b783-005a491b274b.access.udf.f5.com
-PORT=47000
-DATE_WITH_TIME=`date "+%Y%m%d-%H%M%S"`
-# Push local nginx plus config to remote server while making backup first
-$> ssh -p $PORT $USER@$HOST "sudo cp -r /etc/nginx /var/tmp/nginx-$DATE_WITH_TIME"
-$> ssh -p $PORT $USER@$HOST "sudo rm -rf /var/tmp/nginx-new"
-$> scp -r -P $PORT nginx-plus/etc/nginx $USER@$HOST:/var/tmp/nginx-new 
-$> ssh -p $PORT $USER@$HOST "sudo rsync -Prtv --exclude modules/ --delete /var/tmp/nginx-new/* /etc/nginx"
-$> ssh -p $PORT $USER@$HOST "sudo chown -R nginx:nginx /etc/nginx"
-```
+<br/>
 
-3. Get the UDF Address (URL and Port) for the target Web Server NGINX Instance
+### Authors
+- Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
+- Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
 
-![UDF ssh info](docs/labs/intro/media/2020-06-26_11-53.png)
+-------------
 
-4. `scp` the NGINX web server configuration: 
-
-```bash
-# Set variables
-$> USER=ubuntu
-$> HOST=bb56acb6-d774-4bed-b783-005a491b274b.access.udf.f5.com
-$> PORT=47001
-$> DATE_WITH_TIME=`date "+%Y%m%d-%H%M%S"`
-# Push local nginx web server config to remote server while making backup first
-$> ssh -p $PORT $USER@$HOST "sudo cp -r /etc/nginx /var/tmp/nginx-$DATE_WITH_TIME"
-$> ssh -p $PORT $USER@$HOST "sudo rm -rf /var/tmp/nginx-new"
-$> scp -r -P $PORT nginx-hello/etc/nginx $USER@$HOST:/var/tmp/nginx-new 
-# Copy Lab guide config
-$> scp -r -P $PORT docs/misc/lab_guide.conf $USER@$HOST:/var/tmp/nginx-new/conf.d 
-$> ssh -p $PORT $USER@$HOST "sudo rsync -Prtv --exclude modules/ --delete /var/tmp/nginx-new/* /etc/nginx"
-$> ssh -p $PORT $USER@$HOST "sudo chown -R nginx:nginx /etc/nginx"
-# Push local web to remote server while making backup first
-$> ssh -p $PORT $USER@$HOST "sudo cp -r /usr/share/nginx/html /var/tmp/nginx-html-$DATE_WITH_TIME"
-$> ssh -p $PORT $USER@$HOST "sudo rm -rf /var/tmp/nginx-new-html"
-$> scp -r -P $PORT nginx-hello/usr/share/nginx/html $USER@$HOST:/var/tmp/nginx-new-html 
-# Copy Lab guide
-$> scp -r -P $PORT docs/labs $USER@$HOST:/var/tmp/nginx-new-html 
-$> ssh -p $PORT $USER@$HOST "sudo rsync -Prtv --delete /var/tmp/nginx-new-html/* /usr/share/nginx/html"
-# Sync to other Web servers (if you have others configured with nginx-sync.sh)
-# Note: If there is a incorrect host in /root/.ssh/known_hosts, you may need to 
-# run the nginx-sync.sh command on the server, not remotely:
-$> ssh -p $PORT $USER@$HOST "sudo nginx-sync.sh"
-```
-
-Example `nginx-sync.conf` on the web server:
-
-```bash
-# nginx-sync.conf
-NODES="web2 web3"
-CONFPATHS="/etc/nginx /etc/ssl /usr/share/nginx/html"
-#EXCLUDE="default.conf"
-```
+Click the lab1/readme.md to get started ([LabX](../labX/readme.md) | [Main Menu](../LabGuide.md))

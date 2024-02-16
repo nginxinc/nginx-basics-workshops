@@ -1,0 +1,18 @@
+# NGINX OSS webserver with tools
+# NGINX Basics, Jan 2024
+# Chris Akker, Shouvik Dutta
+version: '3.3'
+services:
+  nginx-oss:                  # NGINX OSS Webserver
+    hostname: nginx-oss
+    container_name: nginx-oss
+    build: nginx-oss          # Build new container, using /nginx-oss/Dockerfile
+    volumes:
+        - ./nginx-oss/etc/nginx/conf.d/stub_status.conf:/etc/nginx/conf.d/stub_status.conf            # Copy this file to container
+        - ./nginx-oss/usr/share/nginx/html/.:/usr/share/nginx/html/.           # Copy these files to container
+    ports:
+        - 80:80       # Open for HTTP
+        - 443:443     # Open for HTTPS
+        - 9000:9000   # Open for stub status page
+    restart: always     
+     
