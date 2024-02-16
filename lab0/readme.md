@@ -1,70 +1,90 @@
-# Preparing your Computer for the NGINX Basics Workshop
+# Workshop pre-work
 
-## Introduction
+## Prep for your upcoming F5/NGINX workshop
 
-In order to complete the Lab exercises in this Workshop, your computer will need the following hardware, software, and access requirements.  If you are unable to meet these basic requirements, you will likely not be able to complete the Labs as written.  It is highly recommended that you have the minimum requirements.
+If you're here that probably means you are currently in, or registered for, an upcoming NGINX workshop. By taking the time to run through this exercise you are helping us save time during the workshop and ensure that you meet the prerequisites to access the workshop. We appreciate you taking time to check your access.
 
-## Learning Objectives 
+## Step 0: If this is your first time in a Workshop
 
-By the end of this Setup Lab0, you will be ready for the Workshop lab exercises: 
- * this
- * that
- * finally this
+Look for an email from **`courses@notify.udf.f5.com`**. This will have instructions on how you can login into UDF(F5 workshop environment).
+![Ultra Super Important Invite email](media/megasuperimportantemail.png)
 
-## Hardware Requirments
+### If you cannot find your invite email ("UDF Course Registration:NGINXperts Lab ...") STOP
 
-1. 8GB available RAM
-2. 50GB available disk space
-3. Optional - second monitor
-4. Optionan - ???
+- These commonly get caught by spam filters. *Make sure to check your spam folder **and** your system's email Quarantine.*
 
-## Software Requirements
+- If you still cannot find your invite email, you either have not been invited to a workshop or we have an incorrect email. Please get help from whoever sent you to this page.
 
-1. Docker Engine
-1. Docker Compose
-1. Chrome or other modern browser
-1. Visual Studio Code, or other test/code editor
+## Step 1: Get yourself to UDF
 
-## Administrative Requirements
+- Navigate to [https://udf.f5.com/](https://udf.f5.com/) and select `Invited Users`
+    ![Non F5](media/udfloginnonf5.png)
 
-1. Network connection to the Internet
-1. Admin access to install software, Copy and Edit local files
-1. Admin access to control Network Firewalls and VPN settings
-1. Admin access to configure local DNS
+- If this is your first time using UDF, use the `Sign Up` link which would take your to F5 registration page. 
+  
+  **NOTE:** this will *not be the password to the Jumphost or other VMs in the class!*
+    ![Sign up](media/F5signup.png)
 
-## Install Docker Engine
+- Once you have filled in your registration details, you should be receiving an `Account Activation` email as shown below
+  ![Account Activation Email](media/F5accountactivationemail.png)
 
-1. Mac
-1. Linux
-1. Windows
+- When you click on the `Activate Account` button within the activation email, you would be redirected to setup 2 factor authentication as shown below. Select your preferred authentication method.
+  ![2factor Authentication prompt](media/2factorAuthentication.png)
 
-## Install Docker Compose
+- Once you have set up 2 factor authentication successfully, you will see a `green` checkmark on your preferred method. Click on `Finish`.
+  ![2factor Confirmation](media/2factorConfirmation.png)
 
-1. Mac
-1. Linux
-1. Windows
+- If you already have an account but you can't remember your password, simply reset your password by clicking on `Forgot Password?` link.
+![Non F5](media/udfloginreset.png "happens to the best of us")
 
-## Optional - Install Visual Studio Code
+## Step 2: Start the course
 
-1. Mac
-1. Linux
-1. Windows
+- Once logged into UDF, click `Launch` (This will open a new tab.)
+  ![Non F5](media/courselist.png "click launch")
 
-**This completes this Lab.**
+- And then click on `Join`
+  ![Non F5](media/joinbutton.png "'Yes I'm sure'")
 
-<br/>
+- Click the `DEPLOYMENT` tab at the top
+![Non F5](media/almostthere.png "I'm up here")
 
-## References:
+## Step 3: RDP to the Jumpbox
 
-- [NGINX Plus](https://docs.nginx.com/nginx/)
-- [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
-- [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
-- [Docker](https://www.docker.com/)
-- [Docker Compose](https://docs.docker.com/compose/)
+- username: `ubuntu`
+- password: `Nginx123`
 
-<br/>
+THIS REQUIRES AN RDP CLIENT! If you have a Mac *and* haven't downloaded an RDP client before, here is the first-party version:
+
+[Microsoft's RDP client on the Apple Apps Store](https://apps.apple.com/us/app/microsoft-remote-desktop/id1295203466?mt=12)
+
+- Now we just have to wait for the Jumpbox to finish booting. . .
+![Non F5](media/waitforboot.png "loading. . .")
+
+- Make sure to select a small enough resolution to see the whole screen.
+![Non F5](media/launchrdp.png "almost there")
+
+- Once you select the resolution, your browser will download an rdp file. Open this file to connect to jumphost.
+
+- Accept the self-signed cert, and jumphost username and password will be `ubuntu` and `Nginx123`.
+  
+  (**NOTE:** This is *not* your UDF login username & password.)
+![Non F5](media/useruser.png)
+
+### If you can't connect to the Jumphost, _remember to shut off your VPN_, or join a non-proxied network (sometimes a guest network in the office will work).
+
+### For machines running Windows and attached to a domain, Windows will helpfully attempt to use your domain creds to log in, and you'll see:
+
+![Non F5](media/domaincreds.png "everyone has credentials.com email accounts right?")
+
+### Click "More choices" to enter both a username and a password
+
+![Non F5](media/domaincredsannotated.png "green arrows")
+
+That wraps the pre-requisites.
 
 ### Authors
+
+- Dominic Lucia - Solutions Engineer - Channels @ F5, Inc.
 - Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
 - Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
 
