@@ -6,7 +6,7 @@ In this lab, you will build a test lab environment using NGINX and Docker.  This
 
 NGINX OSS | Docker
 :-------------------------:|:-------------------------:
-![NGINX OSS](media/nginx-icon.png)  |![Docker](media/docker-icon2.png)
+![NGINX OSS](media/nginx-icon.png)  |![Docker](media/docker-icon.png)
   
 ## Learning Objectives 
 
@@ -15,7 +15,8 @@ By the end of the lab you will be able to:
  * Build your Workshop enviroment with Docker Compose
  * Run the NGINX OSS image
  * Verify initial container build and NGINX tests
- * Review the History and Architectrure of NGINX
+ * Create NGINX configuration for Load Balancing
+ * Add additonal NGINX parameters following Best Practices
 
 ## Pre-Requisites
 
@@ -24,7 +25,7 @@ By the end of the lab you will be able to:
 - See `Lab0` for instructions on setting up your system for this Workshop
 - Familiarity with basic Linux commands and commandline tools
 - Familiarity with basic Docker concepts and commands
-- Familiarity with basic HTTP protocol
+- Familiarity with basic HTTP and HTTPS protocol
 
 ## Build the Workshop Environment with Docker Compose
 
@@ -32,13 +33,25 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
 < diagram needed here >
 
-### Build and Run NGINX OSS with Docker
+### Configure the NGINX-OSS Docker build parameters
 
-1. Inspect the Dockerfile, located in the `/lab4/nginx-oss folder`.  Notice the `FROM` directive uses the `NGINX Alpine mainline` image, and also the `RUN apk add` command, which installs additional tool libraries in the image.  These tools are needed for copy/edit of files, and to run various tests while using the container in the exercises.  Note - you can choose a different NGINX base image if you like, but these lab exercises are written to use the Alpine image.
+1. Inspect the Dockerfile, located in the `/lab4/nginx-oss folder`.  Notice the `FROM` build parameter uses the `NGINX Alpine mainline` image, and also the `RUN apk add` command, which installs additional tool libraries in the image.  These tools are needed for copy/edit of files, and to run various tests while using the container in the exercises.  NOTE: you can choose a different NGINX base image if you like, but these lab exercises are written to use the Alpine image.
 
     ```bash
-    FROM nginx:mainline-alpine                                                     # use the Alpine base image
-    RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim   # Add common tools
+    FROM nginx:mainline-alpine
+    RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim
+
+    # Copy certificate files and dhparams
+    COPY etc/ssl /etc/ssl
+
+    # Copy nginx config files
+    COPY /etc/nginx /etc/nginx
+    RUN chown -R nginx:nginx /etc/nginx
+
+    # EXPOSE ports, HTTP 80, HTTPS 443, Nginx stub_status page 9000
+    EXPOSE 80 443 9000
+    STOPSIGNAL SIGTERM
+    CMD ["nginx", "-g", "daemon off;"]
 
     ```
 
@@ -53,10 +66,6 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
             - web1:web1
             - web2:web2
             - web3:web3
-        volumes:
-            - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d        # Copy these folders to container
-            - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
-            - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
         ports:
             - 80:80       # Open for HTTP
             - 443:443     # Open for HTTPS
@@ -65,7 +74,7 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
     ```
 
-    Also notice in the `docker-compose.yml` you are running three Docker NGINX webserver containers, using an image from Docker Hub.  These will be your upstream, backend webservers for the exercises.
+    Also notice in the `docker-compose.yml` you are running three Docker NGINX webserver containers, using an image from Docker Hub.  These will be your upstreams, backend webservers for the exercises.
 
     ```bash
     ...
@@ -99,38 +108,315 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
     ```bash
     #Sample output
-
-    CONTAINER ID   IMAGE                   COMMAND                  CREATED          STATUS          PORTS                                                              NAMES
-    28df738bd4bb   nginx-oss          "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:9000->9000/tcp   lab1-nginx-oss-1
-    49c0ffe31abf   nginxinc/ingress-demo   "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   0.0.0.0:56906->80/tcp, 0.0.0.0:56907->443/tcp                      lab1-web1-1
-    f600f082cae3   nginxinc/ingress-demo   "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   0.0.0.0:56902->80/tcp, 0.0.0.0:56903->443/tcp                      lab1-web3-1
-    642129dd20fc   nginxinc/ingress-demo   "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   443/tcp, 0.0.0.0:56905->80/tcp, 0.0.0.0:56904->433/tcp             lab1-web2-1
+    CONTAINER ID   IMAGE                   COMMAND                  CREATED       STATUS       PORTS                                                              NAMES
+    6ede3846edc3   lab4-nginx-oss          "/docker-entrypoint.…"   3 hours ago   Up 3 hours   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:9000->9000/tcp   nginx-oss
+    e4887e475a14   nginxinc/ingress-demo   "/docker-entrypoint.…"   3 hours ago   Up 3 hours   0.0.0.0:56086->80/tcp, 0.0.0.0:56087->443/tcp                      web1
+    a0a5b33bcf68   nginxinc/ingress-demo   "/docker-entrypoint.…"   3 hours ago   Up 3 hours   443/tcp, 0.0.0.0:56084->80/tcp, 0.0.0.0:56085->433/tcp             web2
+    51dec7d94c6f   nginxinc/ingress-demo   "/docker-entrypoint.…"   3 hours ago   Up 3 hours   0.0.0.0:56082->80/tcp, 0.0.0.0:56081->443/tcp                      web3
 
     ```
 
-    >> < **ISSUE - we don't have a default.conf, so the Nginx Welcome page is missing on nginx-oss image**  Or do we test the nginx-oss image with Welcome first, then add the backends and test a second time in Proxy mode ? >
-
-
-1. Test the NGINX load balancing to the containers for the default webpage, run this command at least 3 times:
+1. Verify `each` of your three web backend servers are working.  Using a Terminal, Docker exec into each one, and verify you get a response to a curl request.  The `Name` should be `web1`, `web2`, and `web3` respectively for each container.
 
     ```bash
-    curl -is http://localhost |grep Server
+    docker exec -it web1 bin/sh   # log into web1 container
+
+    ```
+   
+    ```bash
+    curl -s http://localhost |grep Name
+
+    ```
+
+    ```bash
+    #Sample outputs
+
+    <p class="smaller"><span>Server Name:</span> <span>web1</span></p>   # web1
+
+    <p class="smaller"><span>Server Name:</span> <span>web2</span></p>   # web2
+
+    <p class="smaller"><span>Server Name:</span> <span>web3</span></p>   # web3
+
+    ```
+    Check all three, just to be sure.  Exit the Docker Exec when you are finished.
+
+1. Test the NGINX OSS container, verify it also sends back a response to a curl request:
+
+    ```bash
+    docker exec -it nginx-oss bin/sh   # log into nginx-oss container
+
+    ```
+   
+    ```bash
+    curl http://localhost
+
+    ```
+
+    ```bash
+    #Sample outputs
+   <!DOCTYPE html>
+    <html>
+    <head>
+    <title>Welcome to nginx!</title>
+    <style>
+    html { color-scheme: light dark; }
+    body { width: 35em; margin: 0 auto;
+    font-family: Tahoma, Verdana, Arial, sans-serif; }
+    </style>
+    </head>
+    <body>
+    <h1>Welcome to nginx!</h1>
+    <p>If you see this page, the nginx web server is successfully installed and
+    working. Further configuration is required.</p>
+
+    <p>For online documentation and support please refer to
+    <a href="http://nginx.org/">nginx.org</a>.<br/>
+    Commercial support is available at
+    <a href="http://nginx.com/">nginx.com</a>.</p>
+
+    <p><em>Thank you for using nginx.</em></p>
+    </body>
+    </html>
+
+    ```
+    Congrats - you should see the `Welcome to nginx!` page.
+
+1. NGINX also includes a status page, which shows some basic metrics about the traffic going through NGINX, such as:
+    - Active Connections
+    - Connections Accepted, Handled
+    - Total number of Requests
+    - Reading, writing, and waiting counters.
+ 
+    These are helpful when looking at if/how NGINX is handling traffic.
+    
+    Inspect the `stub_status.conf` file located in the `/etc/nginx/conf.d` folder.  You will see that it is listening on port 9000, and using the URL of `/basic_status`.  This has been provided for you to monitor your traffic, there is a link in the References section with more information on the `stub_status module`.
+
+    ```nginx
+    # ngx_http_stub_status_module (available in NGINX OSS)
+    # provides Basic Status information
+
+    server {
+        listen 9000;              # Listener for Stub Status
+        
+        location /basic_status {
+            stub_status;
+        }
+
+        # Redirect requests for "/" to "/basic_status"
+    location / {
+        return 301 /basic_status;
+        }
+
+    }
+
+    ```
+
+    Give that a try, test access to the NGINX `stub_status` page, on port 9000: 
+
+    ```bash
+    curl http://localhost:9000/basic_status
+
+    ```
+
+    ```bash
+    #Sample output
+    Active connections: 1
+    server accepts handled requests
+    56 56 136
+    Reading: 0 Writing: 1 Waiting: 0
+
+    ```
+
+    Try it in a browser at http://localhost:9000/basic_status 
+
+    It should looks similar to this:
+    
+    ![NGINX Status](media/lab4_nginx-status.png)
+
+1. Now that you know all 4 containers are working with the NGINX Welcome page, and the stub_status page, you can build and test the **NGINX OSS Proxy and Load Balancing** functions.
+
+    - Using your previous lab exercise experience, you will configure a new NGINX configuration for the `cafe.example.com` website.  It will be very similar to `cars.example.com` from lab3.  
+    
+    - This will require a new NGINX config file, for the Server and Location Blocks.
+    
+1. In the /`etc/nginx/conf.d folder`, create a new file named `cafe.example.com.conf`, which will be the config file for the Server and Location blocks for this new website.  
+
+    However, instead of a Location block that points to a folder with html files on disk, you will tell NGINX to proxy the request to one of your web containers instead.  
+
+    >This will show you how to unlock the power of NGINX...`it can serve it's own content, or content from another web server!`
+
+    ```bash
+    docker exec -it nginx-oss bin/sh   # log into nginx-oss container
+
+    ```
+
+    ```bash
+    $ cd /etc/nginx/conf.d
+    $ vi cafe.example.com.conf
+
+    ```
+
+    ```nginx
+    # cafe.example.com HTTP
+    # NGINX Basics Workshop
+    # Feb 2024, Chris Akker, Shouvik Dutta
+    #
+    server {
+        
+        listen 80;      # Listening on port 80 on all IP addresses on this machine
+
+        server_name cafe.example.com;   # Set hostname to match in request
+
+        access_log  /var/log/nginx/cafe.example.com.log main; 
+        error_log   /var/log/nginx/cafe.example.com_error.log notice;
+
+        root /usr/share/nginx/html;         # Set the root folder for the HTML and JPG files
+
+        location / {
+            
+        # New NGINX Directive, "proxy_pass", tells NGINX to proxy traffic to another server.
+            
+            proxy_pass http://web1;        
+        }
+
+    } 
+    
+    ```
+    
+    Save the file.
+
+    Test and Reload your NGINX config.
+
+1.  Test if your Proxy configuration is working, using curl several times, and your browser.
+
+    ```bash
+    curl -s http://cafe.example.com |grep Server
 
     ```
 
     ```bash
     #Sample output
 
-      Server: nginx/1.25.3
-      <p class="smaller"><span>Server Name:</span> <span>web1</span></p>
+      Server: nginx/1.25.4
+      <p class="smaller"><span>Server Name:</span> <span>web1</span></p>   # web1
       <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.4:80</font></span></p>
 
-      Server: nginx/1.25.3
-      <p class="smaller"><span>Server Name:</span> <span>web2</span></p>
+      Server: nginx/1.25.4
+      <p class="smaller"><span>Server Name:</span> <span>web1</span></p>   # web1
+      <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.4:80</font></span></p>
+
+      Server: nginx/1.25.4
+      <p class="smaller"><span>Server Name:</span> <span>web1</span></p>   # web1
+      <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.4:80</font></span></p>
+
+    ```
+
+    Likewise, your browser refreshes should show you the "Out of stock" graphic and webpage for web1.  If you like, change the `proxy_pass` to `web2` or `web3`, and see what happens.
+
+    >This is called a `Direct proxy_pass`, where you are telling NGINX to Proxy the request to another server.  You can also use a FQDN name, or an IP:port with proxy_pass.
+
+<br/>
+
+### NGINX Load Balancing
+
+You see the Proxy_pass working for one backend webserver, but what about the other 2?  Do you need high availability, and increased capacity for your website? Of course, you want to use multiple backends for this, and load balance them.  
+
+You will now configure the `NGINX Upstream Block`, which is a `list of backend servers` that can be used by NGINX Proxy for load balancing requests.
+
+1. Using Terminal, Docker Exec into the nginx-oss container.  Change to the `/etc/nginx/conf.d` folder, where http config files are kept. Create a new file named `upstreams.conf`, which will be the config file for the three backends, web1, 2, and 3.
+
+    ```bash
+    docker exec -it nginx-oss bin/sh   # log into nginx-oss container
+
+    ```
+
+    ```bash
+    $ cd /etc/nginx/conf.d
+    $ vi upstreams.conf
+
+    ```
+
+    Place the three backend containers in an "upstream block" as shown:
+
+    ```nginx
+    # NGINX Basics, OSS Proxy to three upstream NGINX containers
+    # Chris Akker, Shouvik Dutta - Feb 2024
+    #
+    # nginx_cafe servers
+
+    upstream nginx_cafe {         # Upstream block, the name is "nginx_cafe"
+
+        server web1:80;           # These are the containers from your Docker Compose
+        server web2:80;
+        server web3:80;
+
+    }
+
+    ```
+    Save the file.
+
+1. Modify the `proxy_pass` directive in cafe.example.com.conf, to proxy the requests to the `upstream block called nginx_cafe`.
+
+    ```bash
+    $ cd /etc/nginx/conf.d
+    $ vi cafe.example.com.conf
+
+    ```
+
+    ```nginx
+    # cafe.example.com HTTP
+    # NGINX Basics Workshop
+    # Feb 2024, Chris Akker, Shouvik Dutta
+    #
+    server {
+        
+        listen 80;      # Listening on port 80 on all IP addresses on this machine
+
+        server_name cafe.example.com;   # Set hostname to match in request
+
+        access_log  /var/log/nginx/cafe.example.com.log main; 
+        error_log   /var/log/nginx/cafe.example.com_error.log notice;
+
+        root /usr/share/nginx/html;         # Set the root folder for the HTML and JPG files
+
+        location / {
+            
+        # Change the "proxy_pass" directive, tell NGINX to proxy traffic to the upstream block.  If there is more than one server, they will be load balanced
+            
+            proxy_pass http://nginx_cafe;        # Must match the upstream block name
+        }
+
+    } 
+    
+    ```
+
+    Save the file. Test and Reload your NGINX config.
+
+1. Verify that it is load balancing to `all three containers`, run this command at least 3 times:
+
+    ```bash
+    docker exec -it nginx-oss bin/sh   # log into nginx-oss container
+
+    ```
+    
+    ```bash
+    curl -is http://cafe.example.com |grep Server
+
+    ```
+
+    ```bash
+    #Sample output
+
+      Server: nginx/1.25.4
+      <p class="smaller"><span>Server Name:</span> <span>web1</span></p>   # web1
+      <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.4:80</font></span></p>
+
+      Server: nginx/1.25.4
+      <p class="smaller"><span>Server Name:</span> <span>web2</span></p>   # web2
       <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.3:80</font></span></p>
 
-      Server: nginx/1.25.3
-      <p class="smaller"><span>Server Name:</span> <span>web3</span></p>
+      Server: nginx/1.25.4
+      <p class="smaller"><span>Server Name:</span> <span>web3</span></p>   # web3
       <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.2:80</font></span></p>
 
     ```
@@ -139,200 +425,25 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
 1. Test again, this time using a browser, click `Refresh` at least 3 times:
 
-    Launch your browser, go to http://localhost
+    Using your browser, go to http://cafe.example.com
 
-    You should see the Welcome to nginx page, or the `Out of Stock` web page.
-
-    < new screenshot needed here >
-    
-    ![NGINX Welcome](media/lab4_nginx-welcome.png)
-
-    or
+    You should see the `Out of Stock` web page, note the `Server Name` and `Server Addresses`.
 
     NGINX Web1 | NGINX Web2 | NGINX Web3 
     :-------------------------:|:-------------------------:|:-------------------------:
-    ![NGINX Web1](media/lab4_nginx-web1.png)  |![NGINX Web2](media/lab4_nginx-web2.png) |![NGINX Web3](media/lab4_nginx-web3.png) 
+    ![NGINX Web1](media/lab4_nginx-web1.png)  |![NGINX Web2](media/lab4_nginx-web2.png) |![NGINX Web3](media/lab4_nginx-web3.png)
 
-1. Test access to the `NGINX stub status` page.  This page provides basic metrics for NGINX TCP connections and HTTP requests.
+>This is called an `Upstream proxy_pass`, where you are telling NGINX to Proxy the request to a list of servers in the upstream, and load balance them.  You can also use a FQDN name, or an IP:port with proxy_pass.
 
-    ```bash
-    curl http://localhost:9000/basic_status
+<br/>
+   
+1. NGINX Headers
 
-    ```
 
-    ```bash
-    #Sample Output
+1. NGINX Persistence / Affinity
 
-    Active connections: 1
-    server accepts handled requests
-    23 23 37
-    Reading: 0 Writing: 1 Waiting: 0
 
-    ```
-
-    Try it in a browser, copy/paste the previous URL:
-    
-    ![NGINX Status](media/lab4_nginx-status.png)
-
-1. NGINX under the Hood.  Log into the NGINX-OSS container with Docker Exec:
-
-    ```bash
-    docker exec -it <nginx-oss CONTAINER ID> /bin/bash
-
-    ```
-
-1. Run some commands inside the NGINX-OSS Container:
-
-    ```bash
-    # Look around the nginx folders
-    ls -l /etc/nginx
-
-    ls -l /etc/nginx/.conf
-
-    # Check for nginx packages installed
-    apk info -vv |grep nginx
-
-    # What nginx processes are running?
-    ps aux |grep nginx
-
-    # Check Linux TOP for resource usage
-    top -n 1
-
-    # Which TCP Ports are being used by NGINX ?
-    netstat -alpn
-
-    ```
-
-    ```bash
-    #Sample outputs
-
-    #apk
-
-    nginx-1.25.3-r1 - High performance web server
-    nginx-module-geoip-1.25.3-r1 - nginx GeoIP dynamic modules
-    nginx-module-image-filter-1.25.3-r1 - nginx image filter dynamic module
-    nginx-module-njs-1.25.3.0.8.2-r1 - nginx njs dynamic modules
-    nginx-module-xslt-1.25.3-r1 - nginx xslt dynamic module
-
-    #ps
-
-    1 root      0:00 nginx: master process nginx -g daemon off;
-    6 nginx     0:00 nginx: worker process
-    13 root      0:00 grep nginx
-
-    #top
-
-    Mem: 808920K used, 205464K free, 3396K shrd, 53072K buff, 513860K cached
-    CPU:   0% usr   0% sys   0% nic 100% idle   0% io   0% irq   0% sirq
-    Load average: 0.00 0.00 0.00 2/187 30
-    PID  PPID USER     STAT   VSZ %VSZ CPU %CPU COMMAND
-    23     1 nginx    S     6460   1%   0   0% nginx: worker process
-    1     0 root     S     6104   1%   0   0% nginx: master process nginx -g daemon off;
-    7     0 root     S     2308   0%   0   0% /bin/bash
-    30     7 root     R     1528   0%   0   0% top -n 1
-
-    #netstat
-
-    Active Internet connections (servers and established)
-    Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
-    tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      1/nginx: master pro
-    tcp        0      0 0.0.0.0:9000            0.0.0.0:*               LISTEN      1/nginx: master pro
-    tcp        0      0 127.0.0.11:43055        0.0.0.0:*               LISTEN      -
-    udp        0      0 127.0.0.11:44125        0.0.0.0:*                           -
-    Active UNIX domain sockets (servers and established)
-    Proto RefCnt Flags       Type       State         I-Node PID/Program name    Path
-    unix  3      [ ]         STREAM     CONNECTED     188317 1/nginx: master pro 
-    unix  3      [ ]         STREAM     CONNECTED     188318 1/nginx: master pro
-
-    ```
-
-    - Ask NGINX for help, (with NGINX, not dancing)
-
-    ```bash
-    /usr/sbin/nginx -h
-
-    ```
-    ```bash
-    #Sample output
-    nginx version: nginx/1.25.3
-    Usage: nginx [-?hvVtTq] [-s signal] [-c filename] [-p prefix] [-g directives]
-
-    Options:
-    -?,-h         : this help
-    -v            : show version and exit
-    -V            : show version and configure options then exit
-    -t            : test configuration and exit
-    -T            : test configuration, dump it and exit
-    -q            : suppress non-error messages during configuration testing
-    -s signal     : send signal to a master process: stop, quit, reopen, reload
-    -p prefix     : set prefix path (default: /etc/nginx/)
-    -e filename   : set error log file (default: /var/log/nginx/error.log)
-    -c filename   : set configuration file (default: /etc/nginx/nginx.conf)
-    -g directives : set global directives out of configuration file
-
-    ```
-
-    - Verify what version of NGINX is running
-
-    ```bash
-    /usr/sbin/nginx -V
-
-    ```
-
-    ```bash
-    #Sample output
-    nginx version: nginx/1.25.3
-    built by gcc 12.2.1 20220924 (Alpine 12.2.1_git20220924-r10) 
-    built with OpenSSL 3.1.3 19 Sep 2023 (running with OpenSSL 3.1.4 24 Oct 2023)
-    TLS SNI support enabled
-    configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-http_v3_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-cc-opt='-Os -Wformat -Werror=format-security -g' --with-ld-opt='-Wl,--as-needed,-O1,--sort-common -Wl,-z,pack-relative-relocs'
-
-    ```
-
-1. Test the current NGINX configuration
-
-    ```bash
-    /usr/sbin/nginx -t
-
-    ```
-
-    ```bash
-    #Sample output
-    nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
-    nginx: configuration file /etc/nginx/nginx.conf test is successful
-
-    ```
-
-1. Dump the entire NGINX configuration, includes all files.
-
-    ```bash
-    more /usr/sbin/nginx -T
-
-    ```
-
-1. When you are done looking around, Exit the container.
-
-    ```bash
-    exit
-
-    ```
-
-1. Check the logs for the NGINX-OSS container.
-
-    ```bash
-    docker logs <CONTAINER ID>
-
-    ```
-
-    ```bash
-    #Sample output
-    172.17.0.1 - - [18/Jun/2019:18:41:32 +0000] "GET / HTTP/1.1" 200 612 "-" "curl/7.47.0" "-"
-    172.17.0.1 - - [18/Jun/2019:18:41:45 +0000] "HEAD / HTTP/1.1" 200 0 "-" "curl/7.47.0" "-"
-    35.240.46.11 - - [18/Jun/2019:18:46:13 +0000] "GET / HTTP/1.1" 200 612 "-" "Mozilla/5.0 zgrab/0.x" "-"
-    127.0.0.1 - - [18/Jun/2019:19:07:12 +0000] "GET / HTTP/1.1" 200 612 "-" "curl/7.64.0" "-"
-    127.0.0.1 - - [18/Jun/2019:19:07:16 +0000] "HEAD / HTTP/1.1" 200 0 "-" "curl/7.64.0" "-"
-
-    ```
+<br/>
 
 >**Congratulations, you are now a member of Team NGINX !**
 
@@ -345,6 +456,7 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 ## References:
 
 - [NGINX OSS](https://nginx.org/en/docs/)
+- [NGINX Status Module](http://nginx.org/en/docs/http/ngx_http_stub_status_module.html)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
 - [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
 - [Docker](https://www.docker.com/)
