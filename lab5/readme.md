@@ -664,7 +664,7 @@ In this section, you will manage your backend servers dynamically using NGINX Pl
     }' | jq
     ```
 
-1. If you check your NGINX Plus Dashboard, you will notice the `web3` server is not taking any active traffic.
+1. If you check your NGINX Plus Dashboard, you will notice the `web3` server has turned `grey` and also is marked as `down`. You will also notice that it is not taking any active traffic.
    ![disabled web3](media/dashboard_disabled_web3.png)
   
 1. You are notified that the `web3` server has been patched and the maintenance has finished. It can now be added back to the load balancer to serve client traffic. You will now set `web3` server as `down=false` which would inform the NGINX master process to again resume sending traffic to that server. Within postman, open `Enable web3 server` request and execute the call by clicking on `Send` button.
@@ -679,12 +679,12 @@ In this section, you will manage your backend servers dynamically using NGINX Pl
     }' | jq
     ```
 
-1. If you check your NGINX Plus Dashboard, you will notice the `web3` server is now again taking equal amount of active traffic.
+1. If you check your NGINX Plus Dashboard, you will notice the `web3` server has turned back `green` and is also marked as `up`. You will also notice that it is now again taking equal amount of active traffic.
    ![disabled web3](media/dashboard_enabled_web3.png)
 
 ## NGINX Live Activity Monitoring JSON feed
 
-In this section, you will make use of NGINX Plus API to get current statistics returned in a JSON-formatted document. You can request complete statistics at `/api/[api-version]/`, where `[api-version]` is the version number of the NGINX Plus API. This API is extremely useful if you would like to pull NGINX statistics into a central monitoring tool of your choice
+In this section, you will make use of NGINX Plus API to get current statistics returned in a JSON-formatted document. You can request complete statistics at `/api/[api-version]/`, where `[api-version]` is the version number of the NGINX Plus API. This API is extremely useful, as it contains all NGINX Plus metrics(over 240 metrics), which you can pull into a central monitoring tool of your choice. You will do this in future lab exercise.
 
 1. Open `Postman` tool and look into the `NGINX_Basics` collection.
 
