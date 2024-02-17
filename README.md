@@ -174,7 +174,7 @@ $> docker-compose build --no-cache
 
 #### Start the Demo stack
 
-Run `docker-compose` in the foreground so we can see real-time log output to the
+Run `docker-compose` in the foreground so you can see real-time log output to the
 terminal:
 
 ```bash
@@ -204,7 +204,7 @@ For NGINX Plus related labs(lab5 onwards), you can access the NGINX API on **HTT
 - [NGINX Plus](https://docs.nginx.com/nginx/)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
 - [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
-- [NGINX Resources](ttps://www.nginx.com/resources/)
+- [NGINX Resources](https://www.nginx.com/resources/)
 - [NGINX Blogs](https://www.nginx.com/blog/)
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
