@@ -26,9 +26,11 @@ By the end of this Workshop, you will have a working, operational NGINX OSS or P
 
 ## Lab Outline
 
-#### Lab 0: Workshop pre-work
+#### Lab 0: Workshop pre-work (Choose any one)
 
-- [Lab 0: Workshop pre-work](lab0/readme.md)
+- [Lab 0: Workshop pre-work using F5 provided environment](lab0/readme.md)
+  
+- [Lab 0: Workshop pre-work using your own system](lab0/prerequisites.md)
 
 #### Lab 1: Build and Run NGINX Opensource on Docker
 
