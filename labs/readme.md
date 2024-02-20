@@ -56,12 +56,6 @@ By the end of this Workshop, you will have a working, operational NGINX OSS or P
 
 - [Lab 6: Intro to NGINX Plus Caching](lab6/readme.md)
 
-#### Lab 7: Scaling up/down the Cafe Application
-- [Lab 7: Scaling Cafe Ingress](lab7/readme.md)
-
-#### Lab 8: Monitoring KIC with Prometheus and Grafana
-- [Lab 8: Prometheus and Grafana](lab8/readme.md)
-
 <br/>
 
 Click [Lab1: Build and Run NGINX Opensource on Docker](lab1/readme.md) to get started!
