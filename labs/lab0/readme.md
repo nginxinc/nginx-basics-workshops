@@ -57,7 +57,7 @@ THIS REQUIRES AN RDP CLIENT! If you have a Mac *and* haven't downloaded an RDP c
 
 [Microsoft's RDP client on the Apple Apps Store](https://apps.apple.com/us/app/microsoft-remote-desktop/id1295203466?mt=12)
 
-- Now we just have to wait for the Jumpbox to finish booting. . .
+- Now you just have to wait for the Ubuntu Desktop to finish booting. . .
 ![Non F5](media/waitforboot.png "loading. . .")
 
 - Make sure to select a small enough resolution to see the whole screen.
