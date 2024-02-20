@@ -68,11 +68,14 @@ THIS REQUIRES AN RDP CLIENT! If you have a Mac *and* haven't downloaded an RDP c
 - Accept the self-signed cert, and jumphost username and password will be `ubuntu` and `Nginx123`.
   
   (**NOTE:** This is *not* your UDF login username & password.)
-![Non F5](media/useruser.png)
 
-### If you can't connect to the Jumphost, _remember to shut off your VPN_, or join a non-proxied network (sometimes a guest network in the office will work).
+  ![Non F5](media/useruser.png)
 
-### For machines running Windows and attached to a domain, Windows will helpfully attempt to use your domain creds to log in, and you'll see:
+-------------
+> **If you can't connect to the Jumphost, *remember to shut off your VPN*, or join a non-proxied network (sometimes a guest network in the office will work)**
+-------------
+
+**For machines running Windows and attached to a domain, Windows will helpfully attempt to use your domain creds to log in, and you'll see:**
 
 ![Non F5](media/domaincreds.png "everyone has credentials.com email accounts right?")
 
