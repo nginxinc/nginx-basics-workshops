@@ -215,11 +215,13 @@ It is important to understand the details about what NGINX does, when you change
 
 - The `nginx -s reload` command sends a SIGHUP signal to the Linux Kernel.
 - Example looks like this, from the `nginx error.log`:
-- - 2024/01/31 22:26:13 [notice] 1#1: signal 1 (SIGHUP) received from 155, reconfiguring
-- - 2024/01/31 22:26:13 [notice] 1#1: reconfiguring
+
+  - 2024/01/31 22:26:13 [notice] 1#1: signal 1 (SIGHUP) received from 155, reconfiguring
+  
+  - 2024/01/31 22:26:13 [notice] 1#1: reconfiguring
 - The master process reads all the config files, and validates the syntax, configuration commands, variables, and many other dependencies.  It also validates that any dependent Linux system level objects are correct, like folder/file names and paths, file permissions, networking objects like IP addresses, sockets, etc.  If there are any errors, it prints out a `Configuration File /etc/nginx/nginx.conf Test Failed` error with the configuration filename and the line number where the error exists, and some helpful information, like "path /cahce not found" (you have a typo: /cahce should be spelled /cache).  The validation STOPS on the first error encountered.  So you must address the error, and run `nginx -t` again to further check for errors, until you get two successful test messages, like this:
-- - nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
-- - nginx: configuration file /etc/nginx/nginx.conf test is successful
+  - nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+  - nginx: configuration file /etc/nginx/nginx.conf test is successful
 - Once the master process configuration validation is successful, then NGINX will do the following:
 1. With NGINX OSS, new Workers are created, and the old Worker processes are immediately shutdown, along with all existing TCP connections.  After the master process spawns new Worker processes, and they begin handling new connections and traffic based on the new configuration.  Any traffic in flight is usually dropped.
 2. With NGINX Plus, new Worker processes are created, and begin using the new configuration immediately for all new connections and requests.  The old Workers are allowed to complete their previous task, and then close their TCP connections naturally, traffic in flight is not dropped!  The master process terminates the old Workers after they finish their work and close all their connections.  This is called Dynamic Reconfiguration in NGINX Plus documentation.
