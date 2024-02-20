@@ -696,11 +696,11 @@ However, this means a new TCP connection for every request, and is quite ineffic
 
 <br/>
 
-### NGINX Request Custom Headers
+### NGINX Custom Request Headers
 
 <br/>
 
-Now you need to enable some HTTP Headers, to be added to the Request.  These are often required, to relay critical information between the HTTP client and the backend server. These Headers are in addition to the HTTP Protocol control headers.
+Now you need to enable some HTTP Headers, to be added to the Request.  These are often need to relay information between the HTTP client and the backend server. These Headers are in addition to the HTTP Protocol control headers.
 
 1. Inspect the `proxy_headers.conf` in the `/etc/nginx/includes` folder.  You will see that some custom HTTP Headers are being added.
 
@@ -718,9 +718,6 @@ Now you need to enable some HTTP Headers, to be added to the Request.  These are
 
     # request scheme, “http” or “https”
     proxy_set_header X-Forwarded-Proto $scheme;
-
-    # Adding a Testing Variable for Nginx-Basics Lab Exercise
-    proxy_set_header X-NGINX-Basics "Lab 4";
 
     ```
 
@@ -754,7 +751,7 @@ Now you need to enable some HTTP Headers, to be added to the Request.  These are
 
             include includes/proxy_headers.conf; # Add Request Headers
 
-            include includes/keepalive.conf;     # Use HTTP/1.1 keepalives
+            include includes/keepalive.conf;     # Use HTTP/1.1 and keep-alives
             
             # proxy_pass http://web1;            # Proxy to another server
             proxy_pass http://nginx_cafe;        # Proxy AND load balance to a list of servers
@@ -763,11 +760,248 @@ Now you need to enable some HTTP Headers, to be added to the Request.  These are
     } 
     ```
 
+<br/>
+
+### NGINX Load Balancing Algorithms and Load Testing
+
+Different backend applications may benefit from using different load balancing techniques.  NGINX support both legacy and more modern algorithms for different use cases.  You will configure and test several of these algorithms, put them under a Loadtest, and observe the results.  Then you will add/change some Directives to improve performance, and Loadtest again and see if it made any difference.
+
+1. NGINX's default Load Balancing algorithm is round-robin.  In this next lab exercise, you will use the `least connections` algorithm to send more traffic to different backends based on their active TCP connection counts.  You will modify your `upstreams.conf` file to enable Least Connections, as follows:
+
+    ```nginx
+
+    ...snip
+
+        # Uncomment for Least Connections algorithm
+        least_conn;
+        
+        # Docker-compose:
+        server web1:80;
+        server web2:80;
+        server web3:80;
+
+    ```
+
+    Save your file.  Test and Reload your NGINX config.
+
+1. If you open the NGINX Basic Status page at http://localhost:9000/basic_status, and refresh it every 3-4 seconds while you run the `WRK HTTP loadtest` at your nginx-oss Load Balancer:  
+
+    Loadtesting with WRK.  This is a docker container that will download and run, with 4 threads, at 200 connections, for 5 minutes:
+
+    ```bash
+    docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d5m -H 'Host: cafe.example.com' --timeout 2s http://nginx-oss/coffee
+
+    ```
+
+    In the `basic_status` page, you should notice about 200 Active Connections, and the number of `server requests` should be increasing rapidly.  Unfortunately, there is no easy way to monitor the number of TCP connections to Upstreams when using NGINX Opensource.  But good news, you `will` see all the Upstream metrics in the next lab with NGINX Plus!
+
+    After the 5 minute WRK loadtest has finished, you should see a Summary of the statistics.  It should look similar to this:
+
+    ```bash
+    #Sample output
+    Running 5m test @ http://nginx-oss/coffee
+    4 threads and 200 connections
+    Thread Stats   Avg      Stdev     Max   +/- Stdev
+        Latency    51.99ms   25.29ms   1.60s    99.19%
+        Req/Sec     0.98k    86.96     2.95k    86.86%
+    1170593 requests in 5.00m, 1.82GB read
+    Requests/sec:   3900.71                            # Good performance ?
+    Transfer/sec:      6.21MB
+
+    ```
+
+    Well, that performance looks pretty good, about 3900 HTTP Reqs/second.  But NGINX can do better.  You will enable TCP keepalives to the Upstreams.  This Directive will tell NGINX to create a `pool of TCP connections to each Upstream`, and use that established connection pool to rapid-fire HTTP requests to the backends.  `No delays waiting for the TCP handshakes!`  It is considered a Best Practice to enable keepalives to the Upstream servers.
+
+1. Edit the `upstreams.conf` file, and remove the Comment from the `# keepalives 16` line.
+
+    ```nginx
+    upstream nginx_cafe {
+
+        # Load Balancing Algorithms supported by NGINX
+        # - Round Robin (Default if nothing specified)
+        # - Least Connections
+        # - IP Hash
+        # - Hash (Any generic Hash)     
+
+        
+        # Uncomment for Least Connections algorithm
+        least_conn;
+
+        # Docker-compose:
+        server web1:80;
+        server web2:80;
+        server web3:80;
+                            
+        # Uncomment for IP Hash persistence
+        # ip_hash;
+
+        # Uncomment for keepalive TCP connections to upstreams
+        keepalive 16;
+
+    }
+
+    ```
+
+    Save your file.  Test and Reload your NGINX config.
+
+    Run the WRK test again.  You should now have `least_conn` and `keepalive` both **enabled**.
+
+    After the 5 minute WRK test has finished, you should see a Summary of the statistics.  It should look similar to this:
+
+    ```bash
+    #Sample output
+    Running 5m test @ http://nginx-oss/coffee
+    4 threads and 200 connections
+    Thread Stats   Avg      Stdev     Max   +/- Stdev
+        Latency    25.48ms   16.93ms 825.44ms   98.58%
+        Req/Sec     2.02k   281.30     3.98k    79.17%
+    2417366 requests in 5.00m, 3.76GB read
+    Requests/sec:   8056.82                             # NICE, much better!
+    Transfer/sec:     12.82MB
+
+    ```
+
+    >>Wow, more that **DOUBLE the performance**, with Upstream `keepalive` enabled - over 8,000 HTTP Reqs/second.  Did you see a performance increase??  Your mileage here will vary of course, depending on what kind of machine you are using for these Docker containers.
+
+    >Note:  In the next Lab, you will use NGINX Plus, which `does` have detailed Upstream metrics, which you will see in real-time while loadtests are being run. 
+   
+1. In this next lab exercise, you will use the `weighted` algorithm to send more traffic to different backends.  You will modify the `server`entries in youor `upstreams.conf` file to set an administrative ratio, as follows:
+
+    ```nginx
+    ...snip
+
+        # Docker-compose:
+        # Add weights to all three servers
+
+        server web1:80 weight=1;   
+        server web2:80 weight=3;
+        server web3:80 weight=6;
+
+    ```
+
+    Save your file.  Test and Reload your NGINX config.
+
+1. Test again with curl and your browser, you should see a response distribution similar to the server weights. 10% to web1, 30% to web2, and 60% to web3.
+
+1. For a fun test, hit it again with WRK...what do you observe?  Do admin weights help or hurt performance?  
+
+    ![Docker Dashboard](media/lab4_docker-perf-weighted.png)
+    
+    Only the results will tell you for sure, checking the Docker Desktop Dashboard - looks like the CPU ratio on the web containers matches the `weight` values for the Upstreams.
+
+    So that is not too bad for a single CPU docker container.  But didn't you hear that NGINX performance improves with the number of CPUs in the machine?
+
+1. Check your `nginx.conf` file... does it say `worker_processes   1;` near the top?  Hmmm, NGINX is configured to use only one Worker and therefore only one CPU core.  You will change it to `FOUR`, and re-test.  Assuming you have at least 4 cores that Docker and NGINX can use:
+
+    ```nginx
+    user  nginx;
+    worker_processes  4;      # Change to 4 and re-test
+
+    error_log  /var/log/nginx/error.log warn;
+    pid        /var/run/nginx.pid;
+
+
+    events {
+        worker_connections  1024;
+    }
+
+    ...snip
+
+    ```
+
+    Save your file.  
+    
+    NOTE:  The NGINX default setting for `worker_processes` is `auto`, which means one Worker for every CPU core in the machine.  However, some Virtualization platforms, and Docker will often set this value to 1, something to be aware of and check.
+
+1. Edit the `upstreams.conf` file, remove the `server weight=x` parameter from all three servers, and set the load balancing algorithm back to `least_conn`.  
+
+    Save your file. Test and Reload your NGINX config.
+
+1. You should now have `4 workers`, `least_conn` and `keepalive` **enabled**.  Run the WRK test again. You are going FIRE IT UP!
+
+    After the 5 minute WRK test has finished, you should see a Summary of the statistics.  It should look similar to this:
+
+    ```bash
+    #Sample output
+    Running 5m test @ http://nginx-oss/coffee
+    4 threads and 200 connections
+    Thread Stats   Avg      Stdev     Max   +/- Stdev
+        Latency     9.33ms    3.60ms 134.99ms   78.81%
+        Req/Sec     5.40k   721.76    10.97k    74.55%
+    6452981 requests in 5.00m, 10.03GB read
+    Socket errors: connect 0, read 0, write 0, timeout 13
+    Requests/sec:  21503.04                                 # Even better w/ 4 cores 
+    Transfer/sec:     34.23MB
+
+    ```
+
+    Over 21,000 Requests/Second from a little Docker container...not too shabby!  
+
+    Docker Desktop was humming along, with the fan on full blast!
+
+    ![Docker Dashboard](media/lab4_docker-perf-4core.png)
+    
+    Summary:  NGINX can and will use whatever hardware resources you provide.  And as you can see, you were shown just a few settings, but there are **MANY** NGINX configuration parameters that affect performance.  Only time, experience, and rigorous testing will determine which NGINX Directives and values will work best for Load Balancing your application.
 
 <br/>
 
 ### NGINX Persistence / Affinity
 
+<br/>
+
+With many legacy applications, the HTTP client and server must create a temporal unique relationship for the duration of the transaction or communication session.  However, when proxies or load balancers are inserted in the middle of the communication, it is important to retain this affinity between the client and the server. The Load Balancer industry commonly refers to this concept as `Persistence`, or `Sticky`, or `Affinity`, depending on which term the vendor has chosen to use.
+
+With NGINX, there are several configuration options for this, but in this next lab exercise, you will use the most common option called `ip hash`.  This will allow NGINX to send requests to the same backend based on the client's IP Address.
+
+1. Docker exec into your nginx-oss container, and in the `/etc/nginx/conf.d` folder, edit the `upstreams.conf` file as follows:
+
+    ```nginx
+    # NGINX Basics, OSS Proxy to three upstream NGINX web servers
+    # Chris Akker, Shouvik Dutta - Feb 2024
+    #
+    # nginx-cafe servers 
+    upstream nginx_cafe {
+
+        # Load Balancing Algorithms supported by NGINX
+        # - Round Robin (Default if nothing specified)
+        # - Least Connections
+        # - IP Hash
+        # - Hash (Any generic Hash)     
+        
+        # Uncomment for Least Connections algorithm
+        # least_conn;
+
+        # Docker-compose:
+        server web1:80;
+        server web2:80;
+        server web3:80;
+
+        #Uncomment for IP Hash persistence
+        ip_hash;
+
+        # Include keep alive connections to upstreams
+        keepalive 16;
+
+    }
+
+    ```
+
+    Save your file. Test and Reload your NGINX config.
+
+1. Test out `ip_hash` persistence with curl and your browser.  You should find that now NGINX will always send your request to the same backend, it will no longer round-robin or least-conn load balance your requests to all three backends.
+
+    ```bash
+    curl -s http://cafe.example.com |grep IP    # try 5 or 6 times
+
+    ```
+
+1. Try the WRK loadtest again, with the IP Hash enabled, you can only use ONE backend server:
+
+    Looks like web3 is the chosen one:
+
+    ![Docker Dashboard](media/lab4_docker-perf-iphash.png)
+
+    After testing, you might considering adding `least_conn` and removing `ip_hash` for future exercises.
 
 <br/>
 
@@ -787,6 +1021,7 @@ Now you need to enable some HTTP Headers, to be added to the Request.  These are
 - [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
 - [NGINX Variables](https://nginx.org/en/docs/varindex.html)
 - [NGINX Access Logging](https://nginx.org/en/docs/http/ngx_http_log_module.html#access_log)
+- [NGINX Load Balancing Methods](https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/#method)
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 
