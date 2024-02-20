@@ -14,9 +14,9 @@ By the end of the lab you will be able to:
  * Build and run an `NGINX Opensource Docker` image
  * Build your Workshop enviroment with Docker Compose
  * Verify Container build with NGINX tests
+ * Configure NGINX Extended Access Logging
  * Configure NGINX for Load Balancing
  * Add NGINX features following Best Practices
- * Configure NGINX Extended Access Logging
 
 ## Pre-Requisites
 
@@ -25,7 +25,7 @@ By the end of the lab you will be able to:
 - See `Lab0` for instructions on setting up your system for this Workshop
 - Familiarity with basic Linux commands and commandline tools
 - Familiarity with basic Docker concepts and commands
-- Familiarity with basic HTTP and HTTPS protocol
+- Familiarity with basic HTTP protocol
 
 ## Build the Workshop Environment with Docker Compose
 
@@ -245,11 +245,11 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
 <br/>
 
-Now that you know all 4 containers are working with the NGINX Welcome page, and the stub_status page, you can build and test the **NGINX OSS Proxy and Load Balancing** functions.  You will use a new `NGINX proxy_pass Directive` - you will start with Reverse Proxy configuration, test it out.  Then add the Upstream backends and test out Load Balancing.
+Now that you know all 4 containers are working with the NGINX Welcome page, and the basic_status page, you can build and test the **NGINX OSS Proxy and Load Balancing** functions.  You will use a new `NGINX proxy_pass Directive` - you will start with Reverse Proxy configuration, test it out.  Then add the Upstream backends and test out Load Balancing.
 
-    - Using your previous lab exercise experience, you will configure a new NGINX configuration for the `cafe.example.com` website.  It will be very similar to http://cars.example.com from lab3.  
+- Using your previous lab exercise experience, you will configure a new NGINX configuration for the `cafe.example.com` website.  It will be very similar to `cars.example.com.conf` from lab3.  
     
-    - This will require a new NGINX config file, for the Server and Location Blocks.
+- This will require a new NGINX config file, for the Server and Location Blocks.
     
 1. In the /`etc/nginx/conf.d folder`, create a new file named `cafe.example.com.conf`, which will be the config file for the Server and Location blocks for this new website.  
 
@@ -445,7 +445,8 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
 
         location / {
             
-        ### Change the "proxy_pass" directive, tell NGINX to proxy traffic to the upstream block.  If there is more than one server, they will be load balanced
+        ### Change the "proxy_pass" directive, tell NGINX to proxy traffic to the upstream block.  
+        ### If there is more than one server, they will be load balanced
             
             proxy_pass http://nginx_cafe;        # Must match the upstream block name
         }
@@ -503,7 +504,7 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
 
 ### NGINX Extended Access Logging
 
-Now that you have a working NGINX Proxy, and several backends, you will be adding adn using additional NGINX Directives, Variables, and testing them out.  In order to better see the results of these new Directives on your proxied traffic, you need better and more information in your Access logs.  The default NGINX `main` access log_format only contains a fraction of the information you need, so you will  `extend` it to include much more information, especially about the Upstream backend servers.
+Now that you have a working NGINX Proxy, and several backends, you will be adding and using additional NGINX Directives, Variables, and testing them out.  In order to better see the results of these new Directives on your proxied traffic, you need better and more information in your Access logs.  The default NGINX `main` access log_format only contains a fraction of the information you need, so you will  `extend` it to include much more information, especially about the Upstream backend servers.
 
 1. In this next exercise, you will use a new `log_format` which has additional $variables added the access.log, so you can see this metadata.  You will use the Best Practice of defining the log format ONCE, but potentially use it in many Server blocks.
 
@@ -548,7 +549,7 @@ Now that you have a working NGINX Proxy, and several backends, you will be addin
                             
     ```
 
-1. You will use the Extend log_format for the next few exercises.  Update your `cafe.example.com.conf` to use the `main_ext` log format:
+1. You will use the Extended log_format for the next few exercises.  Update your `cafe.example.com.conf` to use the `main_ext` log format:
 
     ```nginx
     # cars.example.com HTTP
@@ -605,15 +606,15 @@ Now that you have a working NGINX Proxy, and several backends, you will be addin
 
 <br/>
 
-Now that you have Reverse Proxy and load balancing working, you need to think about what information should be passed to and from the backend servers.  After all, if you insert a Proxy in between the client and the server, you might lose some important information in the request or the response.  `NGINX proxy_headers` are used to restore this information, and add additional information as well using NGINX $variables.
+Now that you have Reverse Proxy and load balancing working, you need to think about what information should be passed to and from the backend servers.  After all, if you insert a Proxy in between the client and the server, you might lose some important information in the request or the response.  `NGINX proxy_headers` are used to restore this information, and add additional information as well using NGINX $variables.  Proxy headers are also used to control the HTTP protocol itself, which you will do first.
 
-In this next exercise, you will define these HTTP Headers, and then tell NGINX to use them in your `cafe.example.com` Server block, so that every request and response will now include these new headers.  
+In this next exercise, you will define these HTTP Protocol Headers, and then tell NGINX to use them in your `cafe.example.com` Server block, so that every request and response will now include these new headers.  
 
     NOTE: When NGINX proxies a request to an Upstream, it uses the HTTP/1.0 protocol by default, for legacy compatibility.  
 
-However, this means a new TCP connection for every request, and is quite inefficient.  Modern apps mostly run HTTP/1.1, so you will tell NGINX to use HTTP/1.1 for Proxied requests, which allow NGINX to re-use TCP connections for multiple requests.  (This is commonly called HTTP keepalives, or HTTP pipelining).
+However, this means a new TCP connection for every request, and is quite inefficient.  Modern apps mostly run HTTP/1.1, so you will tell NGINX to use HTTP/1.1 for Proxied requests, which allows NGINX to re-use TCP connections for multiple requests.  (This is commonly called HTTP keepalives, or HTTP pipelining).
 
-1. Inspect the `keepalive.conf`, located in the /etc/nginx/includes folder.  Notice that three are three Directives and Headers required for HTTP/1.1 to work correctly:
+1. Inspect the `keepalive.conf`, located in the /etc/nginx/includes folder.  Notice that there are three Directives and Headers required for HTTP/1.1 to work correctly:
 
     - HTTP Protocol = Use the `$proxy_protocol_version` variable to set it to `1.1`.
     - HTTP Connection Header = should be blank, `""`, the default is `Close`.
