@@ -20,9 +20,9 @@ Look for an email from **`courses@notify.udf.f5.com`**. This will have instructi
 - Navigate to [https://udf.f5.com/](https://udf.f5.com/) and select `Invited Users`
     ![Non F5](media/udfloginnonf5.png)
 
-- If this is your first time using UDF, use the `Sign Up` link which would take your to F5 registration page. 
+- If this is your first time using UDF, use the `Sign Up` link which would take your to F5 registration page.
   
-  **NOTE:** this will *not be the password to the Jumphost or other VMs in the class!*
+  **NOTE:** this will *not be the password to the Ubuntu Desktop or other VMs in the class!*
     ![Sign up](media/F5signup.png)
 
 - Once you have filled in your registration details, you should be receiving an `Account Activation` email as shown below
@@ -57,22 +57,25 @@ THIS REQUIRES AN RDP CLIENT! If you have a Mac *and* haven't downloaded an RDP c
 
 [Microsoft's RDP client on the Apple Apps Store](https://apps.apple.com/us/app/microsoft-remote-desktop/id1295203466?mt=12)
 
-- Now we just have to wait for the Jumpbox to finish booting. . .
+- Now you just have to wait for the Ubuntu Desktop to finish booting. . .
 ![Non F5](media/waitforboot.png "loading. . .")
 
 - Make sure to select a small enough resolution to see the whole screen.
 ![Non F5](media/launchrdp.png "almost there")
 
-- Once you select the resolution, your browser will download an rdp file. Open this file to connect to jumphost.
+- Once you select the resolution, your browser will download an rdp file. Open this file to connect to Ubuntu Desktop.
 
-- Accept the self-signed cert, and jumphost username and password will be `ubuntu` and `Nginx123`.
+- Accept the self-signed cert, and Ubuntu Desktop username and password will be `ubuntu` and `Nginx123`.
   
   (**NOTE:** This is *not* your UDF login username & password.)
-![Non F5](media/useruser.png)
 
-### If you can't connect to the Jumphost, _remember to shut off your VPN_, or join a non-proxied network (sometimes a guest network in the office will work).
+  ![Non F5](media/useruser.png)
 
-### For machines running Windows and attached to a domain, Windows will helpfully attempt to use your domain creds to log in, and you'll see:
+-------------
+> **If you can't connect to the Ubuntu Desktop, *remember to shut off your VPN*, or join a non-proxied network (sometimes a guest network in the office will work)**
+-------------
+
+**For machines running Windows and attached to a domain, Windows will helpfully attempt to use your domain creds to log in, and you'll see:**
 
 ![Non F5](media/domaincreds.png "everyone has credentials.com email accounts right?")
 
@@ -90,4 +93,4 @@ That wraps the pre-requisites.
 
 -------------
 
-Navigate to ([Lab1](../lab1/readme.md) | [Main Menu](../LabGuide.md))
+Navigate to ([Lab1](../lab1/readme.md) | [Main Menu](../readme.md))

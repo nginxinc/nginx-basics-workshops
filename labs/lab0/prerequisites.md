@@ -70,4 +70,4 @@ By the end of this Setup Lab0, you will be ready for the Workshop lab exercises:
 
 -------------
 
-Navigate to ([Lab1](../lab1/readme.md) | [Main Menu](../LabGuide.md))
+Navigate to ([Lab1](../lab1/readme.md) | [Main Menu](../readme.md))

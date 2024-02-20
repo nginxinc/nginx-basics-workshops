@@ -746,4 +746,4 @@ In this section, you will make use of NGINX Plus API to get current statistics r
 
 -------------
 
-Navigate to ([Lab6](../lab6/readme.md) | [Main Menu](../LabGuide.md))
+Navigate to ([Lab6](../lab6/readme.md) | [Main Menu](../readme.md))

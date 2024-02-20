@@ -1075,4 +1075,4 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
 -------------
 
-Navigate to ([Lab3](../lab3/readme.md) | [Main Menu](../LabGuide.md))
+Navigate to ([Lab3](../lab3/readme.md) | [Main Menu](../readme.md))

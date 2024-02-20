@@ -1034,4 +1034,4 @@ With NGINX, there are several configuration options for this, but in this next l
 
 -------------
 
-Navigate to ([Lab5](../lab5/readme.md) | [Main Menu](../LabGuide.md))
+Navigate to ([Lab5](../lab5/readme.md) | [Main Menu](../readme.md))
