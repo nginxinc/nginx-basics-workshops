@@ -120,12 +120,12 @@ HTTP-HTTPS redirect   |               |       +-----------------+
 HTTP/Port 80          |  nginx-oss /  |       |                 |
                       |  nginx-plus   +------>|     web2        |                     
 +-------------------->|     (ADC)     |       |  (nginx-cafe)   |
-www2.example.com      |               |       |                 |
-HTTPS/Port 443        |               |       +-----------------+
+cars.example.com      |               |       |                 |
+HTTPS/Port 80         |               |       +-----------------+
                       |               |             
 +-------------------->|               |       +-----------------+         
 cars.example.com      |               |       |                 |
-HTTP/Port 80          |               +------>|     web3        | 
+HTTP/Port 443         |               +------>|     web3        | 
                       |               |       |  (nginx-cafe)   |
 +-------------------->|               |       |                 |
 cafe.example.com      |               |       +-----------------+
