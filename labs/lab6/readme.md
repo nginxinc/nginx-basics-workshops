@@ -24,4 +24,4 @@ By the end of the lab you will be able to:
 
 Same again
 
-[Back to Main Menu](../README.md)
+[Back to Main Menu](../readme.md)

@@ -383,4 +383,4 @@ Visual Studio Code | Docker Compose | GitHub
 
 -------------
 
-Navigate to ([Lab2](../lab2/readme.md) | [Main Menu](../LabGuide.md))
+Navigate to ([Lab2](../lab2/readme.md) | [Main Menu](../readme.md))

@@ -1020,4 +1020,4 @@ NOTE: The `answers` to all the lab exercises are in the lab3/final folder, where
 
 -------------
 
-Navigate to ([Lab4](../lab4/readme.md) | [Main Menu](../LabGuide.md))
+Navigate to ([Lab4](../lab4/readme.md) | [Main Menu](../readme.md))
