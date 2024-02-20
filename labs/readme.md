@@ -28,7 +28,7 @@ By the end of this Workshop, you will have a working, operational NGINX OSS or P
 
 #### Lab 0: Workshop pre-work (Choose any one)
 
-- [Lab 0: Workshop pre-work using F5 provided environment](lab0/readme.md)
+- [Lab 0: Workshop pre-work using F5 provided workshop environment](lab0/readme.md)
   
 - [Lab 0: Workshop pre-work using your own system](lab0/prerequisites.md)
 

@@ -2,7 +2,7 @@
 
 ## Introduction
 
-In order to complete the Lab exercises in this Workshop on your own system and not use F5 provided environment, you would need a system with the following hardware, software, and access requirements.  If you are unable to meet these basic requirements, you will likely not be able to complete the Labs as written.  It is highly recommended that you have the minimum requirements.
+In order to complete the Lab exercises in this Workshop on your own computer and not use F5 provided workshopenvironment, your computer should meet with the following hardware, software, and access requirements. If you are unable to meet these basic requirements, you will likely not be able to complete the Labs as written.  It is highly recommended that you have the minimum requirements.
 
 ## Learning Objectives
 
