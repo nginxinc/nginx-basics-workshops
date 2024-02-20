@@ -60,14 +60,13 @@ By the end of this Workshop, you will have a working, operational NGINX OSS or P
 #### Lab 8: Monitoring KIC with Prometheus and Grafana
 - [Lab 8: Prometheus and Grafana](lab8/readme.md)
 
-
 <br/>
+
+Click [Lab1: Build and Run NGINX Opensource on Docker](lab1/readme.md) to get started!
+
+------------
 
 ### Authors
 
 - Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
 - Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
-
-<br/>
-
-Click [Lab1: Build and Run NGINX Opensource on Docker](lab1/readme.md) to get started! 
