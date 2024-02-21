@@ -96,14 +96,14 @@ URI | location{}
 #
 http {
 
-server {
-    listen 80;
-    server_name www.example.com;
-    
-    location /application1 {
-        index index.html;
+    server {
+        listen 80;
+        server_name www.example.com;
+        
+        location /application1 {
+            index index.html;
+        }
     }
-}
 }
 
 ```
@@ -442,6 +442,7 @@ nginx
 │   ├── stub_status.conf
 │   ├── www.example.com.conf
 │   └── www2.example.com.conf
+├── includes                      # Include other shared config files
 ├── fastcgi.conf
 ├── fastcgi_params
 ├── mime.types
@@ -450,7 +451,7 @@ nginx
 ├── scgi_params
 └── uwsgi_params
 
-1 directories, 13 files
+2 directories, 13 files
 
 ```
 
@@ -525,7 +526,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
    nginx -s reload
    ```
 
-1. Test access to your new website, using curl to localhost (Port forwarding is enabled within Docker):
+1. Test access to your new website, using terminal, curl to localhost:
 
     ```bash
      # Run curl from outside of container
@@ -822,17 +823,17 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 
 1. Reload NGINX with `nginx -s reload` command.
 
-1. Test all three URLs, one for each car with curl, don't forget your Host Header!:
+1. Test all three URLs, one for each car with curl. Because you have updated local `/etc/hosts` file you can now use your FQDN with curl:
 
     ```bash
-    curl localhost/gtr -H "Host: cars.example.com"   # or curl cars.example.com/gtr
-    curl localhost/nsx -H "Host: cars.example.com"
-    curl localhost/rcf -H "Host: cars.example.com"
+    curl cars.example.com/gtr
+    curl cars.example.com/nsx
+    curl cars.example.com/rcf
 
     ```
 
     ```bash
-    #Sample output
+    ##Sample output##
     <!DOCTYPE html>
     <html>
     <head>
@@ -858,7 +859,7 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 
     ```
 
-    Try them in a browser, like <http://cars.example.com/rcf> :
+    Try all three in a browser, like <http://cars.example.com/gtr>, <http://cars.example.com/nsx>, <http://cars.example.com/rcf> :
 
     ![NGINX Welcome RCF](media/lab2_welcome-rcf.png)
 
