@@ -8,16 +8,17 @@ In this lab, NGINX as a web server will be introduced, basic web and content ser
 
 <br/>
 
-## Learning Objectives 
+## Learning Objectives
 
 <br/>
 
-By the end of the lab you will be able to: 
-* Describe NGINX server operations
-* Have a basic understanding of HTTP Requests and URLs
-* Create NGINX configurations for basic web content
-* Create and edit simple NGINX configs following best practices
-* Be familiar with NGINX logging files, formats, variables
+By the end of the lab you will be able to:
+
+- Describe NGINX server operations
+- Have a basic understanding of HTTP Requests and URLs
+- Create NGINX configurations for basic web content
+- Create and edit simple NGINX configs following best practices
+- Be familiar with NGINX logging files, formats, variables
 
 <br/>
 
@@ -46,7 +47,7 @@ So what is a URL??  URL stands for `Uniform Resource Location` - an Internet sta
 
 Every URL consists of 4 or 5 distinct fields.
 
-Given the URL:   http://www.example.com/application1?arg=123456
+Given the URL:   `http://www.example.com/application1?arg=123456`
 
 It is decoded as:
 
@@ -56,7 +57,7 @@ http:// | www.example.com | /application1 | ?arg=123456
 
 >If the TCP port used by the webserver is `not 80`, it must be included in the URL request, like this example using port 8080:
 
-Given the URL:  http://www.example.com:8080/application1?arg=123456
+Given the URL:  `http://www.example.com:8080/application1?arg=123456`
 
 It is decoded with the extra `port`field:
 
@@ -64,7 +65,8 @@ Scheme  | Hostname        | Port  | URI    | Argument
 :------:|:--------:|:--------:|:--------:|:--------:
 http:// | www.example.com | :8080 | /application1 | ?arg=123456
 
-In the examples above: 
+In the examples above:
+
 - the Scheme is the protocol to use, usually either `HTTP` or `HTTPS`.  It must be followed by a colon, and two forward slashs.
 - The Hostname is a fully qualified DNS name, often with a subdomain like `www` in this example.  It must contain the root level Domain name.  It must follow DNS standards based naming conventions.  Using a non-FQDN name is possible, but outside the scope of this lab.
 - Modern browsers use port 80 for HTTP requests, and port 443 for HTTPS by default, and this port number does not appear in the URL.  However, if you are not using Port 80 for HTTP, or Port 443 for HTTPS, the Hostname and Port must be separated by a colon `:`. 
@@ -75,9 +77,9 @@ As you configure NGINX, you will see that it uses these HTTP standards and defin
 
 Now you can configure the NGINX contexts to handle an HTTP request properly.  Let's overlay the NGINX configuration contexts with the example URL.
 
-Given the URL:   http://www.example.com/application1
+Given the URL:   `http://www.example.com/application1`
 
-Scheme  | Hostname        | URI    
+Scheme  | Hostname        | URI
 :------:|:--------:|:--------:
 http:// | www.example.com | /application1
 
@@ -89,20 +91,19 @@ scheme  | http{}
 hostname | server{}
 URI | location{}
 
-
 ```nginx
 # Note:  the use of indented nested contexts makes it easier to read
 #
 http {
 
-  server {
+server {
     listen 80;
     server_name www.example.com;
     
-      location /application1 {
-      index index.html;
-      }
-   }
+    location /application1 {
+        index index.html;
+    }
+}
 }
 
 ```
@@ -139,28 +140,36 @@ $ systemctl stop nginx      #stop nginx processes
 
 Go ahead and try some of these NGINX commands in your nginx-oss container now, so you are familiar with them.  Open a second Terminal, so you can Watch the docker logs while you try these different commands.  It is recommended that you use 2 Terminals, one for issuing commands, and one for watching logs.
 
+1. Run Docker Compose to build and run your NGINX OSS container:
+
+   ```bash
+   cd labs/lab2
+   docker-compose up --force-recreate
+   ```
+
 1. Docker Exec into the nginx-oss container.
 
     ```bash
-    docker exec -it < nginx-oss Container ID > /bin/bash
+    docker exec -it nginx-oss /bin/bash
 
     ```
 
 1. In a second Terminal, watch the nginx-oss container's log file, and watch as you send various NGINX commands.
 
     ```bash
-    docker logs <nginx-oss ContainerID> --follow
-
+    docker logs nginx-oss --follow
     ```
+
     It should look similar to this:
 
     ```bash
-    #Sample output
+    ##Sample output##
 
     /etc/nginx # nginx -v
-    nginx version: nginx/1.25.3
+    nginx version: nginx/1.25.4
 
     /etc/nginx # nginx -s quit
+    ...
     2024/02/02 20:01:32 [notice] 1#1: signal 3 (SIGQUIT) received from 66, shutting down
     2024/02/02 20:01:32 [notice] 53#53: gracefully shutting down
     2024/02/02 20:01:32 [notice] 53#53: exiting
@@ -204,7 +213,6 @@ Go ahead and try some of these NGINX commands in your nginx-oss container now, s
 
     ```
 
-
 <br/>
 
 ### NGINX Reloads
@@ -216,20 +224,33 @@ It is important to understand the details about what NGINX does, when you change
 - The `nginx -s reload` command sends a SIGHUP signal to the Linux Kernel.
 - Example looks like this, from the `nginx error.log`:
 
-  - 2024/01/31 22:26:13 [notice] 1#1: signal 1 (SIGHUP) received from 155, reconfiguring
+  ```bash
+   2024/01/31 22:26:13 [notice] 1#1: signal 1 (SIGHUP) received from 155, reconfiguring
   
-  - 2024/01/31 22:26:13 [notice] 1#1: reconfiguring
-- The master process reads all the config files, and validates the syntax, configuration commands, variables, and many other dependencies.  It also validates that any dependent Linux system level objects are correct, like folder/file names and paths, file permissions, networking objects like IP addresses, sockets, etc.  If there are any errors, it prints out a `Configuration File /etc/nginx/nginx.conf Test Failed` error with the configuration filename and the line number where the error exists, and some helpful information, like "path /cahce not found" (you have a typo: /cahce should be spelled /cache).  The validation STOPS on the first error encountered.  So you must address the error, and run `nginx -t` again to further check for errors, until you get two successful test messages, like this:
-  - nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
-  - nginx: configuration file /etc/nginx/nginx.conf test is successful
+   2024/01/31 22:26:13 [notice] 1#1: reconfiguring
+   ```
+
+- The master process reads all the config files, and validates the syntax, configuration commands, variables, and many other dependencies.  It also validates that any dependent Linux system level objects are correct, like folder/file names and paths, file permissions, networking objects like IP addresses, sockets, etc.  
+  
+  If there are any errors, it prints out a `Configuration File /etc/nginx/nginx.conf Test Failed` error with the configuration filename and the line number where the error exists, and some helpful information, like `"path /cahce not found" (you have a typo: /cahce should be spelled /cache).`  The validation STOPS on the first error encountered.  So you must address the error, and run `nginx -t` again to further check for errors, until you get two successful test messages, like this:
+
+  ```bash
+   nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+   nginx: configuration file /etc/nginx/nginx.conf test is successful
+   ```
+
 - Once the master process configuration validation is successful, then NGINX will do the following:
-1. With NGINX OSS, new Workers are created, and the old Worker processes are immediately shutdown, along with all existing TCP connections.  After the master process spawns new Worker processes, and they begin handling new connections and traffic based on the new configuration.  Any traffic in flight is usually dropped.
-2. With NGINX Plus, new Worker processes are created, and begin using the new configuration immediately for all new connections and requests.  The old Workers are allowed to complete their previous task, and then close their TCP connections naturally, traffic in flight is not dropped!  The master process terminates the old Workers after they finish their work and close all their connections.  This is called Dynamic Reconfiguration in NGINX Plus documentation.
-- The nginx master process writes log information about the reload to the error.log so you can see what happened when, like this:
+  
+  1. With NGINX OSS, new Workers are created, and the old Worker processes are immediately shutdown, along with all existing TCP connections.  After the master process spawns new Worker processes, and they begin handling new connections and traffic based on the new configuration.  Any traffic in flight is usually dropped.
+
+  1. With NGINX Plus, new Worker processes are created, and begin using the new configuration immediately for all new connections and requests.  The old Workers are allowed to complete their previous task, and then close their TCP connections naturally, traffic in flight is not dropped!  The master process terminates the old Workers after they finish their work and close all their connections.  This is called Dynamic Reconfiguration in NGINX Plus documentation.
+
+- The nginx master process writes log information about the reload to the error.log so you can see what happened when, like shown below:
 
 ```bash
 #Sample output for "nginx -s reload" command
 
+...
 2024/02/02 00:27:21 [notice] 1#1: signal 1 (SIGHUP) received from 81, reconfiguring
 2024/02/02 00:27:21 [notice] 1#1: reconfiguring
 2024/02/02 00:27:21 [notice] 1#1: using the "epoll" event method
@@ -242,13 +263,14 @@ It is important to understand the details about what NGINX does, when you change
 2024/02/02 00:27:21 [notice] 1#1: signal 29 (SIGIO) received
 2024/02/02 00:27:21 [notice] 1#1: signal 17 (SIGCHLD) received from 69
 2024/02/02 00:27:21 [notice] 1#1: worker process 69 exited with code 0
+...
 
 ```
 
 You can easily see the nginx master and worker processes in Linux with `top`, it would look something like this:
 
 ```bash
-# Sample output
+##Sample output##
 
 Mem: 1221044K used, 6916284K free, 1460K shrd, 15872K buff, 505096K cached
 CPU:   0% usr   0% sys   0% nic  99% idle   0% io   0% irq   0% sirq
@@ -269,7 +291,7 @@ By default, nginx Master process will create a Worker process for every CPU core
 Or use can use another Linux command `ps |grep nginx` to see the nginx processes:
 
 ```bash
-#Sample output
+##Sample output##
 
     1 root      0:00 nginx: master process nginx -g daemon off;
    82 nginx     0:00 nginx: worker process
@@ -299,9 +321,9 @@ NGINX Configurations are made up from 4 common elements:
 
 `Directives` refer to NGINX configurations consisting of 2 types:
 
-- Simple directives - these are single line commands with some parameters that end in a **semi-colon `;`**
+- **Simple directives:**  these are single line commands with some parameters that end in a **semi-colon `;`**
 
-- Block directives - these are multiple line commands, with an opening and closing curly brace **`{}`**.   A block directive will contain single line directives, and also can contain other block directives, called nested blocks.
+- **Block directives:** these are multiple line commands, with an opening and closing curly brace **`{}`**.   A block directive will contain single line directives, and also can contain other block directives, called nested blocks.
 
 Let's take a look at some examples, by inspecting the default `nginx.conf` that comes installed with NGINX.
 
@@ -355,7 +377,6 @@ http {
 
     # Use all .conf files located in the in /etc/nginx/conf.d folder
     include /etc/nginx/conf.d/*.conf;  
-
 }
 
 ```
@@ -451,26 +472,19 @@ Now that you have a basic understanding of the NGINX binary, contexts, and confi
 
 In this exercise, you will create 2 new HTTP configurations, for 2 different web sites.  You will use `www.example.com` and `www2.example.com` as the two hostnames.
 
-1. First, using VI or a text editor, update your local DNS resolver hosts file, usually `etc/hosts` on MacOS/Linux, to add these FQDN Hostnames used for these lab exercises. `www.example.com www2.example.com`
+1. First, using vi or a text editor, update your local DNS resolver hosts file, usually `etc/hosts` on MacOS/Linux, to add these FQDN Hostnames used for these lab exercises. `www.example.com www2.example.com`
 
     ```bash
-    vi /etc/hosts
+     vi /etc/hosts
 
-    # NGINX Basics hostnames for labs
-    127.0.0.1	localhost www.example.com www2.example.com 
+     # NGINX Basics hostnames for labs
+     127.0.0.1 localhost www.example.com www2.example.com 
 
     ```
 
-1. Docker Exec into the nginx-oss container.
+1. Navigate to the `labs/lab2/nginx-oss/etc/nginx/conf.d` folder.  Remember, this is the default folder for NGINX HTTP configuration files that is volume mounted to the container.
 
-    ```bash
-    docker exec -it < nginx-oss Container ID > /bin/bash
-
-    ```
-
-1. Change to the `/etc/nginx/conf.d` folder.  Remember, this is the default folder for NGINX HTTP configuration files.
-
-1. Using VI, create a new file called `www.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
+1. Within this folder, create a new file called `www.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
     ```nginx
 
@@ -494,42 +508,38 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
     ```
 
-1. After saving and quitting VI, test it with `nginx -t`.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
-
-1. Reload NGINX with `nginx -s reload`.
-
-1. Find the IP address of your nginx-oss container.
+1. Once the content of the file has been saved, Docker Exec into the nginx-oss container.
 
     ```bash
-    ifconfig
+    docker exec -it nginx-oss /bin/bash
 
     ```
 
-1. Test access to your new website, using curl to the IP address above, and to your local docker IP address:
+1. As the `labs/lab2/nginx-oss/etc/nginx/conf.d` folder is volume mounted to the `nginx-oss` container, the new file that you created should appear within the container under `/etc/nginx/conf.d` folder.
+
+1. Test the new config file with `nginx -t`.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
+
+1. Reload NGINX with below command from within the container.  
+
+   ```bash
+   nginx -s reload
+   ```
+
+1. Test access to your new website, using curl to localhost (Port forwarding is enabled within Docker):
 
     ```bash
-    # inside the container
-    curl 172.18.0.2
-   
-    # from outside
+     # Run curl from outside of container
     curl 127.0.0.1
-
     ```
 
     You should see something like:
 
     ```bash
-    #Sample output
-    You have reached www.example.com, location block /
-
+     ##Sample output##
+     You have reached www.example.com, location /
     ```
 
-1. Using VI, create a new file called `www2.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
-
-    ```bash
-    vi www2.example.com.conf
-
-    ```
+1. Within the same folder (`labs/lab2/nginx-oss/etc/nginx/conf.d`), create a new file called `www2.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
     ```nginx
 
@@ -553,23 +563,19 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
     ```
 
-1. Quit VI and save your file, and test your NGINX config ( using `nginx -t`).
+1. Save your file, and test your NGINX config by running  `nginx -t`command from within the container.
 
     **Uh oh - what happened?**  Did you figure out the error?  You can't actually have 2 default servers in NGINX - that makes sense, right ?
 
-1. Go back and edit line #7 wiht the `listen` parameter in www2.example.com.conf, and remove the `default_server` parameter, save and exit VI again.
+1. Go back and edit line #7 with the `listen` parameter in www2.example.com.conf, and remove the `default_server` parameter, save the file again.
 
-1. Now the `nginx -t` should be successful, so go ahead a reload NGINX.
+1. Now the `nginx -t` should be successful, so go ahead a reload NGINX by running `nginx -s reload` command within the container.
 
-1. Test access to the second website, using curl to the same IP address:
+1. Test access to the second website, using curl:
 
     ```bash
-    # inside the container
-    curl 172.18.0.2
-    
-    # from outside
-    curl 127.0.0.1
-
+     # Run curl from outside of container
+     curl 127.0.0.1
     ```
 
 >BUT WAIT!  Curl is still going to the FIRST website - why ??
@@ -579,16 +585,12 @@ You need to include the `Host Header` in your curl request, so NGINX can route t
 Try adding the Host Header:
 
 ```bash
-    # inside the container
-    curl 172.18.0.2 -H "Host: www2.example.com"
-    
-    # from outside
+    # Run curl from outside of container
     curl 127.0.0.1 -H "Host: www2.example.com"
-
 ```
 
 ```bash
-#Sample output
+##Sample output##
 Congrats, you have reached www2.example.com, the base path /
 
 ```
