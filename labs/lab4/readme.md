@@ -8,7 +8,7 @@ NGINX OSS | Docker
 :-------------------------:|:-------------------------:
 ![NGINX OSS](media/nginx-icon.png)  |![Docker](media/docker-icon.png)
   
-## Learning Objectives 
+## Learning Objectives
 
 By the end of the lab you will be able to:
 
@@ -384,9 +384,25 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
 
     upstream nginx_cafe {         # Upstream block, the name is "nginx_cafe"
 
-        server web1:80;           # These are the containers from your Docker Compose
+        # Load Balancing Algorithms supported by NGINX
+        # - Round Robin (Default if nothing specified)
+        # - Least Connections
+        # - IP Hash
+        # - Hash (Any generic Hash)     
+
+        # Uncomment for Least Connections algorithm      
+        # least_conn;
+
+        # From Docker-Compose:
+        server web1:80;
         server web2:80;
         server web3:80;
+
+        #Uncomment for IP Hash persistence
+        # ip_hash;
+
+        # Uncomment for keepalive TCP connections to upstreams
+        # keepalive 16;
 
     }
 
@@ -475,7 +491,7 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
 
 >This is called an `Upstream proxy_pass`, where you are telling NGINX to Proxy the request to a list of servers in the upstream, and load balance them.
 
-1. These backend application do have the following multiple paths which can also be used for testing. Feel free to try out them:
+1. These backend application do have the following multiple paths which can also be used for testing. Feel free to try them out:
    - [http://cafe.example.com/coffee](http://cafe.example.com/coffee)
    - [http://cafe.example.com/tea](http://cafe.example.com/tea)
    - [http://cafe.example.com/icetea](http://cafe.example.com/icetea)
@@ -556,11 +572,10 @@ Now that you have a working NGINX Proxy, and several backends, you will be addin
 
     Save your file.  Test and Reload NGINX.
 
-
-1. Test your new log format.  Docker Exec into your nginx-oss container.  Cat or Tail the /var/log/nginx/cafe.example.com.log Access log file, and you will see the new Extended Log Format. 
+1. Test your new log format.  Docker Exec into your nginx-oss container.  Tail the /var/log/nginx/cafe.example.com.log Access log file, and you will see the new Extended Log Format.
 
     ```bash
-    nginx-oss $ tail -f /var/log/nginx/cafe.example.com.log
+    tail -f /var/log/nginx/cafe.example.com.log
 
     ```
 
@@ -569,20 +584,23 @@ Now that you have a working NGINX Proxy, and several backends, you will be addin
     It should look something like this (comments and line breaks added for clarity):
 
     ```bash
-    #Sample output
+    ##Sample output##
+
+    # Raw Output
     remote_addr="192.168.65.1", [time_local=19/Feb/2024:19:14:32 +0000], request="GET / HTTP/1.1", status="200", http_referer="-", body_bytes_sent="651", Host="cafe.example.com", sn="cafe.example.com", request_time=0.001, http_user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36", http_x_forwarded_for="-", request_length="471",
-    # Line Breaks added 
     upstream_address="172.18.0.3:80",  # Nice, now you know what backend was selected
     upstream_status="200", 
     upstream_connect_time="0.000", 
     upstream_header_time="0.000", 
     upstream_response_time="0.000", 
-    upstream_response_length="651", 
+    upstream_response_length="651",
+
+    # Line Breaks added  
 
     ```
 
     As you can see here, NGINX has `many $variables` that you can use, to customize the Access log_format to meet your needs.  You will find a link to NGINX Access Logging, and ALL the NGINX Variables that are availabe in the References section below.
-    
+
     It should also be pointed out, that you can use different log formats for different Hosts, Server Blocks, or even different Location Blocks, you are not limited to just one log_format.
 
 <br/>
@@ -595,7 +613,7 @@ Now that you have Reverse Proxy and load balancing working, you need to think ab
 
 In this next exercise, you will define these HTTP Protocol Headers, and then tell NGINX to use them in your `cafe.example.com` Server block, so that every request and response will now include these new headers.  
 
-    NOTE: When NGINX proxies a request to an Upstream, it uses the HTTP/1.0 protocol by default, for legacy compatibility.  
+**NOTE:** When NGINX proxies a request to an Upstream, it uses the HTTP/1.0 protocol by default, for legacy compatibility.  
 
 However, this means a new TCP connection for every request, and is quite inefficient.  Modern apps mostly run HTTP/1.1, so you will tell NGINX to use HTTP/1.1 for Proxied requests, which allows NGINX to re-use TCP connections for multiple requests.  (This is commonly called HTTP keepalives, or HTTP pipelining).
 
@@ -665,7 +683,7 @@ However, this means a new TCP connection for every request, and is quite ineffic
     ```
 
     ```bash
-    #Sample output
+    ##Sample output##
     HTTP/1.1 200 OK                          # protocol version is 1.1
     Server: nginx/1.25.4
     Date: Sat, 17 Feb 2024 01:41:01 GMT
@@ -676,7 +694,7 @@ However, this means a new TCP connection for every request, and is quite ineffic
 
     ```
 
-1. Using your browser, open its "Dev Tools", or "Inspect" option, so you can see the browser's debugging metadata.  Visit your website, http://cafe.example.com.  If you click on the Network Tab, and then the first object, you will see the Request and Response Headers, and should find that `Connection:` = `keep-alive`
+1. Using your browser, open its "Dev Tools", or "Inspect" option, so you can see the browser's debugging metadata.  Visit your website, <http://cafe.example.com>.  If you click on the Network Tab, and then the first object, you will see the Request and Response Headers, and should find that `Connection:` = `keep-alive`
 
     ![Chrome keep-alive](media/lab4_chrome-keepalive.png)
 
@@ -706,7 +724,6 @@ Now you need to enable some HTTP Headers, to be added to the Request.  These are
     proxy_set_header X-Forwarded-Proto $scheme;
 
     ```
-
 
 1. Using Terminal, Docker Exec into your nginx-oss Proxy, and edit your `cafe.example.com.conf` to use the `proxy_headers.conf` with an `include`:
 
@@ -770,7 +787,7 @@ Different backend applications may benefit from using different load balancing t
 
     Save your file.  Test and Reload your NGINX config.
 
-1. If you open the NGINX Basic Status page at http://localhost:9000/basic_status, and refresh it every 3-4 seconds while you run the `WRK HTTP loadtest` at your nginx-oss Load Balancer:  
+1. If you open the NGINX Basic Status page at <http://localhost:9000/basic_status>, and refresh it every 3-4 seconds while you run the `WRK HTTP loadtest` at your nginx-oss Load Balancer:  
 
     Loadtesting with WRK.  This is a docker container that will download and run, with 4 threads, at 200 connections, for 5 minutes:
 
@@ -784,7 +801,7 @@ Different backend applications may benefit from using different load balancing t
     After the 5 minute WRK loadtest has finished, you should see a Summary of the statistics.  It should look similar to this:
 
     ```bash
-    #Sample output
+    ##Sample output##
     Running 5m test @ http://nginx-oss/coffee
     4 threads and 200 connections
     Thread Stats   Avg      Stdev     Max   +/- Stdev
