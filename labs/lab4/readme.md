@@ -131,6 +131,7 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
     <p class="smaller"><span>Server Name:</span> <span>web3</span></p>   # web3
 
     ```
+
     Check all three, just to be sure.  Exit the Docker Exec when you are finished.
 
 1. Test the NGINX OSS container, verify it also sends back a response to a curl request:
@@ -139,39 +140,27 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
     docker exec -it nginx-oss bin/sh   # log into nginx-oss container
 
     ```
-   
+
     ```bash
     curl http://localhost
 
     ```
 
     ```bash
-    #Sample outputs
+    ##Sample outputs##
    <!DOCTYPE html>
     <html>
     <head>
     <title>Welcome to nginx!</title>
-    <style>
-    html { color-scheme: light dark; }
-    body { width: 35em; margin: 0 auto;
-    font-family: Tahoma, Verdana, Arial, sans-serif; }
-    </style>
-    </head>
-    <body>
-    <h1>Welcome to nginx!</h1>
-    <p>If you see this page, the nginx web server is successfully installed and
-    working. Further configuration is required.</p>
-
-    <p>For online documentation and support please refer to
-    <a href="http://nginx.org/">nginx.org</a>.<br/>
-    Commercial support is available at
-    <a href="http://nginx.com/">nginx.com</a>.</p>
+    
+    ...snip
 
     <p><em>Thank you for using nginx.</em></p>
     </body>
     </html>
 
     ```
+
     Congrats - you should see the `Welcome to nginx!` page.
 
 <br/>
@@ -180,15 +169,15 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
 <br/>
 
-1. NGINX also includes a status page, which shows some basic metrics about the traffic going through NGINX, such as:
+NGINX also includes a status page, which shows some basic metrics about the traffic going through NGINX, such as:
     - Active Connections
     - Connections Accepted, Handled
     - Total number of Requests
     - Reading, writing, and waiting counters.
- 
-    These are helpful when looking at if/how NGINX is handling traffic.
-    
-    Inspect the `stub_status.conf` file located in the `/etc/nginx/conf.d` folder.  You will see that it is listening on port 9000, and using the URL of `/basic_status`.  This has been provided for you to monitor your traffic, there is a link in the References section with more information on the `stub_status module`.
+
+These are helpful when looking at if/how NGINX is handling traffic.
+
+1. Inspect the `stub_status.conf` file located in the `/etc/nginx/conf.d` folder.  You will see that it is listening on port 9000, and using the URL of `/basic_status`.  This has been provided for you to monitor your traffic, there is a link in the References section with more information on the `stub_status module`.
 
     ```nginx
     # ngx_http_stub_status_module (available in NGINX OSS)
@@ -202,15 +191,14 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
         }
 
         # Redirect requests for "/" to "/basic_status"
-    location / {
-        return 301 /basic_status;
+        location / {
+            return 301 /basic_status;
         }
-
     }
 
     ```
 
-    Give that a try, test access to the NGINX `stub_status` page, on port 9000: 
+1. Give that a try, test access to the NGINX `stub_status` page, on port 9000:
 
     ```bash
     curl http://localhost:9000/basic_status
@@ -218,7 +206,7 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
     ```
 
     ```bash
-    #Sample output
+    ##Sample output##
     Active connections: 1
     server accepts handled requests
     56 56 136
@@ -226,10 +214,8 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
     ```
 
-    Try it in a browser at http://localhost:9000/basic_status 
+1. Try it in a browser at <http://localhost:9000/basic_status>. It should looks similar to this:
 
-    It should looks similar to this:
-    
     ![NGINX Status](media/lab4_nginx-status.png)
 
 <br/>
@@ -240,10 +226,11 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
 Now that you know all 4 containers are working with the NGINX Welcome page, and the basic_status page, you can build and test the **NGINX OSS Proxy and Load Balancing** functions.  You will use a new `NGINX proxy_pass Directive` - you will start with Reverse Proxy configuration, test it out.  Then add the Upstream backends and test out Load Balancing.
 
-- Using your previous lab exercise experience, you will configure a new NGINX configuration for the `cafe.example.com` website.  It will be very similar to `cars.example.com.conf` from lab3.  
-    
-- This will require a new NGINX config file, for the Server and Location Blocks.
-    
+   - Using your previous lab exercise experience, you will configure a new NGINX configuration for the `cafe.example.com` website.  It will be very similar to `cars.example.com.conf` from lab3.  
+
+   - This will require a new NGINX config file, for the Server and Location Blocks.
+
+
 1. In the /`etc/nginx/conf.d folder`, create a new file named `cafe.example.com.conf`, which will be the config file for the Server and Location blocks for this new website.  
 
     However, instead of a Location block that points to a folder with html content on disk, you will tell NGINX to `proxy_pass` the request to one of your three web containers instead.  
@@ -294,7 +281,7 @@ Now that you know all 4 containers are working with the NGINX Welcome page, and 
     
     Save the file and Quit VI.  Test and Reload your NGINX config.
 
-1.  Test if your Proxy_pass configuration is working, using curl several times, and your browser.
+2.  Test if your Proxy_pass configuration is working, using curl several times, and your browser.
 
     ```bash
     curl -s http://cafe.example.com |grep Server
@@ -322,7 +309,7 @@ Now that you know all 4 containers are working with the NGINX Welcome page, and 
 
     >This is called a `Direct proxy_pass`, where you are telling NGINX to Proxy the request to another server.  You can also use a FQDN name, or an IP:port with proxy_pass.  In this lab environment, Docker is providing the IP for web1.
 
-1. You can even use proxy_pass in front of a public website.  Try that, with `nginx.org`...what do you think, can you use a Docker container on your desktop to deliver someone else's website?  No, that `can't` be that easy, can it ?
+3. You can even use proxy_pass in front of a public website.  Try that, with `nginx.org`...what do you think, can you use a Docker container on your desktop to deliver someone else's website?  No, that `can't` be that easy, can it ?
 
     ```bash
     docker exec -it nginx-oss bin/sh   # log into nginx-oss container
@@ -364,7 +351,7 @@ Now that you know all 4 containers are working with the NGINX Welcome page, and 
     
     Save the file and Quit VI.  Test and Reload your NGINX config.
 
-1. Try it with Chrome, http://cafe.example.com.  Yes, that works alright, NGINX sends your cafe.example.com request to `nginx.org`.  No WAY, that's cool.
+4. Try it with Chrome, http://cafe.example.com.  Yes, that works alright, NGINX sends your cafe.example.com request to `nginx.org`.  No WAY, that's cool.
 
     ![Proxy_pass NGINX.org](media/lab4_proxypass-nginx-org.png)
 
