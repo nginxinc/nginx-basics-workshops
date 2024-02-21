@@ -77,11 +77,11 @@ As you configure NGINX, you will see that it uses these HTTP standards and defin
 
 Now you can configure the NGINX contexts to handle an HTTP request properly.  Let's overlay the NGINX configuration contexts with the example URL.
 
-Given the URL:   `http://www.example.com/application1`
+Given the URL:   <http://www.example.com/application1>
 
 Scheme  | Hostname        | URI
 :------:|:--------:|:--------:
-http:// | <www.example.com> | /application1
+http:// | www.example.com | /application1
 
 Would require the following NGINX configuration Contexts:
 
@@ -622,7 +622,7 @@ In this exercise, you will continue to learn how NGINX routes requests, by looki
 
     ```
 
-1. Within the mounted folder (labs/lab2/nginx-oss/etc/nginx/conf.d), create a new file called `cafe.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
+1. Within the mounted folder (`labs/lab2/nginx-oss/etc/nginx/conf.d`), create a new file called `cafe.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
 ```nginx
 
@@ -772,22 +772,17 @@ Let try some HTML files and images.  You will create another new website, `cars.
 
 The default directory for serving HTML content with NGINX is `/usr/share/nginx/html`, so you will use that as the root of your new website.
 
-1. First, using VI or a text editor, update your local DNS resolver hosts file, usually `etc/hosts` on MacOS/Linux, to add these FQDN Hostnames used for these lab exercises. `cars.example.com`
+1. First, using vi or a text editor, update your local DNS resolver hosts file, usually `etc/hosts` on MacOS/Linux, to add these FQDN Hostnames used for these lab exercises. `cars.example.com`
 
     ```bash
-    vi /etc/hosts
+     vi /etc/hosts
 
-    # NGINX Basics hostnames for labs
-    127.0.0.1 localhost www.example.com www2.example.com cafe.example.com cars.example.com
+     # NGINX Basics hostnames for labs
+     127.0.0.1 localhost www.example.com www2.example.com cafe.example.com cars.example.com
 
     ```
 
-1. Using VI, create a new file called `cars.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
-
-    ```bash
-    vi cars.example.com.conf
-
-    ```
+1. Within the mounted folder (`labs/lab2/nginx-oss/etc/nginx/conf.d`),  create a new file called `cars.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
     ```nginx
 
@@ -823,7 +818,7 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 
     ```
 
-1. After saving and quitting VI, test it with `nginx -t`.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
+1. Save your file, and test your NGINX config by running `nginx -t` command from within the container.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
 
 1. Reload NGINX with `nginx -s reload`.
 
