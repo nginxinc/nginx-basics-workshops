@@ -58,7 +58,7 @@ For this first lab you will build and run 1 Docker container, used as an NGINX w
 
 ### Build and Run NGINX OSS with Docker
 
-Visual Studio Code | Docker Compose | GitHub 
+Visual Studio Code | Docker Compose | GitHub
 :-------------------------:|:-------------------------:|:-------------------------:
 ![Visual Studio](media/vs-code-icon.png)|![NGINX Logo](media/docker-icon2.png)|![Github Logo](media/github-icon.png)
 
@@ -108,7 +108,7 @@ Visual Studio Code | Docker Compose | GitHub
     ```bash
      ##Sample output##
      Running 2/2
-     Container lab1-nginx-oss-1     Created               0.1s
+     Container nginx-oss            Created               0.1s
      Network lab1_default           Created               0.1s
 
     ```
@@ -122,7 +122,7 @@ Visual Studio Code | Docker Compose | GitHub
     ```bash
      ##Sample output##
      CONTAINER ID   IMAGE                   COMMAND                  CREATED          STATUS          PORTS                                                              NAMES
-     28df738bd4bb   lab1-nginx-oss          "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:9000->9000/tcp   lab1-nginx-oss-1
+     28df738bd4bb   lab1-nginx-oss          "/docker-entrypoint.…"   34 minutes ago   Up 34 minutes   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:9000->9000/tcp   nginx-oss
 
     ```
 
@@ -212,23 +212,14 @@ Visual Studio Code | Docker Compose | GitHub
      1 root      0:00 nginx: master process nginx -g daemon off;
      30 nginx     0:00 nginx: worker process
      31 nginx     0:00 nginx: worker process
-     32 nginx     0:00 nginx: worker process
-     33 nginx     0:00 nginx: worker process
-     34 nginx     0:00 nginx: worker process
-     35 nginx     0:00 nginx: worker process
-     36 nginx     0:00 nginx: worker process
-     37 nginx     0:00 nginx: worker process
-     38 nginx     0:00 nginx: worker process
-     39 nginx     0:00 nginx: worker process
-     40 nginx     0:00 nginx: worker process
-     41 nginx     0:00 nginx: worker process
+     ...
      50 root      0:00 grep nginx
 
     ```
 
     ```bash
      # Check Linux TOP for resource usage
-      
+     top -n 1 
     ```
 
     ```bash
@@ -237,18 +228,9 @@ Visual Studio Code | Docker Compose | GitHub
      CPU:   0% usr   0% sys   0% nic 100% idle   0% io   0% irq   0% sirq
      Load average: 0.00 0.00 0.00 1/601 54
        PID  PPID USER     STAT   VSZ %VSZ CPU %CPU COMMAND
-        31     1 nginx    S     9372   0%   8   0% nginx: worker process
+        31     1 nginx    S     9372   0%   8   0% nginx: worker      process
         30     1 nginx    S     9372   0%   1   0% nginx: worker      process
-        33     1 nginx    S     9372   0%   3   0% nginx: worker      process
-        32     1 nginx    S     9372   0%   2   0% nginx: worker      process
-        37     1 nginx    S     9372   0%   1   0% nginx: worker      process
-        34     1 nginx    S     9372   0%   7   0% nginx: worker      process
-        35     1 nginx    S     9372   0%   5   0% nginx: worker      process
-        36     1 nginx    S     9372   0%   7   0% nginx: worker      process
-        40     1 nginx    S     9372   0%   0   0% nginx: worker      process
-        38     1 nginx    S     9372   0%   5   0% nginx: worker      process
-        39     1 nginx    S     9372   0%  11   0% nginx: worker      process
-        41     1 nginx    S     9372   0%   6   0% nginx: worker      process
+        ...
          1     0 root     S     8908   0%   4   0% nginx: master      process nginx -g daemon off;
         42     0 root     S     3404   0%   5   0% /bin/bash
         54    42 root     R     1600   0%   6   0% top -n 1
@@ -373,12 +355,12 @@ docker-compose down
 ```bash
 ##Sample output##
 Running 2/2
-Container lab1-nginx-oss-1   Removed                            
+Container nginx-oss          Removed                            
 Network lab1_default         Removed
 
 ```
 
-**This completes this Lab.**
+**This completes Lab1.**
 
 <br/>
 
