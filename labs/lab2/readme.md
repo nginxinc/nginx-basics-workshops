@@ -47,23 +47,23 @@ So what is a URL??  URL stands for `Uniform Resource Location` - an Internet sta
 
 Every URL consists of 4 or 5 distinct fields.
 
-Given the URL:   `http://www.example.com/application1?arg=123456`
+Given the URL:   <http://www.example.com/application1?arg=123456>
 
 It is decoded as:
 
 Scheme  | Hostname        | URI           | Argument
 :------:|:---------------:|:-------------:|:-----------:
-http:// | <www.example.com> | /application1 | ?arg=123456
+http:// | www.example.com | /application1 | ?arg=123456
 
 >If the TCP port used by the webserver is `not 80`, it must be included in the URL request, like this example using port 8080:
 
-Given the URL:  `http://www.example.com:8080/application1?arg=123456`
+Given the URL:  <http://www.example.com:8080/application1?arg=123456>
 
 It is decoded with the extra `port`field:
 
 Scheme  | Hostname        | Port  | URI    | Argument
 :------:|:--------:|:--------:|:--------:|:--------:
-http:// | <www.example.com> | :8080 | /application1 | ?arg=123456
+http:// | www.example.com | :8080 | /application1 | ?arg=123456
 
 In the examples above:
 
