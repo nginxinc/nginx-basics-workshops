@@ -129,8 +129,8 @@ Now that you have a TLS cert and key for testing, you will configure NGINX to us
 1. In the /etc/nginx/conf.d folder, make the following changes to your `tls-cars.example.com.conf` file:
 
     1. On line #1, change the comment from HTTP to HTTPS
-    1. On line #7, change the `listen 80` directive to `listen 443 ssl`.
-    1. Insert 2 new lines, between the server_name and access_log lines:
+    1. On line #7, swap comments on the `listen 81` directive and `listen 443 ssl`, to enable port 443 and ssl.
+    1. Uncomment 2 new lines, between the server_name and access_log lines:
     - ssl_certificate /etc/ssl/nginx/cars.example.com.crt;
     - ssl_certificate_key /etc/ssl/nginx/cars.example.com.key;
 
@@ -143,11 +143,12 @@ Now that you have a TLS cert and key for testing, you will configure NGINX to us
     #
     server {
         
-        listen 443 ssl;  # change to port 443, add "ssl" parameter for terminating TLS
+        # listen 81;   # Use port 81 to avoid conflicts
+        listen 443 ssl;   # Uncomment to change to port 443, add "ssl" parameter for terminating TLS on all IP addresses on this machine
 
         server_name cars.example.com;   # Set hostname to match in request
 
-    # Add the following 2 lines for NGINX cert and key directives and file locations.  The filenames and path must be correct.
+    # Uncomment the following 2 lines for NGINX cert and key directives and file locations.  The filenames and path must be correct.
 
         ssl_certificate /etc/ssl/nginx/cars.example.com.crt;
         ssl_certificate_key /etc/ssl/nginx/cars.example.com.key; 

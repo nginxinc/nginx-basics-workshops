@@ -9,14 +9,10 @@ services:
     build: nginx-oss          # Build new container, using /nginx-oss/Dockerfile
     volumes:                  # Sync these folders to container
         - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
-        - ./nginx-oss/etc/nginx/conf.d/.:/etc/nginx/conf.d/.
-        - ./nginx-oss/etc/nginx/includes/log_formats/.:/etc/nginx/includes/log_formats/.
-        - ./nginx-oss/etc/nginx/includes/ssl/.:/etc/nginx/includes/ssl/.             
-        - ./nginx-oss/etc/nginx/ssl/.:/etc/nginx/ssl/.   
-        - ./nginx-oss/usr/share/nginx/html/.:/usr/share/nginx/html/.
-        - ./nginx-oss/etc/ssl/nginx/.:/etc/ssl/nginx/.
-        - ./nginx-oss/etc/ssl/dhparam/2048/.:/etc/ssl/dhparam/2048/.
-        - ./nginx-oss/etc/ssl/dhparam/4096/.:/etc/ssl/dhparam/4096/.    
+        - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d
+        - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
+        - ./nginx-oss/usr/share/nginx/html:/usr/share/nginx/html
+        - ./nginx-oss/etc/ssl:/etc/ssl
     ports:
         - 80:80       # Open for HTTP
         - 443:443     # Open for HTTPS
