@@ -1,4 +1,0 @@
-# Build NGINX OSS container from Debian bookworm
-FROM nginx:mainline-bookworm
-RUN apt-get update
-RUN apt-get install -y ca-certificates bash-completion curl jq wget vim net-tools

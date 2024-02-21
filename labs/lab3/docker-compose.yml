@@ -7,12 +7,12 @@ services:
     hostname: nginx-oss
     container_name: nginx-oss
     build: nginx-oss          # Build new container, using /nginx-oss/Dockerfile
-    volumes:                  # Copy these folders to container
-        - ./nginx-oss/etc/ssl/nginx/.:/etc/ssl/nginx/.
-        - ./nginx-oss/etc/nginx/conf.d/.:/etc/nginx/conf.d/.
-        - ./nginx-oss/etc/nginx/includes/.:/etc/nginx/includes/.            
-        - ./nginx-oss/etc/nginx/ssl/.:/etc/nginx/ssl/.   
-        - ./nginx-oss/usr/share/nginx/html/.:/usr/share/nginx/html/.    
+    volumes:                  # Sync these folders to container
+        - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+        - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d
+        - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
+        - ./nginx-oss/usr/share/nginx/html:/usr/share/nginx/html
+        - ./nginx-oss/etc/ssl:/etc/ssl
     ports:
         - 80:80       # Open for HTTP
         - 443:443     # Open for HTTPS
