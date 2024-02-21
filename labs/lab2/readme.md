@@ -53,7 +53,7 @@ It is decoded as:
 
 Scheme  | Hostname        | URI           | Argument
 :------:|:---------------:|:-------------:|:-----------:
-http:// | www.example.com | /application1 | ?arg=123456
+http:// | <www.example.com> | /application1 | ?arg=123456
 
 >If the TCP port used by the webserver is `not 80`, it must be included in the URL request, like this example using port 8080:
 
@@ -63,13 +63,13 @@ It is decoded with the extra `port`field:
 
 Scheme  | Hostname        | Port  | URI    | Argument
 :------:|:--------:|:--------:|:--------:|:--------:
-http:// | www.example.com | :8080 | /application1 | ?arg=123456
+http:// | <www.example.com> | :8080 | /application1 | ?arg=123456
 
 In the examples above:
 
 - the Scheme is the protocol to use, usually either `HTTP` or `HTTPS`.  It must be followed by a colon, and two forward slashs.
 - The Hostname is a fully qualified DNS name, often with a subdomain like `www` in this example.  It must contain the root level Domain name.  It must follow DNS standards based naming conventions.  Using a non-FQDN name is possible, but outside the scope of this lab.
-- Modern browsers use port 80 for HTTP requests, and port 443 for HTTPS by default, and this port number does not appear in the URL.  However, if you are not using Port 80 for HTTP, or Port 443 for HTTPS, the Hostname and Port must be separated by a colon `:`. 
+- Modern browsers use port 80 for HTTP requests, and port 443 for HTTPS by default, and this port number does not appear in the URL.  However, if you are not using Port 80 for HTTP, or Port 443 for HTTPS, the Hostname and Port must be separated by a colon `:`.
 - The URI, `Uniform Resource Identifier`, is often called the `path`, because it often refers to a matching folder name on the web server's disk system.  It must start with a forward slash `/`, just like a Linux disk folder does.
 - The Argument, also commonly known as a `query string` is an optional extension of the URI, and adds additional information the web server might need to understand the request properly.  It must start with a question mark, and each argument has a unique name followed by an equal sign. Multiple arguments are allowed, each separated by the ampersand character `&`.
 
@@ -81,7 +81,7 @@ Given the URL:   `http://www.example.com/application1`
 
 Scheme  | Hostname        | URI
 :------:|:--------:|:--------:
-http:// | www.example.com | /application1
+http:// | <www.example.com> | /application1
 
 Would require the following NGINX configuration Contexts:
 
@@ -120,21 +120,21 @@ Here is a quick review of the NGINX commands you should be familiar with.  Depen
 
 ```bash
 
-$ nginx -v                  #displays NGINX version detauls
+nginx -v                  #displays NGINX version detauls
 
-$ nginx -s quit             #graceful shutdown
+nginx -s quit             #graceful shutdown
 
-$ nginx -s stop             #terminates all NGINX processes
+nginx -s stop             #terminates all NGINX processes
 
-$ nginx -t                  #test configuration syntax and files
+nginx -t                  #test configuration syntax and files
 
-$ nginx -T                  #dumps the current running configurations
+nginx -T                  #dumps the current running configurations
 
-$ nginx -s reload           #reloads NGINX with new configuration
+nginx -s reload           #reloads NGINX with new configuration
 
-$ systemctl start nginx     #start nginx processes
+systemctl start nginx     #start nginx processes
 
-$ systemctl stop nginx      #stop nginx processes
+systemctl stop nginx      #stop nginx processes
 
 ```
 
@@ -415,7 +415,7 @@ In general, the contexts and blocks are in a logical hierarchy that follows the 
 - server > virtual server parameters - listen port, hostname, access log, include files
 - location > URL path, object type
 
-http://www.example.com:8080/images/smile.png
+<http://www.example.com:8080/images/smile.png>
 
 maps to:
 
@@ -563,7 +563,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
     ```
 
-1. Save your file, and test your NGINX config by running  `nginx -t`command from within the container.
+1. Save your file, and test your NGINX config by running  `nginx -t` command from within the container.
 
     **Uh oh - what happened?**  Did you figure out the error?  You can't actually have 2 default servers in NGINX - that makes sense, right ?
 
@@ -612,21 +612,17 @@ Now that you have a basic understand of how NGINX routes requests based on the H
 
 In this exercise, you will continue to learn how NGINX routes requests, by looking at the URI ( the path ) of the URL.  You will create a third website, to show Path based routing.
 
-1. First, using VI or a text editor, update your local DNS resolver hosts file, usually `etc/hosts` on MacOS/Linux, to add these FQDN Hostnames used for these lab exercises. `cafe.example.com`
+1. First, using vi or a text editor, update your local DNS resolver hosts file, usually `etc/hosts` on MacOS/Linux, to add these FQDN Hostnames used for these lab exercises. `cafe.example.com`
 
     ```bash
-    vi /etc/hosts
+     vi /etc/hosts
 
-    # NGINX Basics hostnames for labs
-    127.0.0.1	localhost www.example.com www2.example.com cafe.example.com
+     # NGINX Basics hostnames for labs
+     127.0.0.1 localhost www.example.com www2.example.com cafe.example.com
 
     ```
 
-1. Using VI, create a new file called `cafe.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
-
-```bash
-/etc/nginx/conf.d$ vi cafe.example.com.conf
-```
+1. Within the mounted folder (labs/lab2/nginx-oss/etc/nginx/conf.d), create a new file called `cafe.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
 ```nginx
 
@@ -673,63 +669,63 @@ server {
 
 ```
 
-1. After saving and quitting VI, test it with `nginx -t`.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
+1. Save your file, and test your NGINX config by running `nginx -t` command from within the container.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
 
-1. Reload NGINX with `nginx -s reload`.
+1. Reload NGINX with below command from within the container.
+
+   ```bash
+   nginx -s reload
+   ```
 
 1. Test your new /paths with curl, don't forget your Host Header:
 
     ```bash
     curl 127.0.0.1 -H "Host: cafe.example.com"
-
     ```
+
     ```bash
     curl 127.0.0.1/coffee -H "Host: cafe.example.com"
-
     ```
 
     ```bash
     curl 127.0.0.1/tea -H "Host: cafe.example.com"
-
     ```
 
     ```bash
     curl 127.0.0.1/hours -H "Host: cafe.example.com"
-
     ```
 
     ```bash
-    #Sample outputs
-    Congrats, you have reached cafe.example.com, path /
-
-    Caffiene relief from cafe.example.com, path /coffee
-
-    Green Tea from cafe.example.com, path /tea
-
-    We are open:
-    Sun 6am-3pm
-    Mon Closed
-    Tue 6am-3pm
-    Wed 6am-3pm
-    Thurs 6am-3pm
-    Fri 6am-3pm
-    Sat 6am-3pm
-    Sun 6am-3pm
-    at cafe.example.com, path /hours
-
-    Sorry - We are Closed on Tuesdays
-    at cafe.example.com, path /hours/closed
-
+    curl 127.0.0.1/hours/closed -H "Host: cafe.example.com"
     ```
-
-    > NOTE:  You added an NGINX variable, `$uri` to the return directive, to echo back what the request URI path that was received.  There are many more NGINX variables that can be used like this.  Let's use more of these `NGINX $variables` to build a simple `debug` page, that will echo back some of the important information you might need when working/testing NGINX:
-
-1. Using VI, add a new `location block` called `/debug` to your existing `cafe.example.com.conf`, and type in these commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
     ```bash
-    vi cafe.example.com.conf
+     ##Sample outputs##
+     Congrats, you have reached cafe.example.com, path /
+
+     Caffeine relief from cafe.example.com, path /coffee
+
+     Green Tea from cafe.example.com, path /tea
+
+     We are open:
+     Sun 6am-3pm
+     Mon Closed
+     Tue 6am-3pm
+     Wed 6am-3pm
+     Thurs 6am-3pm
+     Fri 6am-3pm
+     Sat 6am-3pm
+     Sun 6am-3pm
+     at cafe.example.com, path /hours
+ 
+     Sorry - We are Closed on Tuesdays
+     at cafe.example.com, path /hours/closed
 
     ```
+
+    > **NOTE:**  You added an NGINX variable, `$uri` to the return directive, to echo back what the request URI path that was received.  There are many more NGINX variables that can be used like this.  Let's use more of these `NGINX $variables` to build a simple `debug` page, that will echo back some of the important information you might need when working/testing NGINX:
+
+1. Update the file `cafe.example.com.conf` to add a new `location` block called `/debug`, open the file and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
     ```nginx
 
@@ -740,18 +736,17 @@ server {
         
     ```
 
-1. After saving and quitting VI, test it with `nginx -t`.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
+1. Save your file, and test your NGINX config by running `nginx -t` command from within the container.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
 
-1. Reload NGINX with `nginx -s reload`.
+1. Reload NGINX with `nginx -s reload` command.
 
 1. Test your new /debug path with curl, did you remember your Host Header?
 
     ```bash
     curl 127.0.0.1/debug -H "Host: cafe.example.com"
-
     ```
 
-    You should see a response from the `/debug location block`, with the NGINX `$variables` filled in with data for each request to http://cafe.example.com/debug :
+    You should see a response from the `/debug location block`, with the NGINX `$variables` filled in with data for each request to <http://cafe.example.com/debug> :
 
     ```bash
     #Sample output
@@ -783,7 +778,7 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
     vi /etc/hosts
 
     # NGINX Basics hostnames for labs
-    127.0.0.1	localhost www.example.com www2.example.com cafe.example.com cars.example.com
+    127.0.0.1 localhost www.example.com www2.example.com cafe.example.com cars.example.com
 
     ```
 
@@ -868,7 +863,7 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 
     ```
 
-    Try them in a browser, like http://cars.example.com/rcf :
+    Try them in a browser, like <http://cars.example.com/rcf> :
 
     ![NGINX Welcome RCF](media/lab2_welcome-rcf.png)
 
@@ -899,13 +894,12 @@ Now that you have some hot cars in your garage to show off, you might want to le
     ```
 
     Save your file and quit VI.  
-    
+
 1. Test and Reload your new NGINX config.
 
-1. To see this in action, open your browser to http://cars.example.com/browse , you should see something similar to this.  If you click on one of the .jpg files, you will see the image; or the webpage if you click on the .html files.  This is a handy feature for presenting images, downloading files from directories, PDFs for documents, etc.
+1. To see this in action, open your browser to <http://cars.example.com/browse> , you should see something similar to this.  If you click on one of the .jpg files, you will see the image; or the webpage if you click on the .html files.  This is a handy feature for presenting images, downloading files from directories, PDFs for documents, etc.
 
     ![NGINX Directory Browse](media/lab2_directory-browse.png)
-
 
 <br/>
 
@@ -1041,6 +1035,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
     docker logs <nginx-oss ContainerID> --follow
 
     ```
+
     It should look similar to this:
 
     ```bash
@@ -1057,7 +1052,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
 <br/>
 
-## References:
+## References
 
 - [NGINX Beginner's Guide](https://nginx.org/en/docs/beginners_guide.html)
 - [NGINX OSS](https://nginx.org/en/docs/)
@@ -1070,10 +1065,10 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 - [HTTP URL Overview](https://en.wikipedia.org/wiki/URL)
 - [Run NGINX off a Floppy disk](https://www.youtube.com/watch?v=IjjiTD-1Cvg)
 
-
 <br/>
 
 ### Authors
+
 - Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
 - Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
 
