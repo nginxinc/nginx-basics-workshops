@@ -226,30 +226,27 @@ These are helpful when looking at if/how NGINX is handling traffic.
 
 Now that you know all 4 containers are working with the NGINX Welcome page, and the basic_status page, you can build and test the **NGINX OSS Proxy and Load Balancing** functions.  You will use a new `NGINX proxy_pass Directive` - you will start with Reverse Proxy configuration, test it out.  Then add the Upstream backends and test out Load Balancing.
 
-   - Using your previous lab exercise experience, you will configure a new NGINX configuration for the `cafe.example.com` website.  It will be very similar to `cars.example.com.conf` from lab3.  
+- Using your previous lab exercise experience, you will configure a new NGINX configuration for the `cafe.example.com` website.  It will be very similar to `cars.example.com.conf` from lab3.  
 
-   - This will require a new NGINX config file, for the Server and Location Blocks.
-
+- This will require a new NGINX config file, for the Server and Location Blocks.
 
 1. In the /`etc/nginx/conf.d folder`, create a new file named `cafe.example.com.conf`, which will be the config file for the Server and Location blocks for this new website.  
 
     However, instead of a Location block that points to a folder with html content on disk, you will tell NGINX to `proxy_pass` the request to one of your three web containers instead.  
 
     >This will show you how to unlock the amazing power of NGINX...
-    >>it can serve it's own content, 
+    >>it can serve it's own content,
     >>> or **content from another web server!**
 
     Docker Exec into your nginx-oss container.
 
     ```bash
-    docker exec -it nginx-oss bin/sh   # log into nginx-oss container
-
+    docker exec -it nginx-oss bin/bash   # log into nginx-oss container
     ```
 
     ```bash
-    $ cd /etc/nginx/conf.d
-    $ vi cafe.example.com.conf
-
+    cd /etc/nginx/conf.d
+    vi cafe.example.com.conf
     ```
 
     ```nginx
@@ -266,8 +263,6 @@ Now that you know all 4 containers are working with the NGINX Welcome page, and 
         access_log  /var/log/nginx/cafe.example.com.log main; 
         error_log   /var/log/nginx/cafe.example.com_error.log notice;
 
-        root /usr/share/nginx/html;         # Set the root folder for the HTML and JPG files
-
         location / {
             
         ### New NGINX Directive, "proxy_pass", tells NGINX to proxy traffic to another server.
@@ -278,10 +273,10 @@ Now that you know all 4 containers are working with the NGINX Welcome page, and 
     } 
     
     ```
-    
+
     Save the file and Quit VI.  Test and Reload your NGINX config.
 
-2.  Test if your Proxy_pass configuration is working, using curl several times, and your browser.
+2. Test if your Proxy_pass configuration is working, using curl several times, and your browser.
 
     ```bash
     curl -s http://cafe.example.com |grep Server
@@ -317,8 +312,8 @@ Now that you know all 4 containers are working with the NGINX Welcome page, and 
     ```
 
     ```bash
-    $ cd /etc/nginx/conf.d
-    $ vi cafe.example.com.conf
+    cd /etc/nginx/conf.d
+    vi cafe.example.com.conf
 
     ```
 
@@ -348,13 +343,12 @@ Now that you know all 4 containers are working with the NGINX Welcome page, and 
     } 
     
     ```
-    
+
     Save the file and Quit VI.  Test and Reload your NGINX config.
 
 4. Try it with Chrome, http://cafe.example.com.  Yes, that works alright, NGINX sends your cafe.example.com request to `nginx.org`.  No WAY, that's cool.
 
     ![Proxy_pass NGINX.org](media/lab4_proxypass-nginx-org.png)
-
 
 <br/>
 
@@ -375,8 +369,8 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
     ```
 
     ```bash
-    $ cd /etc/nginx/conf.d
-    $ vi upstreams.conf
+    cd /etc/nginx/conf.d
+    vi upstreams.conf
 
     ```
 
@@ -397,13 +391,14 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
     }
 
     ```
+
     Save the file and Quit VI.
 
 1. Modify the `proxy_pass` directive in `cafe.example.com.conf`, to proxy the requests to the `upstream block called nginx_cafe`.  And it goes without saying, you can have literally hundreds of upstream blocks for various backend apps, but each upstream block name must be unique.  (And you can have hundreds of backends, if you need that much capacity for your website).
 
     ```bash
-    $ cd /etc/nginx/conf.d
-    $ vi cafe.example.com.conf
+    cd /etc/nginx/conf.d
+    vi cafe.example.com.conf
 
     ```
 
@@ -443,7 +438,7 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
     docker exec -it nginx-oss bin/sh   # log into nginx-oss container
 
     ```
-    
+
     ```bash
     curl -is http://cafe.example.com |grep Server     # run at least 3 times
 
@@ -478,7 +473,17 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
     :-------------------------:|:-------------------------:|:-------------------------:
     ![NGINX Web1](media/lab4_nginx-web1.png)  |![NGINX Web2](media/lab4_nginx-web2.png) |![NGINX Web3](media/lab4_nginx-web3.png)
 
->This is called an `Upstream proxy_pass`, where you are telling NGINX to Proxy the request to a list of servers in the upstream, and load balance them. 
+>This is called an `Upstream proxy_pass`, where you are telling NGINX to Proxy the request to a list of servers in the upstream, and load balance them.
+
+1. These backend application do have the following multiple paths which can also be used for testing. Feel free to try out them:
+   - [http://cafe.example.com/coffee](http://cafe.example.com/coffee)
+   - [http://cafe.example.com/tea](http://cafe.example.com/tea)
+   - [http://cafe.example.com/icetea](http://cafe.example.com/icetea)
+   - [http://cafe.example.com/beer](http://cafe.example.com/beer)
+   - [http://cafe.example.com/wine](http://cafe.example.com/wine)
+   - [http://cafe.example.com/cosmo](http://cafe.example.com/cosmo)
+   - [http://cafe.example.com/mojito](http://cafe.example.com/mojito)
+   - [http://cafe.example.com/daiquiri](http://cafe.example.com/daiquiri)
 
 <br/>
 
