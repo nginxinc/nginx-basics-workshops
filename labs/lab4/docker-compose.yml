@@ -9,6 +9,10 @@ services:
     hostname: nginx-oss
     container_name: nginx-oss
     build: nginx-oss          # Build new container, using /nginx-oss/Dockerfile
+    volumes:                  # Sync these folders to container
+        - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+        - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d
+        - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
     links:
         - web1:web1
         - web2:web2

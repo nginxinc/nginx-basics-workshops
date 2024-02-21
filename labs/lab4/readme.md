@@ -10,13 +10,14 @@ NGINX OSS | Docker
   
 ## Learning Objectives 
 
-By the end of the lab you will be able to: 
- * Build and run an `NGINX Opensource Docker` image
- * Build your Workshop enviroment with Docker Compose
- * Verify Container build with NGINX tests
- * Configure NGINX Extended Access Logging
- * Configure NGINX for Load Balancing
- * Add NGINX features following Best Practices
+By the end of the lab you will be able to:
+
+- Build and run an `NGINX Opensource Docker` image
+- Build your Workshop enviroment with Docker Compose
+- Verify Container build with NGINX tests
+- Configure NGINX Extended Access Logging
+- Configure NGINX for Load Balancing
+- Add NGINX features following Best Practices
 
 ## Pre-Requisites
 
@@ -41,18 +42,6 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
     FROM nginx:mainline-alpine
     RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim
 
-    # Copy certificate files and dhparams
-    COPY etc/ssl /etc/ssl
-
-    # Copy nginx config files
-    COPY /etc/nginx /etc/nginx
-    RUN chown -R nginx:nginx /etc/nginx
-
-    # EXPOSE ports, HTTP 80, HTTPS 443, Nginx stub_status page 9000
-    EXPOSE 80 443 9000
-    STOPSIGNAL SIGTERM
-    CMD ["nginx", "-g", "daemon off;"]
-
     ```
 
 1. Inspect the `docker-compose.yml` file, located in the /lab4 folder.  Notice you are building and running the NGINX-OSS web and Proxy container, (using the modified `/nginx-oss/Dockerfile` from the previous step).  
@@ -62,6 +51,10 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
     nginx-oss:                  # NGINX OSS Web / Load Balancer
         hostname: nginx-oss
         build: nginx-oss          # Build new container, using /nginx-oss/Dockerfile
+        volumes:                  # Sync these folders to container
+            - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+            - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d
+            - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
         links:
             - web1:web1
             - web2:web2
@@ -122,7 +115,7 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
     docker exec -it web1 bin/sh   # log into web1 container, then web2, then web3
 
     ```
-   
+
     ```bash
     curl -s http://localhost |grep Name
 
