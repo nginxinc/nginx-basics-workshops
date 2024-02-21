@@ -9,6 +9,7 @@ services:
     build: nginx-oss          # Build new container, using /nginx-oss/Dockerfile
     volumes:
         - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d                # Copy all files from this folder to container
+        - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
         - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
         - ./nginx-oss/usr/share/nginx/html/.:/usr/share/nginx/html/.    # Copy these files to container
     ports:

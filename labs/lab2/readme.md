@@ -820,7 +820,7 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 
 1. Save your file, and test your NGINX config by running `nginx -t` command from within the container.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
 
-1. Reload NGINX with `nginx -s reload`.
+1. Reload NGINX with `nginx -s reload` command.
 
 1. Test all three URLs, one for each car with curl, don't forget your Host Header!:
 
@@ -866,16 +866,9 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 
 ### NGINX Directory Browsing
 
-Now that you have some hot cars in your garage to show off, you might want to let users browse images without knowing all the names or links.  Or, you might want to know what files are in different folders on your webserver, either for yourself or for your visitors, so a File Manager type of user interface would be nice.  NGINX can provide this for you with a module called `http_auto_index`, that can provide this feature.  You will now create a new `/location block` called `/browse` that will perform `Directory Browsing` using this feature module:
+Now that you have some hot cars in your garage to show off, you might want to let users browse images without knowing all the names or links.  Or, you might want to know what files are in different folders on your webserver, either for yourself or for your visitors, so a File Manager type of user interface would be nice.  NGINX can provide this for you with a module called `http_auto_index`, that can provide this feature.  You will now create a new `location` block called `/browse` that will perform `Directory Browsing` using this feature module:
 
-1. Using VI, edit your `cars.example.com.conf` file, and add this new Location Block:
-
-    ```bash
-    vi /etc/nginx/conf.d/cars.example.com.conf
-
-    ```
-
-    Add this location block, change the URL path if you like:
+1. Update the `cars.example.com.conf` file, and add this new Location Block, change the URL path if you like:
 
     ```nginx
 
@@ -888,9 +881,9 @@ Now that you have some hot cars in your garage to show off, you might want to le
 
     ```
 
-    Save your file and quit VI.  
+1. Save your file, and test your NGINX config by running `nginx -t` command from within the container.
 
-1. Test and Reload your new NGINX config.
+1. Reload NGINX with `nginx -s reload` command.
 
 1. To see this in action, open your browser to <http://cars.example.com/browse> , you should see something similar to this.  If you click on one of the .jpg files, you will see the image; or the webpage if you click on the .html files.  This is a handy feature for presenting images, downloading files from directories, PDFs for documents, etc.
 
@@ -904,13 +897,13 @@ Now that you have some hot cars in your garage to show off, you might want to le
 
 In this exercise, you will learn about NGINX logging.  There are only 2 logs that you need to worry about.  The NGINX error.log, and the access.logs.
 
-1. The NGINX `error.log`, despite it's name, is also used to record start/stop/reload events, and other important messages when NGINX boots up.   It is also the `FIRST` place you should look if you suspect a problem with your website or NGINX configurations.  It will record any DNS, TCP, HTTP, or HTTPS errors it encounters with processing traffic in realtime. It also records issues with the Linux Host system during runtime, like running out of memory or disk, file not found, etc.  You will drastically reduce the time required to find and address issues if you start your troubleshooting process with the NGINX error.log.  There is only one NGINX error.log file, but you can change the name and folder if you like.
+1. The NGINX `error.log`, despite it's name, is also used to record `start/stop/reload` events, and other important messages when NGINX boots up.   It is also the `FIRST` place you should look if you suspect a problem with your website or NGINX configurations.  It will record any DNS, TCP, HTTP, or HTTPS errors it encounters with processing traffic in realtime. It also records issues with the Linux Host system during runtime, like running out of memory or disk, file not found, etc.  You will drastically reduce the time required to find and address issues if you start your troubleshooting process with the NGINX error.log.  There is only one NGINX error.log file, but you can change the name and folder if you like.
 
     For example, here is what the nginx error.log shows when NGINX is started:
 
     ```bash
     2024/02/02 00:11:28 [notice] 1#1: using the "epoll" event method
-    2024/02/02 00:11:28 [notice] 1#1: nginx/1.25.3
+    2024/02/02 00:11:28 [notice] 1#1: nginx/1.25.4
     2024/02/02 00:11:28 [notice] 1#1: built by gcc 12.2.1 20220924 (Alpine 12.2.1_git20220924-r10)
     2024/02/02 00:11:28 [notice] 1#1: OS: Linux 6.4.16-linuxkit
     2024/02/02 00:11:28 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1048576:1048576
@@ -936,21 +929,9 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
     ```
 
-    As a Best Practice, you should not modify this main log format, but rather copy this one and create a new one with your changes.  The `include` directive is also introduced here, because it makes your NGINX configurations more concise, uniform, and consistent.  As you will likely want to use the same access log format for multiple websites, you will define it ONCE, but use it for every server block, instead of duplicating the log format config for every website.  If you need to make a change to your log format, you can update it in one file, but it would apply to all your websites/server blocks.
+    As a Best Practice, you should not modify this `main` log format, but rather copy this one and create a new one with your changes.  The `include` directive is also introduced here, because it makes your NGINX configurations more concise, uniform, and consistent.  As you will likely want to use the same access log format for multiple websites, you will define it ONCE, but use it for every server block, instead of duplicating the log format config for every website.  If you need to make a change to your log format, you can update it in one file, but it would apply to all your websites/server blocks.
 
-1. Create a new folder `/includes` under the /etc/nginx folder.  Then create a second folder called `/log_formats` in the /etc/nginx/includes folder.  This is where the new log format files will be created.
-
-    ```bash
-    /etc/nginx$ mkdir includes
-
-    cd includes
-    mkdir log_format
-
-    cd log_format
-
-    ```
-
-1. Now using VI, create a new file called `main_ext.conf`, and add this following log format to it:
+1. Inspect `main_ext.conf`file that can be found within `labs/lab2/nginx-oss/etc/nginx/includes/log_formats` folder:
 
     ```nginx
     # Extended Metrics Log Format
@@ -969,11 +950,11 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
     ```
 
-    Save the file and quit VI.
+1. Notice we have added a few new fields using $variables, like the $server_name, $request_time, etc.  You can modify this as you like to suit your needs.
 
-    Notice we have added a few new fields using $variables, like the $server_name, $request_time, etc.  You can modify this as you like to suit your needs.
+1. Similar to `/etc/nginx/conf.d` folder we have volume mounted `etc/nginx/includes` folder. So any changes that you make within this folder locally will sync up within the running `nginx-oss` container.
 
-1. Now you need to tell NGINX where to find these new log format definitions. Using VI, edit your nginx.conf, to add your `/includes/log_formats` folder as a search location:
+1. Now you need to tell NGINX where to find these new log format definitions. Edit your `nginx.conf`, uncomment line #24 to add your `/includes/log_formats` folder as a search location:
 
     ```nginx
     http {
@@ -999,14 +980,9 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
     }
     ```
 
-    Save your nginx.conf, quit VI, and test your config with `nginx -t`.
+1. Save your `nginx.conf` file, and test your NGINX config by running `nginx -t` command from within the container.
 
-1. Next, modify your `cars.example.com` website to use this new log format:
-
-    ```bash
-    vi /etc/nginx/conf.d/cars.example.com.conf
-
-    ```
+1. Next, enable your `cars.example.com` website to use this new log format. To do so you need to modify `cars.example.com.conf` file to make use of the new log format:
 
     ```nginx
 
@@ -1018,17 +994,22 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
         access_log  /var/log/nginx/cars.example.com.log main_ext;  # Change log format to main_ext
 
+        error_log   /var/log/nginx/cars.example.com_error.log notice;
+        ...
+    }
+
     ```
 
-    Save your cars.example.com.conf file, and exit VI.
+1. Save your file, and test your NGINX config by running `nginx -t` command from within the container.
 
-    Test your nginx configuration, and reload nginx.  If all was correct, it will reload and now your cars.example.com website will be using a new access log.  Let's go check.
+1. Reload NGINX with `nginx -s reload` command.  If all was correct, it will reload and now your cars.example.com website will be using a new access log.  Let's go check.
 
-1. Watch the nginx-oss container's log file, and watch as you send a couple requests.
+1. `cars.example.com` access logs are written within a custom file(`/var/log/nginx/cars.example.com.log`) which is also passed as one of the parameters to the `access_log` directive. Within the `nginx-oss`container, tail this log file, and watch as you send a couple requests.
 
     ```bash
-    docker logs <nginx-oss ContainerID> --follow
+    docker exec -it nginx-oss /bin/bash
 
+    tail -f /var/log/nginx/cars.example.com.log
     ```
 
     It should look similar to this:
@@ -1039,11 +1020,11 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
     ```
 
-    You see one request for the rcf.html page, and a second request for the rcf.jpg image.
+    You see one request for the rcf.html page, and a second request for the rcf.jpg image
 
 <br/>
 
-**This completes this Lab.**
+**This completes Lab2.**
 
 <br/>
 
