@@ -2,21 +2,17 @@
 
 ## Introduction
 
-In order to complete the Lab exercises in this Workshop, your computer will need the following hardware, software, and access requirements.  If you are unable to meet these basic requirements, you will likely not be able to complete the Labs as written.  It is highly recommended that you have the minimum requirements.
+In order to complete the Lab exercises in this Workshop on your own computer and not use F5 provided workshopenvironment, your computer should meet with the following hardware, software, and access requirements. If you are unable to meet these basic requirements, you will likely not be able to complete the Labs as written.  It is highly recommended that you have the minimum requirements.
 
-## Learning Objectives 
+## Learning Objectives
 
-By the end of this Setup Lab0, you will be ready for the Workshop lab exercises: 
- * this
- * that
- * finally this
+By the end of this prerequisite instructions, you will be ready to do the Workshop lab exercises in your own system:
 
 ## Hardware Requirments
 
 1. 8GB available RAM
 2. 50GB available disk space
 3. Optional - second monitor
-4. Optionan - ???
 
 ## Software Requirements
 
@@ -24,6 +20,7 @@ By the end of this Setup Lab0, you will be ready for the Workshop lab exercises:
 1. Docker Compose
 1. Chrome or other modern browser
 1. Visual Studio Code, or other test/code editor
+1. Postman or any other API platform that helps running API requests.
 
 ## Administrative Requirements
 
@@ -34,24 +31,30 @@ By the end of this Setup Lab0, you will be ready for the Workshop lab exercises:
 
 ## Install Docker Engine
 
-1. Mac
-1. Linux
-1. Windows
+- [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
 
 ## Install Docker Compose
 
-1. Mac
-1. Linux
-1. Windows
+- [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
 
 ## Optional - Install Visual Studio Code
 
-1. Mac
-1. Linux
-1. Windows
+- [https://code.visualstudio.com/download](https://code.visualstudio.com/download)
 
-**This completes this Lab.**
+## Optional - Install Postman Tool
 
+- [https://www.postman.com/downloads/](https://www.postman.com/downloads/)
+
+## Cloning the Workshop Repository locally
+
+Once you have setup your system make sure to clone this repository locally in your system.
+
+```bash
+git clone https://github.com/nginxinc/nginx-basics-workshops.git
+```
+
+<br/>
+You are now all set to start with the workshop labs.
 <br/>
 
 ## References:
@@ -59,12 +62,11 @@ By the end of this Setup Lab0, you will be ready for the Workshop lab exercises:
 - [NGINX Plus](https://docs.nginx.com/nginx/)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
 - [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
-- [Docker](https://www.docker.com/)
-- [Docker Compose](https://docs.docker.com/compose/)
 
 <br/>
 
 ### Authors
+
 - Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
 - Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
 

@@ -1,11 +1,5 @@
 ![NGINX Basics Workshop Banner](media/basics-workshop-banner.png)
 
-<br/>
-
-# Under Construction - This workshop is under a re-write.  Use at your own risk
-
-<br/>
-
 # NGINX Basics Workshop
 
 ## Welcome to the NGINX OSS and Plus Basics Workshop

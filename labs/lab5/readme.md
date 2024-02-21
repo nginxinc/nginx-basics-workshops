@@ -742,7 +742,6 @@ In this section, you will make use of NGINX Plus API to get current statistics r
 
 - Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
 - Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
-- Kevin Jones - Technical Evanglist - Community and Alliances @ F5, Inc.
 
 -------------
 
