@@ -53,8 +53,8 @@ The Hands On lab exercises are written for users with a host running multiple Do
    For example, on Linux/macOS the host file is located at `/etc/hosts`:
 
    ```bash
-    # NGINX Plus Basics lab hostnames (local docker hosts)
-    127.0.0.1 example.com www.example.com www2.example.com cars.example.com cafe.example.com nginx-plus-1 web1 web2 web3
+    # NGINX OSS/Plus Basics lab hostnames (local docker hosts)
+    127.0.0.1 example.com www.example.com www2.example.com cars.example.com cafe.example.com
    ```
 
      > **Note on Docker DNS:**

@@ -96,14 +96,14 @@ URI | location{}
 #
 http {
 
-server {
-    listen 80;
-    server_name www.example.com;
-    
-    location /application1 {
-        index index.html;
+    server {
+        listen 80;
+        server_name www.example.com;
+        
+        location /application1 {
+            index index.html;
+        }
     }
-}
 }
 
 ```
@@ -151,7 +151,6 @@ Go ahead and try some of these NGINX commands in your nginx-oss container now, s
 
     ```bash
     docker exec -it nginx-oss /bin/bash
-
     ```
 
 1. In a second Terminal, watch the nginx-oss container's log file, and watch as you send various NGINX commands.
@@ -415,7 +414,7 @@ In general, the contexts and blocks are in a logical hierarchy that follows the 
 - server > virtual server parameters - listen port, hostname, access log, include files
 - location > URL path, object type
 
-<http://www.example.com:8080/images/smile.png>
+`http://www.example.com:8080/images/smile.png`
 
 maps to:
 
@@ -442,6 +441,7 @@ nginx
 │   ├── stub_status.conf
 │   ├── www.example.com.conf
 │   └── www2.example.com.conf
+├── includes                      # Include other shared config files
 ├── fastcgi.conf
 ├── fastcgi_params
 ├── mime.types
@@ -450,7 +450,7 @@ nginx
 ├── scgi_params
 └── uwsgi_params
 
-1 directories, 13 files
+2 directories, 13 files
 
 ```
 
@@ -525,7 +525,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
    nginx -s reload
    ```
 
-1. Test access to your new website, using curl to localhost (Port forwarding is enabled within Docker):
+1. Test access to your new website, using terminal, curl to localhost:
 
     ```bash
      # Run curl from outside of container
@@ -822,17 +822,17 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 
 1. Reload NGINX with `nginx -s reload` command.
 
-1. Test all three URLs, one for each car with curl, don't forget your Host Header!:
+1. Test all three URLs, one for each car with curl. Because you have updated local `/etc/hosts` file you can now use your FQDN with curl:
 
     ```bash
-    curl localhost/gtr -H "Host: cars.example.com"   # or curl cars.example.com/gtr
-    curl localhost/nsx -H "Host: cars.example.com"
-    curl localhost/rcf -H "Host: cars.example.com"
+    curl cars.example.com/gtr
+    curl cars.example.com/nsx
+    curl cars.example.com/rcf
 
     ```
 
     ```bash
-    #Sample output
+    ##Sample output##
     <!DOCTYPE html>
     <html>
     <head>
@@ -858,13 +858,17 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 
     ```
 
-    Try them in a browser, like <http://cars.example.com/rcf> :
+    Try all three in a browser, like <http://cars.example.com/gtr>, <http://cars.example.com/nsx>, <http://cars.example.com/rcf> :
 
     ![NGINX Welcome RCF](media/lab2_welcome-rcf.png)
 
     You will notice, this page has just a few simple modification to NGINX's default Welcome page.  Feel free to try adding some of your favorite images, and create a new hostname, and location blocks to serve up your new content ... now that you have a couple examples to work with - it's easy with NGINX!
 
+<br/>
+
 ### NGINX Directory Browsing
+
+<br/>
 
 Now that you have some hot cars in your garage to show off, you might want to let users browse images without knowing all the names or links.  Or, you might want to know what files are in different folders on your webserver, either for yourself or for your visitors, so a File Manager type of user interface would be nice.  NGINX can provide this for you with a module called `http_auto_index`, that can provide this feature.  You will now create a new `location` block called `/browse` that will perform `Directory Browsing` using this feature module:
 
@@ -897,11 +901,18 @@ Now that you have some hot cars in your garage to show off, you might want to le
 
 In this exercise, you will learn about NGINX logging.  There are only 2 logs that you need to worry about.  The NGINX error.log, and the access.logs.
 
-1. The NGINX `error.log`, despite it's name, is also used to record `start/stop/reload` events, and other important messages when NGINX boots up.   It is also the `FIRST` place you should look if you suspect a problem with your website or NGINX configurations.  It will record any DNS, TCP, HTTP, or HTTPS errors it encounters with processing traffic in realtime. It also records issues with the Linux Host system during runtime, like running out of memory or disk, file not found, etc.  You will drastically reduce the time required to find and address issues if you start your troubleshooting process with the NGINX error.log.  There is only one NGINX error.log file, but you can change the name and folder if you like.
+1. The NGINX `error.log`, despite its name, it also used to record other important information at boot and runtime:
+
+    - NGINX binary start/stop/reload messages
+    - NGINX version and binary file details
+    - Networking errors
+    - Configuration errors
+    - Linux System Errors
 
     For example, here is what the nginx error.log shows when NGINX is started:
 
     ```bash
+    ##Sample output##
     2024/02/02 00:11:28 [notice] 1#1: using the "epoll" event method
     2024/02/02 00:11:28 [notice] 1#1: nginx/1.25.4
     2024/02/02 00:11:28 [notice] 1#1: built by gcc 12.2.1 20220924 (Alpine 12.2.1_git20220924-r10)
