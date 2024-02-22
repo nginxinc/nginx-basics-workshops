@@ -143,7 +143,7 @@ Go ahead and try some of these NGINX commands in your nginx-oss container now, s
 1. Run Docker Compose to build and run your NGINX OSS container:
 
    ```bash
-   cd labs/lab2
+   cd lab2
    docker-compose up --force-recreate
    ```
 
