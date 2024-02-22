@@ -100,7 +100,7 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
     ```
 
     ```bash
-    #Sample output
+    ##Sample output##
     CONTAINER ID   IMAGE                   COMMAND                  CREATED       STATUS       PORTS                                                              NAMES
     6ede3846edc3   lab4-nginx-oss          "/docker-entrypoint.…"   3 hours ago   Up 3 hours   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:9000->9000/tcp   nginx-oss
     e4887e475a14   nginxinc/ingress-demo   "/docker-entrypoint.…"   3 hours ago   Up 3 hours   0.0.0.0:56086->80/tcp, 0.0.0.0:56087->443/tcp                      web1
@@ -122,7 +122,7 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
     ```
 
     ```bash
-    #Sample outputs
+    ##Sample outputs##
 
     <p class="smaller"><span>Server Name:</span> <span>web1</span></p>   # web1
 
@@ -284,7 +284,7 @@ Now that you know all 4 containers are working with the NGINX Welcome page, and 
     ```
 
     ```bash
-    #Sample output
+    ##Sample output##
 
       Server: nginx/1.25.4
       <p class="smaller"><span>Server Name:</span> <span>web1</span></p>   # web1
@@ -461,7 +461,7 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
     ```
 
     ```bash
-    #Sample output
+    ##Sample output##
 
       Server: nginx/1.25.4
       <p class="smaller"><span>Server Name:</span> <span>web1</span></p>   # web1
@@ -789,10 +789,10 @@ Different backend applications may benefit from using different load balancing t
 
 1. If you open the NGINX Basic Status page at <http://localhost:9000/basic_status>, and refresh it every 3-4 seconds while you run the `WRK HTTP loadtest` at your nginx-oss Load Balancer:  
 
-    Loadtesting with WRK.  This is a docker container that will download and run, with 4 threads, at 200 connections, for 5 minutes:
+    Loadtesting with WRK.  This is a docker container that will download and run, with 4 threads, at 200 connections, for 2 minutes:
 
     ```bash
-    docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d5m -H 'Host: cafe.example.com' --timeout 2s http://nginx-oss/coffee
+    docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d2m -H 'Host: cafe.example.com' --timeout 2s http://nginx-oss/coffee
 
     ```
 
@@ -802,7 +802,7 @@ Different backend applications may benefit from using different load balancing t
 
     ```bash
     ##Sample output##
-    Running 5m test @ http://nginx-oss/coffee
+    Running 2m test @ http://nginx-oss/coffee
     4 threads and 200 connections
     Thread Stats   Avg      Stdev     Max   +/- Stdev
         Latency    51.99ms   25.29ms   1.60s    99.19%
@@ -849,11 +849,11 @@ Different backend applications may benefit from using different load balancing t
 
     Run the WRK test again.  You should now have `least_conn` and `keepalive` both **enabled**.
 
-    After the 5 minute WRK test has finished, you should see a Summary of the statistics.  It should look similar to this:
+    After the 2 minute WRK test has finished, you should see a Summary of the statistics.  It should look similar to this:
 
     ```bash
-    #Sample output
-    Running 5m test @ http://nginx-oss/coffee
+    ##Sample output##
+    Running 2m test @ http://nginx-oss/coffee
     4 threads and 200 connections
     Thread Stats   Avg      Stdev     Max   +/- Stdev
         Latency    25.48ms   16.93ms 825.44ms   98.58%
@@ -920,13 +920,31 @@ Different backend applications may benefit from using different load balancing t
 
     Save your file. Test and Reload your NGINX config.
 
-1. You should now have `4 workers`, `least_conn` and `keepalive` **enabled**.  Run the WRK test again. You are going FIRE IT UP!
+1. You should now have `4 workers`, `least_conn` and `keepalive` **enabled**.  Run the WRK test again. You are going to CRANK IT UP!
 
-    After the 5 minute WRK test has finished, you should see a Summary of the statistics.  It should look similar to this:
+    Docker Exec into the nginx-oss container, and run `top` to see the NGINX Workers at work.  Should look something like this:
 
     ```bash
-    #Sample output
-    Running 5m test @ http://nginx-oss/coffee
+    ##Sample output##
+    Mem: 4273520K used, 3863844K free, 5364K shrd, 30348K buff, 3166924K cached
+    CPU:  18% usr  35% sys   0% nic  11% idle   0% io   0% irq  33% sirq
+    Load average: 13.75 4.73 3.71 17/703 63
+    PID  PPID USER     STAT   VSZ %VSZ CPU %CPU COMMAND
+    61     1 nginx    R     9964   0%  10   7% nginx: worker process
+    59     1 nginx    R     9988   0%   9   7% nginx: worker process
+    60     1 nginx    R     9972   0%   3   7% nginx: worker process
+    62     1 nginx    R     9920   0%   1   7% nginx: worker process
+    1     0 root     S     9036   0%   4   0% nginx: master process nginx -g daemon off;
+    30     0 root     S     1672   0%  10   0% /bin/sh
+    63    30 root     R     1600   0%   3   0% top
+
+    ```
+    
+    After the 2 minute WRK test has finished, you should see a Summary of the statistics.  It should look similar to this:
+
+    ```bash
+    ##Sample output##
+    Running 2m test @ http://nginx-oss/coffee
     4 threads and 200 connections
     Thread Stats   Avg      Stdev     Max   +/- Stdev
         Latency     9.33ms    3.60ms 134.99ms   78.81%
@@ -940,7 +958,7 @@ Different backend applications may benefit from using different load balancing t
 
     Over 21,000 Requests/Second from a little Docker container...not too shabby!  
 
-    Docker Desktop was humming along, with the fan on full blast!
+    Was your Docker Desktop was humming along, with the fan on full blast?!
 
     ![Docker Dashboard](media/lab4_docker-perf-4core.png)
     
@@ -1008,11 +1026,13 @@ With NGINX, there are several configuration options for this, but in this next l
 
 <br/>
 
+If you need to find the `answers` to the lab exercises, you will find the final NGINX configuration files for all the labs in the /lab4/final folder.  Use them for reference to compare how you completed the labs.
+
 >**Congratulations, you are now a member of Team NGINX !**
 
 ![NGINX Logo](media/nginx-logo.png)
 
-**This completes this Lab.**
+**This completes Lab4.**
 
 <br/>
 
@@ -1027,6 +1047,7 @@ With NGINX, there are several configuration options for this, but in this next l
 - [NGINX Load Balancing Methods](https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/#method)
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
+- [WRK Docker image](https://registry.hub.docker.com/r/williamyeh/wrk)
 
 <br/>
 
