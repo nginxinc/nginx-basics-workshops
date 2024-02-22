@@ -95,7 +95,7 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 1. Run Docker Compose to build and run your containers:
 
    ```bash
-    cd labs/lab4
+    cd lab4
     docker-compose up --force-recreate
    ```
 
@@ -1113,6 +1113,23 @@ If you need to find the `answers` to the lab exercises, you will find the final 
 
 ![NGINX Logo](media/nginx-logo.png)
 
+>If you are finished with this lab, you can use Docker Compose to shut down your test environment:
+
+```bash
+docker-compose down
+```
+
+```bash
+##Sample output##
+Running 5/5
+Container nginx-oss          Removed
+Container web2               Removed
+Container web3               Removed
+Container web1               Removed                            
+Network lab4_default         Removed
+
+```
+
 **This completes Lab4.**
 
 <br/>
@@ -1133,6 +1150,7 @@ If you need to find the `answers` to the lab exercises, you will find the final 
 <br/>
 
 ### Authors
+
 - Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
 - Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
 

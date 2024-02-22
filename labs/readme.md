@@ -1,4 +1,4 @@
-![NGINX NIC](../media/basics-workshop-banner.png)
+![NGINX NIC](media/basics-workshop-banner.png)
 
 ## NGINX Basics Workshop
 
@@ -16,7 +16,7 @@ You will learn about `NGINX` Opensource Software (OSS) and `NGINX Plus`, the Com
 
 <br/>
 
-![NGINXpert Desk](../media/nginx-workshop-desk.png)
+![NGINXpert Desk](media/nginx-workshop-desk.png)
 
 <br/>
 

@@ -114,7 +114,8 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
 1. Build and run all the above containers by using docker compose.
 
    ```bash
-    docker compose up
+    cd lab5
+    docker compose up --force-recreate
    ```
 
 1. Verify all four containers are running:
@@ -729,6 +730,23 @@ In this section, you will make use of NGINX Plus API to get current statistics r
      #[Optional] curl command if not using postman
      curl 'http://localhost:9000/api/9/http/upstreams' | jq
     ```
+
+>If you are finished with this lab, you can use Docker Compose to shut down your test environment:
+
+```bash
+docker-compose down
+```
+
+```bash
+##Sample output##
+Running 5/5
+Container nginx-plus         Removed
+Container web2               Removed
+Container web3               Removed
+Container web1               Removed                            
+Network lab5_default         Removed
+
+```
 
 **This completes Lab 5.**
 

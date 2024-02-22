@@ -143,7 +143,7 @@ Go ahead and try some of these NGINX commands in your nginx-oss container now, s
 1. Run Docker Compose to build and run your NGINX OSS container:
 
    ```bash
-   cd labs/lab2
+   cd lab2
    docker-compose up --force-recreate
    ```
 
@@ -1034,6 +1034,20 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
     You see one request for the rcf.html page, and a second request for the rcf.jpg image
 
 <br/>
+
+>If you are finished with this lab, you can use Docker Compose to shut down your test environment:
+
+```bash
+docker-compose down
+```
+
+```bash
+##Sample output##
+Running 2/2
+Container nginx-oss          Removed                            
+Network lab2_default         Removed
+
+```
 
 **This completes Lab2.**
 

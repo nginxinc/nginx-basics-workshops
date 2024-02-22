@@ -4,14 +4,15 @@
 
 In this Lab, NGINX as a webserver with HTTPS TLS termination will be introduced.  HTTPS is commonly used to secure a website with encryption, so that data sent between the browser and the NGINX server cannot be easily read like clear text HTTP. You will explore common TLS configuration directives and variables, to provide encryption for your traffic.  You will also explore some common tools to create and test TLS encryption components.
 
-## Learning Objectives 
+## Learning Objectives
 
-By the end of the lab you will be able to: 
- * Create a Self-signed TLS certificate and key
- * Configure NGINX webserver to use a TLS cert and key
- * Configure TLS settings
- * Add some TLS Best Practice configurations
- * Test and validate TLS traffic components and settings
+By the end of the lab you will be able to:
+
+- Create a Self-signed TLS certificate and key
+- Configure NGINX webserver to use a TLS cert and key
+- Configure TLS settings
+- Add some TLS Best Practice configurations
+- Test and validate TLS traffic components and settings
 
 </br>
 
@@ -34,11 +35,18 @@ In this exercise, you will use `openssl` to create a Self-signed certificate and
 
 <br/>
 
-![Openssl](media/openssl-logo.png) 
+![Openssl](media/openssl-logo.png)
 
 <br/>
 
 1. Ensure you are in the `lab3` folder.  Using a Terminal, use Docker Compose to build and run the `nginx-oss` container.  This is a new image, based on the Dockerfile in the lab3 folder.  The `openssl` libraries have been added, so you can use them to build, configure, and test TLS.  Optionally, you can use `openssl` if it is installed on your local machine.
+
+1. Run Docker Compose to build and run your containers:
+
+   ```bash
+    cd lab3
+    docker-compose up --force-recreate
+   ```
 
 1. After the Docker Compose has completed, and the lab3/nginx-oss container is running, Docker Exec into the nginx-oss container.
 
@@ -96,6 +104,7 @@ In this exercise, you will use `openssl` to create a Self-signed certificate and
     -----END CERTIFICATE-----
 
     ```
+
     ```bash
     /etc/ssl/nginx $ cat cars.example.com.key
     ```
@@ -827,6 +836,20 @@ As a Best Practice, you should not modify the `main` log format, but rather copy
 
 >Don't forget - Save any Docker containers/images, docker compose, NGINX config files and Notes you may want for future reference.
 
+>If you are finished with this lab, you can use Docker Compose to shut down your test environment:
+
+```bash
+docker-compose down
+```
+
+```bash
+##Sample output##
+Running 2/2
+Container nginx-oss          Removed                            
+Network lab3_default         Removed
+
+```
+
 ### Summary
 
 In this lab, you learned the following NGINX / Docker topics.
@@ -857,6 +880,7 @@ In this lab, you learned the following NGINX / Docker topics.
 <br/>
 
 ### Authors
+
 - Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
 - Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
 
