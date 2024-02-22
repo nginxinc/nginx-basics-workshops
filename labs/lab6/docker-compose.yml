@@ -14,10 +14,10 @@ services:
         - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d        # Copy these folders to container
         - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
         - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
-      #links:
-          #- juice1:juice1
-          #- juice2:juice2
-          #- juice3:juice3
+      links:
+          - juice1:juice1
+          - juice2:juice2
+          - juice3:juice3
       ports:
           - 80:80
           - 443:443
