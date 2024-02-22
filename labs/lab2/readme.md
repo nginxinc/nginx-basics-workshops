@@ -1035,6 +1035,20 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
 <br/>
 
+>If you are finished with this lab, you can use Docker Compose to shut down your test environment:
+
+```bash
+docker-compose down
+```
+
+```bash
+##Sample output##
+Running 2/2
+Container nginx-oss          Removed                            
+Network lab2_default         Removed
+
+```
+
 **This completes Lab2.**
 
 <br/>

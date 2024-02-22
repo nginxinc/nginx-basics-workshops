@@ -100,7 +100,7 @@ Visual Studio Code | Docker Compose | GitHub
 1. Run Docker Compose to build and run your NGINX OSS container:
 
     ```bash
-    cd labs/lab1
+    cd lab1
     docker-compose up --force-recreate
 
     ```
