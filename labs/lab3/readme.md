@@ -66,7 +66,7 @@ In this exercise, you will use `openssl` to create a Self-signed certificate and
     ```bash
     cd nginx
 
-    /etc/ssl/nginx $ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout cars.example.com.key -out cars.example.com.crt -subj "/CN=NginxBasics"
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout cars.example.com.key -out cars.example.com.crt -subj "/CN=NginxBasics"
     ```
 
     Quick explanation of the `openssl` command above:
@@ -80,7 +80,7 @@ In this exercise, you will use `openssl` to create a Self-signed certificate and
 1. Verify the files were created, list them in the folder, and use `cat` to look at them:
 
     ```bash
-    /etc/ssl/nginx $ ls -l
+    ls -l
     ```
 
     ```bash
@@ -92,7 +92,7 @@ In this exercise, you will use `openssl` to create a Self-signed certificate and
     ```
 
     ```bash
-    /etc/ssl/nginx $ cat cars.example.com.crt
+    cat cars.example.com.crt
     ```
 
     ```bash
@@ -106,7 +106,7 @@ In this exercise, you will use `openssl` to create a Self-signed certificate and
     ```
 
     ```bash
-    /etc/ssl/nginx $ cat cars.example.com.key
+    cat cars.example.com.key
     ```
 
     ```bash
@@ -131,17 +131,15 @@ NGINX | TLS
 
 <br/>
 
-Now that you have a TLS cert and key for testing, you will configure NGINX to use them. 
+Now that you have a TLS cert and key for testing, you will configure NGINX to use them.
 
-*NOTE:*  If you have a real TLS cert and key issued by a Certificate Authority, you can use those files in this exercise if you like, just copy them to the docker container, and use the configuration commands below. 
+*NOTE:*  If you have a real TLS cert and key issued by a Certificate Authority, you can use those files in this exercise if you like, just copy them to the docker container, and use the configuration commands below.
 
-1. In the /etc/nginx/conf.d folder, make the following changes to your `tls-cars.example.com.conf` file:
+1. In the `labs/lab3/nginx-oss/etc/nginx/conf.d` folder, make the following changes to your `tls-cars.example.com.conf` file:
 
     1. On line #1, change the comment from HTTP to HTTPS
-    1. On line #7, swap comments on the `listen 81` directive and `listen 443 ssl`, to enable port 443 and ssl.
-    1. Uncomment 2 new lines, between the server_name and access_log lines:
-    - ssl_certificate /etc/ssl/nginx/cars.example.com.crt;
-    - ssl_certificate_key /etc/ssl/nginx/cars.example.com.key;
+    2. On line #6-7, comment out the `listen 81` directive and uncomment the `listen 443 ssl`, to enable port 443 and ssl.
+    3. On line #13-14, uncomment the `ssl_certificate` and `ssl_certificate_key` directives.
 
 1. Your updated `tls-cars.example.com.conf` should look similar to this:
 
@@ -157,7 +155,7 @@ Now that you have a TLS cert and key for testing, you will configure NGINX to us
 
         server_name cars.example.com;   # Set hostname to match in request
 
-    # Uncomment the following 2 lines for NGINX cert and key directives and file locations.  The filenames and path must be correct.
+        # Uncomment the following 2 lines for NGINX cert and key directives and file locations.  The filenames and path must be correct.
 
         ssl_certificate /etc/ssl/nginx/cars.example.com.crt;
         ssl_certificate_key /etc/ssl/nginx/cars.example.com.key; 
@@ -166,13 +164,18 @@ Now that you have a TLS cert and key for testing, you will configure NGINX to us
 
     ```
 
-    Save your file.
+1. Once the content of the file has been saved, Docker Exec into the nginx-oss container.
 
-1. Test and reload your NGINX configuration.
+   ```bash
+    docker exec -it nginx-oss bin/bash
+   ```
 
-1. Now give a try with curl, using a Terminal on your local machine. 
+1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
+
+1. Now give it a try with curl, using a Terminal on your local machine.
 
     ```bash
+    # Run curl from outside of container
     curl https://cars.example.com
     ```
 
@@ -187,7 +190,7 @@ Now that you have a TLS cert and key for testing, you will configure NGINX to us
     ```
 
     As you can see, `curl reports an error` that the certificate is not legitimate (because it is Self-singed) and refuses to complete the request!  Adding the `-k` switch means `-insecure`, which tells curl to ignore this error - this is required for Self-signed certificates.
-    
+
     Give that a try:
 
     ```bash
@@ -202,15 +205,13 @@ Now that you have a TLS cert and key for testing, you will configure NGINX to us
 
     > Congrats!  That was easy - you have just enabled TLS on your webserver with only 3 NGINX commands!
 
-
-1. Now try it with a browser, go to https://cars.example.com.  YIKES - what's this??  Most modern browsers will display an `Error or Security Warning`:
+1. Now try it with a browser, go to <https://cars.example.com>.  YIKES - what's this??  Most modern browsers will display an `Error or Security Warning`:
 
     ![Certificate Invalid](media/lab3_cert-invalid.png)
 
 1. You can use Chrome's built-in Certificate Viewer to look at the details of the TLS certificate that was sent from NGINX to your browser.  In the address bar, click on the `Not Secure` icon, then `Cerificate is not valid`, and it will display the certificate.  Who provided this Invalid Certificate??  - well, you did.
 
     ![Certificate Details](media/lab3_cert-details.png)
-
 
 1. With Chrome, Close the Certificate Viewer, and then you have to click on the Advanced button, and then the Proceed link, to bypass the Warning and continue.  
 
@@ -226,7 +227,7 @@ Now that you have a TLS cert and key for testing, you will configure NGINX to us
 
 Now that you have a working TLS configuration, you decide to use it for every user.  However, sometimes users forget to type the `S` with `http`, or saved the URL as a bookmark, and come to your NGINX server with an HTTP request on port 80.  You will configure a helpful HTTP to HTTPS re-direct, to automagically send all users over to your HTTPS configuration.
 
-1. Change to the `/etc/nginx/conf.d` folder, and edit your existing `cars.example.com.conf file`.  In the `/` location block, uncomment the HTTP>HTTPS `301 return` directive, and also comment out the `return 200` directive.  This will send requests to port 80 will get a friendly re-direct to port 443, like this:
+1. Edit the file `cars.example.com.conf` within the same mounted folder(`labs/lab3/nginx-oss/etc/nginx/conf.d`).  In the `/` location block, uncomment the HTTP>HTTPS `return 301` directive on line #21, and also comment out the `return 200` directive on line #23.  This will enable any incoming requests to port 80, getting a friendly re-direct to port 443, like this:
 
     ```nginx
     location / {
@@ -238,23 +239,29 @@ Now that you have a working TLS configuration, you decide to use it for every us
         # Comment the line below
         # return 200 "Let's go fast, you have reached cars.example.com, path $uri\n";
     }
-    
-    # Rest of the config snipped
-    ...
+
+    ...snip
 
     ```
 
-    Save your file.  Test and Reload NGINX.
+1. Once the content of the file has been saved, Docker Exec into the nginx-oss container.
+
+   ```bash
+    docker exec -it nginx-oss bin/bash
+   ```
+
+1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
 
 1. Test out your redirect with curl, adding the `-I` parameter to show just the Headers:
 
     ```bash
+    # Run curl from outside of container
     curl -I http://cars.example.com
     ```
 
     It should look something like this:
 
-    ```
+    ```bash
     ##Sample output##
     HTTP/1.1 301 Moved Permanently
     Server: nginx/1.25.4
@@ -274,7 +281,7 @@ Now that you have a working TLS configuration, you decide to use it for every us
 
     It should look something like this:
 
-    ```
+    ```bash
     ##Sample output##
 
     HTTP/1.1 301 Moved Permanently
@@ -296,7 +303,7 @@ Now that you have a working TLS configuration, you decide to use it for every us
 
 1. Let's check it with your browser.  This example is from Chrome, it will differ slightly for other browsers.
 
-    Open Chrome, and then using the 3-dot menu, select More Tools, then Developer Tools.  Now type http://cars.example.com in the address bar.  You should see Chrome Dev Tools record and display the 301 redirect, if you click on the first URL Name:
+    Open Chrome, and then using the 3-dot menu, select More Tools, then Developer Tools.  Now type <http://cars.example.com> in the address bar.  You should see Chrome Dev Tools record and display the 301 redirect, if you click on the first URL Name:
 
     ![Chrome Redirect](media/lab3_chrome-redirect.png)
 
@@ -317,11 +324,11 @@ In this exercise, you will add some additional NGINX TLS settings to control the
     - High Security Encryption Ciphers, Hashes, and other settings
     - TLS version 1.3
 
-1. Inspect the /etc/ssl/dhparam/ folder. The 4096/dhparam.pem file contains the TLS Prime at 4,096 bits.  (And the 2048/dhparam.pem file sets the TLS Prime to 2,048 bits).  You will be using the 4,096 bit Prime for maximum security.  Normally you would create these Prime files yourself, but as they take some time to create, these files have been provided for you here.  See the References section for Links to more information on TLS/dhparams.
+1. Inspect the `labs/lab3/nginx-oss/etc/ssl/dhparam/` folder. The `dhparam-4096.pem` file contains the TLS Prime at 4,096 bits.  (And the `dhparam-2048.pem` file sets the TLS Prime to 2,048 bits).  You will be using the 4,096 bit Prime for maximum security.  Normally you would create these Prime files yourself, but as they take some time to create, these files have been provided for you here.  See the [References](#references) section for Links to more information on TLS/dhparams.
 
-1. Inspect the `/nginx/includes/ssl/ssl_strong.conf` file.  Notice you are using TLS version 1.3, and very high strength ciphers, rated `A+` by SSL Labs, a third party TLS testing and information website.  You notice there are also 4 HTTP Headers being added, to provide additional security settings.
+1. Inspect the `/labs/lab3/nginx-oss/etc/nginx/includes/ssl/ssl_strong.conf` file.  Notice you are using TLS version 1.3, and very high strength ciphers, rated `A+` by SSL Labs, a third party TLS testing and information website.  You notice there are also 4 HTTP Headers being added, to provide additional security settings.
 
-1. In the /etc/nginx/conf.d folder, edit your `tls-cars.example.com.conf` as shown, and Uncomment the `ssl_strong.conf` for the `include` directives on line #18:
+1. Update your `tls-cars.example.com.conf` file within your mounted folder (`labs/lab3/nginx-oss/etc/nginx/conf.d`) as shown below, and uncomment the `ssl_strong.conf` for the `include` directives on line #18:
 
     ```nginx
     # cars.example.com HTTPS
@@ -350,7 +357,13 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
     ```
 
-    Save your file.  Test and reload NGINX.
+1. Once the content of the file has been saved, Docker Exec into the nginx-oss container.
+
+   ```bash
+    docker exec -it nginx-oss bin/bash
+   ```
+
+1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
 
 1. Test with curl.  First, let's see if the new HTTP Headers are added:
 
@@ -594,7 +607,7 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
 1. Inspect the `/includes/ssl/ssl_intermediate.conf` file, you will see that the TLS version is set to 1.0, 1.1, 1.2 on line #19 with the `ssl_protocols` directive.  You can modify this to meet your needs if you like.
 
-1. Edit your `tls-cars.example.com.conf` configuration, and change the comments to use the `/includes/ssl/ssl_intermediate.conf`, instead of the ssl_strong.conf.
+1. Update your `tls-cars.example.com.conf` file within your mounted folder (`labs/lab3/nginx-oss/etc/nginx/conf.d`) and change the comments to use the `/includes/ssl/ssl_intermediate.conf`, instead of the `ssl_strong.conf`.
 
     ```nginx
     ...snip
@@ -610,7 +623,13 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
     ```
 
-    Test your config and reload NGINX.
+1. Once the content of the file has been saved, Docker Exec into the nginx-oss container.
+
+   ```bash
+    docker exec -it nginx-oss bin/bash
+   ```
+
+1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
 
 1. Check the HTTP Headers, what is different from `ssl_strong` ?
 
@@ -688,9 +707,9 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
     So after Peer Review, your Security team says **`Absolutely NOT!`** to any TLS version older that 1.2.  So after testing and auditing and compliance paperwork, you will use the `ssl_modern.conf` configuration file instead.  It is set for TLS 1.2, and will support most of the modern browsers and HTTP clients.
 
-1. Inspect the `/includes/ssl/ssl_modern.conf` file, to confirm it only contains the TLS protocols and ciphers that are approved by your Security team.
+1. Inspect the `/labs/lab3/nginx-oss/etc/nginx/includes/ssl/ssl_modern.conf` file, to confirm it only contains the TLS protocols and ciphers that are approved by your Security team.
 
-1. Edit your `tls-cars.example.com.conf` configuration, and change the comments to use the `/includes/ssl/ssl_modern.conf`.
+1. Update your `tls-cars.example.com.conf` file within your mounted folder (`labs/lab3/nginx-oss/etc/nginx/conf.d`) and change the comments to use the `/includes/ssl/ssl_modern.conf`.
 
     ```nginx
     ...snip
@@ -706,8 +725,14 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
     ```
 
-    Test your config and reload NGINX.  
-    
+1. Once the content of the file has been saved, Docker Exec into the nginx-oss container.
+
+   ```bash
+    docker exec -it nginx-oss bin/bash
+   ```
+
+1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.  
+
 1. You should now re-test and verify that these Modern TLS parameters will work well for your environment, and pass muster with your Security team.
 
 <br/>
@@ -716,7 +741,7 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
 Not all TLS Ciphers are the same, and not all Ciphers work with all versions of TLS.  They often go hand-in-hand, they must match correctly to work as expected.  In this exercise, you will test a couple different TLS Ciphers against your `Modern TLS Settings` from the previous exercise.
 
-1. Try a cipher that you know works with TLS1.2, `ECDHE-ECDSA-AES256-GCM-SHA384`, which is found first in the list in your `/includes/ssl/ssl_modern.conf` file:
+1. Try a cipher that you know works with TLS1.2, `ECDHE-ECDSA-AES256-GCM-SHA384`, which is found first in the list in your `labs/lab3/nginx-oss/etc/nginx/includes/ssl/ssl_modern.conf` file:
 
     ```bash
     curl -kI -v --tlsv1.2 --tls-max 1.2 -cipher ECDHE-ECDSA-AES256-GCM-SHA384 https://cars.example.com
@@ -724,7 +749,7 @@ Not all TLS Ciphers are the same, and not all Ciphers work with all versions of 
 
     That should have been a successful test.
 
-1. Next, try a TLS1.3 cipher, `ECDHE-RSA-AES256-GCM-SHA384`, which is found first in the list in your `/includes/ssl/ssl_strong.conf` file, which only uses TLS1.3:
+1. Next, try a TLS1.3 cipher, `ECDHE-RSA-AES256-GCM-SHA384`, which is found first in the list in your `labs/lab3/nginx-oss/etc/nginx/includes/ssl/ssl_strong.conf` file, which only uses TLS1.3:
 
     ```bash
     curl -kI -v --tlsv1.3 --tls-max 1.3 -cipher ECDHE-RSA-AES256-GCM-SHA512 https://cars.example.com
@@ -732,9 +757,8 @@ Not all TLS Ciphers are the same, and not all Ciphers work with all versions of 
 
     Unfortunately, this should fail, because this Cipher will only work with TLS1.3, but your current NGINX TLS config is set for `Modern` with TLS1.2.
 
-
 >CAUTION: Security Warning !!
->> It should also be noted, a very old SSL config file is provided for your review, `/includes/ssl/ssl_old.conf`, for clients older than TLS v1.0.  Hopefully you will never have to use these Legacy settings, but if you do, please consult with your Security team, perform extensive testing, and use other security measures before using it. 
+>> It should also be noted, a very old SSL config file is provided for your review, `labs/lab3/nginx-oss/etc/nginx/includes/ssl/ssl_old.conf`, for clients older than TLS v1.0.  Hopefully you will never have to use these Legacy settings, but if you do, please consult with your Security team, perform extensive testing, and use other security measures before using it.
 
 <br/>
 
@@ -744,18 +768,7 @@ In this next lab exercise, you will create a new NGINX Access Log format, and ad
 
 As a Best Practice, you should not modify the `main` log format, but rather copy this one and create a new one with your changes.  The `include` directive is also use here, because it makes your NGINX configurations more concise, uniform, and consistent.  As you will likely want to use the same access log format for multiple websites, you will define it ONCE, but use it for many server blocks, instead of duplicating the log format config for every website.  If you need to make a change to your log format, you can update it in one file, but it would apply to all your websites/server blocks.
 
-1. If it does not already exist, create a new folder `/includes` under the /etc/nginx folder.  Then create a second folder called `/log_formats` in the /etc/nginx/includes folder.  This is where the new log format files will be created.
-
-    ```bash
-    /etc/nginx$ mkdir includes
-
-    cd includes
-    mkdir log_format
-
-    cd log_format
-    ```
-
-1. Create a new file called `main_ssl.conf`, and add this following log format to it.  Notice the 4 new `$ssl` variables added at the end - for the TLS Version, Cipher, SNI, and Session_ID.
+1. Inspect the `main_ssl.conf` configuration file, located in the `/etc/nginx/includes/log_formats` folder.  Notice the 4 new `$ssl` variables added at the end - for the `TLS Version`, `Cipher`, `SNI`, and `Session_ID`.
 
     ```nginx
     # Extended SSL Log Format
@@ -775,7 +788,7 @@ As a Best Practice, you should not modify the `main` log format, but rather copy
 
     ```
 
-1. Now you need to tell NGINX where to find these new log format definitions. Edit your nginx.conf, to add your `/includes/log_formats` folder as a search location:
+1. Now you need to tell NGINX where to find these new log format definitions. Update your `nginx.conf`, to add your `etc/nginx/includes/log_formats` folder as a search location:
 
     ```nginx
     ...snip
@@ -789,9 +802,9 @@ As a Best Practice, you should not modify the `main` log format, but rather copy
 
     ```
 
-    Save your nginx.conf file.  Test your config with `nginx -t`.
+    Save your `nginx.conf` file.  
 
-1. Next, modify your `cars.example.com` TLS enabled website to use this new log format:
+1. Next, modify your `tls-cars.example.com.conf` file to use this new log format:
 
     ```nginx
     ...snip
@@ -803,9 +816,15 @@ As a Best Practice, you should not modify the `main` log format, but rather copy
 
     ```
 
-    Save your cars.example.com.conf file.
+    Save your `tls-cars.example.com.conf` file.
 
-    Test your nginx configuration, and reload nginx.  If all was correct, it will reload and now your cars.example.com website will be using a new access log format.  Let's go check.
+1. Once the content of both the files have been saved, Docker Exec into the nginx-oss container.
+
+   ```bash
+    docker exec -it nginx-oss bin/bash
+   ```
+
+1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container. If all was correct, it will reload and now your cars.example.com website will be using a new access log format.  Let's go check.
 
 1. Watch the `var/log/nginx/cars.example.com.log` log file, and watch as you send a couple requests.
 
@@ -853,11 +872,12 @@ Network lab3_default         Removed
 ### Summary
 
 In this lab, you learned the following NGINX / Docker topics.
- * Create a Self-signed TLS certificate and key
- * Configure NGINX webserver to use a TLS cert and key
- * Configure TLS settings
- * Add some TLS Best Practice configurations
- * Test and validate TLS traffic components and settings
+
+- Create a Self-signed TLS certificate and key
+- Configure NGINX webserver to use a TLS cert and key
+- Configure TLS settings
+- Add some TLS Best Practice configurations
+- Test and validate TLS traffic components and settings
 
 <br/>
 
@@ -875,7 +895,6 @@ In this lab, you learned the following NGINX / Docker topics.
 - [NIGNX Directives](https://nginx.org/en/docs/dirindex.html)
 - [NGINX Variables](https://nginx.org/en/docs/varindex.html)
 - [NGINX Logging](https://docs.nginx.com/nginx/admin-guide/monitoring/logging/)
-
 
 <br/>
 
