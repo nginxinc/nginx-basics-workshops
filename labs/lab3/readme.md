@@ -838,7 +838,7 @@ In this lab, you learned the following NGINX / Docker topics.
 
 <br/>
 
-**This completes this Lab.**
+**This completes Lab3.**
 
 <br/>
 
