@@ -354,6 +354,8 @@ Now that you know all 4 containers are working with the NGINX Welcome page, and 
 
 ### NGINX Load Balancing
 
+<br/>
+
 You see the `proxy_pass` working for one backend webserver, but what about the other 2 backends?  Do you need high availability, and increased capacity for your website? Of course, you want to use multiple backends for this, and load balance them.  This is very easy, as it requires only 2 configuration changes:
 
 - Create a new .conf file for the Upstream Block
@@ -504,6 +506,8 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
 <br/>
 
 ### NGINX Extended Access Logging
+
+<br/>
 
 Now that you have a working NGINX Proxy, and several backends, you will be adding and using additional NGINX Directives, Variables, and testing them out.  In order to better see the results of these new Directives on your proxied traffic, you need better and more information in your Access logs.  The default NGINX `main` access log_format only contains a fraction of the information you need, so you will  `extend` it to include much more information, especially about the Upstream backend servers.
 
@@ -766,6 +770,8 @@ Now you need to enable some HTTP Headers, to be added to the Request.  These are
 <br/>
 
 ### NGINX Load Balancing Algorithms and Load Testing
+
+<br/>
 
 Different backend applications may benefit from using different load balancing techniques.  NGINX support both legacy and more modern algorithms for different use cases.  You will configure and test several of these algorithms, put them under a Loadtest, and observe the results.  Then you will add/change some Directives to improve performance, and Loadtest again and see if it made any difference.
 
