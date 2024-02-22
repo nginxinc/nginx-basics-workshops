@@ -2,8 +2,7 @@
 
 ## Introduction
 
-NGINX can be used as an HTTP cache, delivering static content directly from memory and disk.  This can improve the response time and appearance of your web pages by providing this content much faster than waiting for the origin server to deliver it.  You have complete control over all parameters of HTTP caching, like the Headers, aging, refresh time, and other controls.  This high performance, low latency, scalable HTTP caching capability is the backbone of many og the world's largest Content Delivery Networks.  You will configure and test NGINX caching, with configurations you can use for your own website.
-
+NGINX can be used as an HTTP cache, delivering static content directly from memory and disk.  This can improve the response time and appearance of your web pages by providing this content much faster than waiting for the origin server to deliver it.  You have complete control over all parameters of HTTP caching, like the Headers, aging, refresh time, and other controls.  This high performance, low latency, scalable HTTP caching capability is the backbone of many of the world's largest Content Delivery Networks.  You will configure and test NGINX caching, with configurations you can use for your own website.
 
 ## Learning Objectives 
 
