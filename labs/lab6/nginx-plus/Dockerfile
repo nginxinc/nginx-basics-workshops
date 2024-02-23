@@ -9,7 +9,7 @@ COPY etc/ssl/nginx/nginx-repo.* /etc/ssl/nginx/
 RUN chmod 644 /etc/ssl/nginx/* 
 
 # Install prerequisite packages:
-RUN apt-get update && apt-get install -y apt-transport-https lsb-release ca-certificates wget gnupg2 net-tools
+RUN apt-get update && apt-get install -y apt-transport-https lsb-release ca-certificates curl wget jq gnupg2 net-tools bash bash-completion
 
 # Download and add the NGINX signing key:
 RUN wget https://cs.nginx.com/static/keys/nginx_signing.key && apt-key add nginx_signing.key 
@@ -20,7 +20,7 @@ RUN printf "deb https://pkgs.nginx.com/plus/ubuntu `lsb_release -cs` nginx-plus\
 # Download the apt configuration to `/etc/apt/apt.conf.d`:
 RUN wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90pkgs-nginx
 # Update the repository and install the most recent version of the NGINX Plus:
-RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y nginx-plus
+RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y nginx-plus nginx-plus-module-njs nginx-plus-module-prometheus
 
 # Remove nginx repository key/cert from docker
 RUN rm -rf /etc/ssl/nginx \

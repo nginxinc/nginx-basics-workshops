@@ -52,9 +52,9 @@ By the end of this Workshop, you will have a working, operational NGINX OSS or P
 
 - [Lab 5: Build and Run NGINX Plus on Docker](lab5/readme.md)
 
-#### Lab 6: Intro to NGINX Plus Caching
+#### Lab 6: Monitoring NGINX Plus with Prometheus and Grafana
 
-- [Lab 6: Intro to NGINX Plus Caching](lab6/readme.md)
+- [Lab 6: Monitoring NGINX Plus with Prometheus and Grafana](lab6/readme.md)
 
 <br/>
 
