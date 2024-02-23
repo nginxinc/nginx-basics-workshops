@@ -1,45 +1,67 @@
-# NGINX Plus Proxy
-# Juiceshop web application
-# NGINX Basics Caching, Feb 2024
+# NGINX Plus Proxy with tools build
+# NGINX webservers with ingress-demo pages
+# NGINX Basics, Jan 2024
 # Chris Akker, Shouvik Dutta
-#
 version: '3.3'
 services:
-# NGINX Plus Load Balancer, Cache       
-  nginx-plus:
-      hostname: nginx-plus
-      container_name: nginx-plus
-      build: nginx-plus
-      volumes:
+  nginx-plus:                  # NGINX Plus Web / Load Balancer
+    hostname: nginx-plus
+    container_name: nginx-plus
+    build: nginx-plus          # Build new container, using /nginx-plus/Dockerfile
+    volumes:
         - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d        # Copy these folders to container
         - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
         - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
-      #links:
-          #- juice1:juice1
-          #- juice2:juice2
-          #- juice3:juice3
+    ports:
+        - 80:80       # Open for HTTP
+        - 443:443     # Open for HTTPS
+        - 9000:9000   # Open for stub status page
+        - 9113:9113   # Open for Prometheus Scraper page
+    restart: always     
+  web1:
+      hostname: web1
+      container_name: web1
+      image: nginxinc/ingress-demo            # Image from Docker Hub
       ports:
-          - 80:80
-          - 443:443
-          - 9000:9000
+        - "80"                                # Open for HTTP
+        - "443"                               # Open for HTTPS
+  web2:
+      hostname: web2
+      container_name: web2
+      image: nginxinc/ingress-demo
+      ports:
+        - "80"
+        - "433"
+  web3:
+      hostname: web3
+      container_name: web3
+      image: nginxinc/ingress-demo
+      ports:
+        - "80"
+        - "443"
+  prometheus:
+      hostname: prometheus
+      container_name: prometheus
+      image: prom/prometheus
+      volumes:
+        - ./nginx-plus/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      ports:
+        - "9090:9090"
       restart: always
-# Juiceshop web application containers
-  juice1:
-      hostname: juice1
-      container_name: juice1
-      image: bkimminich/juice-shop            # Image from Docker Hub
+      depends_on:
+        - nginx-plus
+  grafana:
+      hostname: grafana
+      container_name: grafana
+      volumes:
+        - grafana-storage:/var/lib/grafana
+      image: grafana/grafana
       ports:
-        - "3000"
-  juice2:
-      hostname: juice2
-      container_name: juice2
-      image: bkimminich/juice-shop
-      ports:
-        - "3000"
-  juice3:
-      hostname: juice3
-      container_name: juice3
-      image: bkimminich/juice-shop
-      ports:
-        - "3000"
-
+        - "3000:3000"
+      restart: always
+      depends_on:
+        - nginx-plus
+volumes:
+  grafana-storage:
+    name: "grafana-storage"
+    external: false
