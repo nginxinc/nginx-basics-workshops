@@ -200,7 +200,7 @@ Grafana is a data visualization tool, which contains a time series database and 
 
 1. Scroll to the bottom and click `Test and Save`.
 
-1. Import the provided `labs/lab6/NGINX-Basics.json` file to see statistics like the NGINX Plus HTTP RPS and Upstream Response Times.  Click on New Dashboard, then Import.  Copy and Paste the `labs/lab6/NGINX-Basics.json` file provided.  You should see a dashboard like this one:
+1. Import the provided `labs/lab6/NGINX-Basics.json` file to see statistics like the NGINX Plus HTTP Requests Per Second and Upstream Response Times.  Click on New Dashboard, then Import.  Copy and Paste the `labs/lab6/NGINX-Basics.json` file provided.  You should see a dashboard like this one:
 
     ![Grafana Dashboard](media/lab6_grafana-dashboard.png)
 
@@ -217,8 +217,7 @@ Grafana is a data visualization tool, which contains a time series database and 
 - [NGINX Plus](https://www.nginx.com/products/nginx/)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
 - [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
-
-
+- [NGINX Prometheus Exporter Metrics](https://github.com/nginxinc/nginx-prometheus-exporter?tab=readme-ov-file#exported-metrics)
 
 <br/>
 
@@ -226,7 +225,6 @@ Grafana is a data visualization tool, which contains a time series database and 
 
 - Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
 - Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
-- Kevin Jones - Technical Evanglist - Community and Alliances @ F5, Inc.
 
 -------------
 
