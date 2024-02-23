@@ -14,11 +14,11 @@ NGINX Plus | Prometheus | Grafana
 
 By the end of the lab you will be able to:
 
-- Install and enable NJS - NGINX Java Script
+- Enable and configure NGINX Java Script
 - Create Prometheus Exporter configuration
-- Run a Docker based Prometheus Server
-- Run a Docker based Grafana Server
-- View various Grafana Dashboards
+- Test the Prometheus Server
+- Test the Grafana Server
+- View Grafana Dashboard
 
 ## Pre-Requisites
 
@@ -32,9 +32,12 @@ By the end of the lab you will be able to:
 - Familiarity with Prometheus
 - Familiartiy with Grafana
 
-As part of your Dockerfile, your NGINX Plus container already has the added `NGINX Java Script and NGINX Prometheus dynamic modules` installed during the build process.  Refer to the Dockerfile if you want to check it out.
+As part of your Dockerfile, your NGINX Plus container already has the added `NGINX Java Script and NGINX Prometheus dynamic module` installed during the build process.  Refer to the Dockerfile if you want to check it out.
 
-1. Edit your `nginx.conf` file, you will make 2 changes.  1.  Uncomment Line #9 to enable the `ngx_http_js_module` module.  2.  Uncomment Line #38 to set a parameter for an NGINX buffer called `subrequest_output_buffer_size`.
+1. Edit your `nginx.conf` file, you will make 2 changes.
+
+    - Uncomment Line #8 to enable the `ngx_http_js_module` module.
+    - Uncomment Line #37 to set a parameter for an NGINX buffer called `subrequest_output_buffer_size`.
 
     ```nginx
     ...snip
@@ -57,7 +60,7 @@ As part of your Dockerfile, your NGINX Plus container already has the added `NGI
 
     ```
 
-1. Inspect the `prometheus.conf` file.  This is the NGINX config file which opens up port 9113, and provides access to the scraper page.  Uncomment all the lines to enable this.
+1. Inspect the `prometheus.conf` file in the `labs/lab6/nginx-plus/etc/nginx/conf.d` folder.  This is the NGINX config file which opens up port 9113, and provides access to the scraper page.  Uncomment all the lines to enable this.
 
     ```nginx
     # NGINX Plus Prometheus configuration, for HTTP scraper page
@@ -70,7 +73,7 @@ As part of your Dockerfile, your NGINX Plus container already has the added `NGI
 
     server {
     
-    listen 9113;               # This is the default port for Prometheus scraper page
+        listen 9113;               # This is the default port for Prometheus scraper page
         
         location = /metrics {
             js_content prometheus.metrics;
@@ -84,64 +87,76 @@ As part of your Dockerfile, your NGINX Plus container already has the added `NGI
 
     ```
 
+    
+
 1.  Test the Prometheus scraper page.  Open your browser to http://localhost:9113/metrics.  You see an html/text page like this one.  Click refresh a couple times, and some of the metrics should increment.
 
-< scraper page screenshot here>
+    ![Scraper page](media/lab6_scraper_page1.png)
 
 <br/>
-
 
 ## Prometheus and Grafana Server Docker containers
 
 <br/>
 
-![](../media/prometheus-icon.png)  |![](../media/grafana-icon.png)
+![](media/prometheus-icon.png)  |![](media/grafana-icon.png)
 --- | ---
 
-You will run 2 additional Docker containers, one for the Prometheus Server, and one for the Grafana Server.
+1. Inspect your `docker-compose.yml` file, you will see it includes 2 additional Docker containers for this lab, one for a Prometheus server, and one for a Grafana server.  These have been configured to run for you, but the images will be pulled from public repos.
 
-<br/>
+    ```bash
+    ...snip
+    
+    prometheus:
+        hostname: prometheus
+        container_name: prometheus
+        image: prom/prometheus
+        volumes:
+            - ./nginx-plus/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+        ports:
+            - "9090:9090"
+        restart: always
+        depends_on:
+            - nginx-plus
+    grafana:
+        hostname: grafana
+        container_name: grafana
+        volumes:
+            - grafana-storage:/var/lib/grafana
+        image: grafana/grafana
+        ports:
+            - "3000:3000"
+        restart: always
+        depends_on:
+            - nginx-plus
+    volumes:
+    grafana-storage:
+        name: "grafana-storage"
+        external: false
 
-Here are the instructions to run 2 Docker containers in your lab environment, which will collect the NGINX Plus statistics from Prometheus, and graph them with Grafana.  Likely, you already have these running in your environment, but are provided here as an example to display the NGINX Plus metrics of high value.
+    ```
+
+1. Verify these 2 containers are running.
+
+    ```bash
+    docker ps -a
+    ```
+
+    ```
+    ##Sample output##
+    CONTAINER ID   IMAGE                   COMMAND                  CREATED          STATUS          PORTS                                                                                      NAMES
+    8a61c66fc511   prom/prometheus         "/bin/prometheus --c…"   36 minutes ago   Up 36 minutes   0.0.0.0:9090->9090/tcp                                                                     prometheus
+    4d38710ed4ec   grafana/grafana         "/run.sh"                36 minutes ago   Up 36 minutes   0.0.0.0:3000->3000/tcp                                                                     grafana
+
+    ...snip
+
+    ```
 
 <br/>
 
 ### Prometheus
 
 <br/>
-
-1. Configure your Prometheus server to collect NGINX Plus statistics from the scraper page.  Use the prometheus.yml file provided, edit the `targets` to match your NGINX Plus container name and port of the scraper page.
-
-    ```bash
-    cat prometheus.yml
-
-    ```
-
-    ```yaml
-    global:
-      scrape_interval: 15s 
-      
-      external_labels:
-        monitor: 'nginx-monitor'
-    
-    scrape_configs:  
-      - job_name: 'prometheus'
-        
-        scrape_interval: 5s
-    
-        static_configs:
-          - targets: ['nginx-plus:9113]  # NGINX Plus container:port
-
-    ```
-
-1. Review, edit and place your `prometheus.yml` file in /etc/prometheus folder.
-
-1. Start the Prometheus docker container:
-
-    ```bash
-    sudo docker run --restart always --network=lab8_default -d -p 9090:9090 --name=prometheus -v /Users/akker/Downloads/KIC/nginxinc/nginx-basics-workshops/labs/lab8/nginx-plus/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
-
-    ```
 
 1. Prometheus Web Console access to the data is on http://localhost:9090.
 
@@ -157,23 +172,20 @@ Here are the instructions to run 2 Docker containers in your lab environment, wh
 
 <br/>
 
-1. Create a docker volume to store the Grafana data.
+Grafana is a data visualization tool, which contains a time series database and graphical web presentation tools. Grafana imports the Prometheus scraper page statistics into it's database, and allows you to create Dashboards of the statistics that are important to you.
 
-    ```bash
-    docker volume create grafana-storage
+1. Log into the Web console access for Grafana at http://localhost:3000.  The default Login should be user/pass of `admin/admin`.
 
-    ```
+1. Check Data Source 
 
-1. Start the Grafana docker container:
+1. Import JSON steps
 
-    ```bash
-    docker run --restart always -d -p 3000:3000 --name=grafana --network=lab8_default -v grafana-storage:/var/lib/grafana grafana/grafana
+1. You can import the provided `NGINX-Basics.json` file to see statistics like the NGINX Plus HTTP RPS and Upstream Response Times.
 
-    ```
+    ![Grafana Dashboard](media/lab6_grafana-dashboard.png)
 
-1. Web console access to Grafana is on http://localhost:3000.  The default Login should be user/pass of `admin/admin`.
 
-1. You can import the provided `grafana-dashboard.json` file to see the NGINX Plus `Cluster1 and 2 statistics` HTTP RPS and Upstream Response Times.
+There are many different Grafana Dashboards available, and you have the option to create and build dashboards to suite your needs.  NGINX Plus provides over 240 metrics for TCP, HTTP, SSL, Virtual Servers, Locations, Rate Limits, and Upstreams.
 
 <br/>
 
@@ -183,12 +195,11 @@ Here are the instructions to run 2 Docker containers in your lab environment, wh
 
 ## References:
 
-- [NGINX OSS](https://nginx.org/en/docs/)
+- [NGINX Plus](https://www.nginx.com/products/nginx/)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
 - [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
-- [Docker](https://www.docker.com/)
-- [Docker Compose](https://docs.docker.com/compose/)
-- [NGINX Architecture Blog](https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/)
+
+
 
 <br/>
 
