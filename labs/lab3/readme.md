@@ -45,7 +45,7 @@ In this exercise, you will use `openssl` to create a Self-signed certificate and
 
    ```bash
     cd lab3
-    docker-compose up --force-recreate
+    docker compose up --force-recreate
    ```
 
 1. After the Docker Compose has completed, and the lab3/nginx-oss container is running, Docker Exec into the nginx-oss container.
@@ -858,7 +858,8 @@ As a Best Practice, you should not modify the `main` log format, but rather copy
 >If you are finished with this lab, you can use Docker Compose to shut down your test environment:
 
 ```bash
-docker-compose down
+cd lab3
+docker compose down
 ```
 
 ```bash

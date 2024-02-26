@@ -101,7 +101,7 @@ Visual Studio Code | Docker Compose | GitHub
 
     ```bash
     cd lab1
-    docker-compose up --force-recreate
+    docker compose up --force-recreate
 
     ```
 
@@ -113,7 +113,7 @@ Visual Studio Code | Docker Compose | GitHub
 
     ```
 
-1. Verify your container is running:
+1. Verify your container is running by typing below command on a new terminal window:
 
     ```bash
     docker ps -a
@@ -135,13 +135,13 @@ Visual Studio Code | Docker Compose | GitHub
     ```bash
      ##Sample output##
      HTTP/1.1 200 OK
-     Server: nginx/1.25.3
-     Date: Thu, 25 Jan 2024 23:55:47 GMT
+     Server: nginx/1.25.4
+     Date: Thu, 15 Feb 2024 23:55:47 GMT
      Content-Type: text/html
      Content-Length: 615
-     Last-Modified: Tue, 24 Oct 2023 16:48:50 GMT
+     Last-Modified: Wed, 14 Feb 2024 16:20:36 GMT
      Connection: keep-alive
-     ETag: "6537f572-267"
+     ETag: "65cce854-267"
      Accept-Ranges: bytes
 
     ```
@@ -314,7 +314,7 @@ Visual Studio Code | Docker Compose | GitHub
 
     ```bash
      # Display the entire NGINX configuration, includes all files.
-     more nginx -T
+     nginx -T | more
     ```
 
 1. When you are done looking around, Exit the container.
@@ -349,7 +349,8 @@ Visual Studio Code | Docker Compose | GitHub
 >If you are finished with all the testing of the NGINX web server container, you can use Docker Compose to shut down your test environment:
 
 ```bash
-docker-compose down
+cd lab1
+docker compose down
 ```
 
 ```bash
