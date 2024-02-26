@@ -39,7 +39,7 @@ By the end of the lab you will be able to:
 
 <br/>
 
-In order to understand how NGINX works as web server, a basic understanding of the HTTP protocol, and how URLS work is neccessary.  This is not a lab on HTTP, but the principle objects and definitions are briefly reviewed here as they relate to NGINX.  You will find a link to more information on HTTP in the References section.
+In order to understand how NGINX works as web server, a basic understanding of the HTTP protocol, and how URLS work is neccessary.  This is not a lab on HTTP, but the principle objects and definitions are briefly reviewed here as they relate to NGINX.  You will find a link to more information on HTTP in the [References](#references) section.
 
 So what is a URL??  URL stands for `Uniform Resource Location` - an Internet standard that describes a web object that is globally unique.
 
@@ -47,23 +47,23 @@ So what is a URL??  URL stands for `Uniform Resource Location` - an Internet sta
 
 Every URL consists of 4 or 5 distinct fields.
 
-Given the URL:   <http://www.example.com/application1?arg=123456>
+Given the URL:   `http://www.example.com/application1?arg=123456`
 
 It is decoded as:
 
 Scheme  | Hostname        | URI           | Argument
 :------:|:---------------:|:-------------:|:-----------:
-http:// | www.example.com | /application1 | ?arg=123456
+http:// | `www.example.com` | /application1 | ?arg=123456
 
 >If the TCP port used by the webserver is `not 80`, it must be included in the URL request, like this example using port 8080:
 
-Given the URL:  <http://www.example.com:8080/application1?arg=123456>
+Given the URL:  `http://www.example.com:8080/application1?arg=123456`
 
 It is decoded with the extra `port`field:
 
 Scheme  | Hostname        | Port  | URI    | Argument
 :------:|:--------:|:--------:|:--------:|:--------:
-http:// | www.example.com | :8080 | /application1 | ?arg=123456
+http:// | `www.example.com` | :8080 | /application1 | ?arg=123456
 
 In the examples above:
 
@@ -77,11 +77,11 @@ As you configure NGINX, you will see that it uses these HTTP standards and defin
 
 Now you can configure the NGINX contexts to handle an HTTP request properly.  Let's overlay the NGINX configuration contexts with the example URL.
 
-Given the URL:   <http://www.example.com/application1>
+Given the URL: `http://www.example.com/application1`
 
 Scheme  | Hostname        | URI
 :------:|:--------:|:--------:
-http:// | www.example.com | /application1
+http:// | `www.example.com` | /application1
 
 Would require the following NGINX configuration Contexts:
 
@@ -120,7 +120,7 @@ Here is a quick review of the NGINX commands you should be familiar with.  Depen
 
 ```bash
 
-nginx -v                  #displays NGINX version detauls
+nginx -v                  #displays NGINX version details
 
 nginx -s quit             #graceful shutdown
 
@@ -144,7 +144,7 @@ Go ahead and try some of these NGINX commands in your nginx-oss container now, s
 
    ```bash
    cd lab2
-   docker-compose up --force-recreate
+   docker compose up --force-recreate
    ```
 
 1. Docker Exec into the nginx-oss container.
@@ -247,7 +247,7 @@ It is important to understand the details about what NGINX does, when you change
 - The nginx master process writes log information about the reload to the error.log so you can see what happened when, like shown below:
 
 ```bash
-#Sample output for "nginx -s reload" command
+#Sample output for "nginx -s reload" command##
 
 ...
 2024/02/02 00:27:21 [notice] 1#1: signal 1 (SIGHUP) received from 81, reconfiguring
@@ -269,7 +269,7 @@ It is important to understand the details about what NGINX does, when you change
 You can easily see the nginx master and worker processes in Linux with `top`, it would look something like this:
 
 ```bash
-##Sample output##
+##Sample output for "top -n 1" command##
 
 Mem: 1221044K used, 6916284K free, 1460K shrd, 15872K buff, 505096K cached
 CPU:   0% usr   0% sys   0% nic  99% idle   0% io   0% irq   0% sirq
@@ -287,7 +287,7 @@ Load average: 0.00 0.00 0.00 1/568 95
 
 By default, nginx Master process will create a Worker process for every CPU core in the system.  If you reload NGINX while watching top, you will see the new Workers created with new PIDs, and old Workers disappear as they are terminated.
 
-Or use can use another Linux command `ps |grep nginx` to see the nginx processes:
+Or use can use another Linux command `ps aux|grep nginx` to see the nginx processes:
 
 ```bash
 ##Sample output##
@@ -547,7 +547,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
         
         listen 80 default_server;        # Listening on port 80 on all IP addresses on this machine
 
-        server_name wwww2.example.com;   # Set hostname to match in request
+        server_name www2.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/www2.example.com.log main; 
         error_log   /var/log/nginx/www2.example.com_error.log notice; 
@@ -567,7 +567,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
     **Uh oh - what happened?**  Did you figure out the error?  You can't actually have 2 default servers in NGINX - that makes sense, right ?
 
-1. Go back and edit line #7 with the `listen` parameter in www2.example.com.conf, and remove the `default_server` parameter, save the file again.
+1. Go back and edit the line with `listen` parameter in www2.example.com.conf, and remove the `default_server` parameter, save the file again.
 
 1. Now the `nginx -t` should be successful, so go ahead a reload NGINX by running `nginx -s reload` command within the container.
 
@@ -993,7 +993,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
 1. Save your `nginx.conf` file, and test your NGINX config by running `nginx -t` command from within the container.
 
-1. Next, enable your `cars.example.com` website to use this new log format. To do so you need to modify `cars.example.com.conf` file to make use of the new log format:
+1. Next, enable your `cars.example.com` website to use this new log format. To do so you need to modify `cars.example.com.conf` file to make use of the new log format by updating the log format from `main` to `main_ext`:
 
     ```nginx
 
@@ -1038,7 +1038,8 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 >If you are finished with this lab, you can use Docker Compose to shut down your test environment:
 
 ```bash
-docker-compose down
+cd lab2
+docker compose down
 ```
 
 ```bash
