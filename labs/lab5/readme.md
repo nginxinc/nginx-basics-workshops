@@ -111,7 +111,7 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
             - "443"
     ```
 
-1. Build and run all the above containers by using docker compose.
+1. Ensure you are in the `lab5` folder.  Using a Terminal, run Docker Compose to build and run all the above containers.
 
    ```bash
     cd lab5
@@ -731,10 +731,11 @@ In this section, you will make use of NGINX Plus API to get current statistics r
      curl 'http://localhost:9000/api/9/http/upstreams' | jq
     ```
 
->If you are finished with this lab, you can use Docker Compose to shut down your test environment:
+>If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab5` folder:
 
 ```bash
-docker-compose down
+cd lab5
+docker compose down
 ```
 
 ```bash

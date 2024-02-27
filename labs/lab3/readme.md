@@ -855,7 +855,7 @@ As a Best Practice, you should not modify the `main` log format, but rather copy
 
 >Don't forget - Save any Docker containers/images, docker compose, NGINX config files and Notes you may want for future reference.
 
->If you are finished with this lab, you can use Docker Compose to shut down your test environment:
+>If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab3` folder:
 
 ```bash
 cd lab3

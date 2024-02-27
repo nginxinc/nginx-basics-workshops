@@ -140,7 +140,7 @@ systemctl stop nginx      #stop nginx processes
 
 Go ahead and try some of these NGINX commands in your nginx-oss container now, so you are familiar with them.  Open a second Terminal, so you can Watch the docker logs while you try these different commands.  It is recommended that you use 2 Terminals, one for issuing commands, and one for watching logs.
 
-1. Run Docker Compose to build and run your NGINX OSS container:
+1. Ensure you are in the `lab2` folder. Using a Terminal, run Docker Compose to build and run your NGINX OSS container:
 
    ```bash
    cd lab2
@@ -1035,7 +1035,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
 <br/>
 
->If you are finished with this lab, you can use Docker Compose to shut down your test environment:
+>If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab2` folder:
 
 ```bash
 cd lab2

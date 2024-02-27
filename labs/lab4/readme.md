@@ -92,11 +92,11 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
     ```
 
-1. Run Docker Compose to build and run your containers:
+1. Ensure you are in the `lab4` folder.  Using a Terminal, run Docker Compose to build and run your containers:
 
    ```bash
     cd lab4
-    docker-compose up --force-recreate
+    docker compose up --force-recreate
    ```
 
 1. Verify all four containers are running:
@@ -1113,10 +1113,11 @@ If you need to find the `answers` to the lab exercises, you will find the final 
 
 ![NGINX Logo](media/nginx-logo.png)
 
->If you are finished with this lab, you can use Docker Compose to shut down your test environment:
+>If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab4` folder:
 
 ```bash
-docker-compose down
+cd lab4
+docker compose down
 ```
 
 ```bash
