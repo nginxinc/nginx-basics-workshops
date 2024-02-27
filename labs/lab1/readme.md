@@ -97,11 +97,11 @@ Visual Studio Code | Docker Compose | GitHub
 
     ```
 
-1. Run Docker Compose to build and run your NGINX OSS container:
+1. Ensure you are in the `lab1` folder. Using a Terminal, run Docker Compose to build and run your NGINX OSS container:
 
     ```bash
     cd lab1
-    docker compose up --force-recreate
+    docker compose up --force-recreate -d
 
     ```
 
@@ -346,7 +346,7 @@ Visual Studio Code | Docker Compose | GitHub
 
 ![NGINX Logo](media/nginx-tshirt.png)
 
->If you are finished with all the testing of the NGINX web server container, you can use Docker Compose to shut down your test environment:
+>If you are finished with all the testing of the NGINX web server container, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab1` folder:
 
 ```bash
 cd lab1
@@ -380,7 +380,7 @@ Network lab1_default         Removed
 
 - Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
 - Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
-- Kevin Jones - Technical Evanglist - Community and Alliances @ F5, Inc.
+- Kevin Jones - Technical Evangelist - Community and Alliances @ F5, Inc.
 
 -------------
 

@@ -122,9 +122,9 @@ Here is a quick review of the NGINX commands you should be familiar with.  Depen
 
 nginx -v                  #displays NGINX version details
 
-nginx -s quit             #graceful shutdown
+nginx -s quit             #graceful shutdown (Note: This will exit the container)
 
-nginx -s stop             #terminates all NGINX processes
+nginx -s stop             #terminates all NGINX processes (Note: This will exit the container)
 
 nginx -t                  #test configuration syntax and files
 
@@ -132,19 +132,15 @@ nginx -T                  #dumps the current running configurations
 
 nginx -s reload           #reloads NGINX with new configuration
 
-systemctl start nginx     #start nginx processes
-
-systemctl stop nginx      #stop nginx processes
-
 ```
 
 Go ahead and try some of these NGINX commands in your nginx-oss container now, so you are familiar with them.  Open a second Terminal, so you can Watch the docker logs while you try these different commands.  It is recommended that you use 2 Terminals, one for issuing commands, and one for watching logs.
 
-1. Run Docker Compose to build and run your NGINX OSS container:
+1. Ensure you are in the `lab2` folder. Using a Terminal, run Docker Compose to build and run your NGINX OSS container:
 
    ```bash
    cd lab2
-   docker compose up --force-recreate
+   docker compose up --force-recreate -d
    ```
 
 1. Docker Exec into the nginx-oss container.
@@ -167,27 +163,6 @@ Go ahead and try some of these NGINX commands in your nginx-oss container now, s
     /etc/nginx # nginx -v
     nginx version: nginx/1.25.4
 
-    /etc/nginx # nginx -s quit
-    ...
-    2024/02/02 20:01:32 [notice] 1#1: signal 3 (SIGQUIT) received from 66, shutting down
-    2024/02/02 20:01:32 [notice] 53#53: gracefully shutting down
-    2024/02/02 20:01:32 [notice] 53#53: exiting
-    2024/02/02 20:01:32 [notice] 54#54: gracefully shutting down
-    2024/02/02 20:01:32 [notice] 54#54: exiting
-    2024/02/02 20:01:32 [notice] 1#1: signal 17 (SIGCHLD) received from 56
-    2024/02/02 20:01:32 [notice] 1#1: worker process 56 exited with code 0
-    ...
-
-    /etc/nginx # nginx -s stop
-    2024/02/02 20:06:22 [notice] 1#1: signal 15 (SIGTERM) received from 48, exiting
-    2024/02/02 20:01:32 [notice] 53#53: gracefully shutting down
-    2024/02/02 20:01:32 [notice] 53#53: exiting
-    2024/02/02 20:01:32 [notice] 54#54: gracefully shutting down
-    2024/02/02 20:01:32 [notice] 54#54: exiting
-    2024/02/02 20:01:32 [notice] 1#1: signal 17 (SIGCHLD) received from 56
-    2024/02/02 20:01:32 [notice] 1#1: worker process 56 exited with code 0
-    ...
-
     /etc/nginx # nginx -t
     nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
     nginx: configuration file /etc/nginx/nginx.conf test is successful
@@ -207,8 +182,6 @@ Go ahead and try some of these NGINX commands in your nginx-oss container now, s
     2024/02/02 20:10:04 [notice] 1#1: reconfiguring
     2024/02/02 20:10:04 [notice] 1#1: using the "epoll" event method
     ...
-
-    NOTE: systemctl commands may not be available in your container OS
 
     ```
 
@@ -336,7 +309,7 @@ Inspect the nginx.conf file, here are some explanations:
 user  nginx;                               #Linux user
 worker_processes  auto;                    #Number of Workers, 1 per CPU core
 
-error_log  /var/log/nginx/error.log warn;  #set NGINX error log path and name and level
+error_log  /var/log/nginx/error.log info;  #set NGINX error log path and name and level
 pid        /var/run/nginx.pid;             #set NGINX master process PID file
 
 ```
@@ -495,7 +468,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
         server_name www.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/www.example.com.log main; 
-        error_log   /var/log/nginx/www.example.com_error.log notice; 
+        error_log   /var/log/nginx/www.example.com_error.log info; 
 
         location / {
             
@@ -550,7 +523,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
         server_name www2.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/www2.example.com.log main; 
-        error_log   /var/log/nginx/www2.example.com_error.log notice; 
+        error_log   /var/log/nginx/www2.example.com_error.log info; 
 
         location / {
             
@@ -633,7 +606,7 @@ server {
     server_name cafe.example.com;   # Set hostname to match in request
 
     access_log  /var/log/nginx/cafe.example.com.log main; 
-    error_log   /var/log/nginx/cafe.example.com_error.log notice; 
+    error_log   /var/log/nginx/cafe.example.com_error.log info; 
 
     location / {
         
@@ -793,7 +766,7 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
         server_name cars.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/cars.example.com.log main; 
-        error_log   /var/log/nginx/cars.example.com_error.log notice;
+        error_log   /var/log/nginx/cars.example.com_error.log info;
 
         root /usr/share/nginx/html;      # Set the root folder for the HTML and JPG files
 
@@ -889,7 +862,7 @@ Now that you have some hot cars in your garage to show off, you might want to le
 
 1. Reload NGINX with `nginx -s reload` command.
 
-1. To see this in action, open your browser to <http://cars.example.com/browse> , you should see something similar to this.  If you click on one of the .jpg files, you will see the image; or the webpage if you click on the .html files.  This is a handy feature for presenting images, downloading files from directories, PDFs for documents, etc.
+1. To see this in action, open your browser to <http://cars.example.com/browse/> , you should see something similar to this.  If you click on one of the .jpg files, you will see the image; or the webpage if you click on the .html files.  This is a handy feature for presenting images, downloading files from directories, PDFs for documents, etc.
 
     ![NGINX Directory Browse](media/lab2_directory-browse.png)
 
@@ -1005,7 +978,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
         access_log  /var/log/nginx/cars.example.com.log main_ext;  # Change log format to main_ext
 
-        error_log   /var/log/nginx/cars.example.com_error.log notice;
+        error_log   /var/log/nginx/cars.example.com_error.log info;
         ...
     }
 
@@ -1035,7 +1008,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
 <br/>
 
->If you are finished with this lab, you can use Docker Compose to shut down your test environment:
+>If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab2` folder:
 
 ```bash
 cd lab2

@@ -92,11 +92,11 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
     ```
 
-1. Run Docker Compose to build and run your containers:
+1. Ensure you are in the `lab4` folder.  Using a Terminal, run Docker Compose to build and run your containers:
 
    ```bash
     cd lab4
-    docker-compose up --force-recreate
+    docker compose up --force-recreate -d
    ```
 
 1. Verify all four containers are running:
@@ -139,7 +139,7 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
     ```
 
-    Check all three, just to be sure.  Exit the Docker Exec when you are finished.
+    Check all three, just to be sure.  Exit the Docker Exec when you are finished by typing in `exit` within the container terminal.
 
 1. Test the NGINX OSS container, verify it also sends back a response to a curl request:
 
@@ -168,7 +168,7 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
     ```
 
-    Congrats - you should see the `Welcome to nginx!` page.
+    Congrats - you should see the `Welcome to nginx!` page. Exit the Docker Exec when you are finished by typing in `exit` within the container terminal.
 
 <br/>
 
@@ -261,7 +261,7 @@ This will require a new NGINX config file, for the Server and Location Blocks. F
         server_name cafe.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/cafe.example.com.log main; 
-        error_log   /var/log/nginx/cafe.example.com_error.log notice;
+        error_log   /var/log/nginx/cafe.example.com_error.log info;
 
         location / {
             
@@ -331,7 +331,7 @@ This will require a new NGINX config file, for the Server and Location Blocks. F
         server_name cafe.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/cafe.example.com.log main; 
-        error_log   /var/log/nginx/cafe.example.com_error.log notice;
+        error_log   /var/log/nginx/cafe.example.com_error.log info;
 
         location / {
             
@@ -419,7 +419,7 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
         server_name cafe.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/cafe.example.com.log main; 
-        error_log   /var/log/nginx/cafe.example.com_error.log notice;
+        error_log   /var/log/nginx/cafe.example.com_error.log info;
 
         root /usr/share/nginx/html;         # Set the root folder for the HTML and JPG files
 
@@ -560,7 +560,7 @@ Now that you have a working NGINX Proxy, and several backends, you will be addin
         server_name cafe.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/cafe.example.com.log main_ext;         # Change this to "main_ext"
-        error_log   /var/log/nginx/cafe.example.com_error.log notice;
+        error_log   /var/log/nginx/cafe.example.com_error.log info;
 
     ...snip
 
@@ -665,7 +665,7 @@ However, this means a new TCP connection for every request, and is quite ineffic
         server_name cafe.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/cafe.example.com.log main; 
-        error_log   /var/log/nginx/cafe.example.com_error.log notice;
+        error_log   /var/log/nginx/cafe.example.com_error.log info;
 
         root /usr/share/nginx/html;         # Set the root folder for the HTML and JPG files
 
@@ -754,7 +754,7 @@ Now you need to enable some HTTP Headers, to be added to the Request.  These are
         server_name cafe.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/cafe.example.com.log main; 
-        error_log   /var/log/nginx/cafe.example.com_error.log notice;
+        error_log   /var/log/nginx/cafe.example.com_error.log info;
 
         root /usr/share/nginx/html;         # Set the root folder for the HTML and JPG files
 
@@ -831,30 +831,30 @@ Different backend applications may benefit from using different load balancing t
 
 1. If you open the NGINX Basic Status page at <http://localhost:9000/basic_status>, and refresh it every 3-4 seconds while you run the `wrk` load generation tool at your nginx-oss Load Balancer:  
 
-    `wrk` load generation tool is a docker container that will download and run, with 4 threads, at 200 connections, for 2 minutes:
+    `wrk` load generation tool is a docker container that will download and run, with 4 threads, at 200 connections, for 1 minute:
 
     ```bash
-    docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d2m -H 'Host: cafe.example.com' --timeout 2s http://nginx-oss/coffee
+    docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d1m -H 'Host: cafe.example.com' --timeout 2s http://nginx-oss/coffee
     ```
 
     In the `basic_status` page, you should notice about 200 Active Connections, and the number of `server requests` should be increasing rapidly.  Unfortunately, there is no easy way to monitor the number of TCP connections to Upstreams when using NGINX Opensource.  But good news, you `will` see all the Upstream metrics in the next lab with NGINX Plus!
 
-    After the 2 minute run of `wrk` load generation tool has finished, you should see a Summary of the statistics.  It should look similar to this:
+    After the 1 minute run of `wrk` load generation tool has finished, you should see a Summary of the statistics.  It should look similar to this:
 
     ```bash
     ##Sample output##
-    Running 2m test @ http://nginx-oss/coffee
+    Running 1m test @ http://nginx-oss/coffee
     4 threads and 200 connections
     Thread Stats   Avg      Stdev     Max   +/- Stdev
-        Latency    51.99ms   25.29ms   1.60s    99.19%
-        Req/Sec     0.98k    86.96     2.95k    86.86%
-    1170593 requests in 2.00m, 1.82GB read
-    Requests/sec:   3900.71                            # Good performance ?
-    Transfer/sec:      6.21MB
+        Latency    68.41ms   30.72ms   1.28s    98.85%
+        Req/Sec   747.52     81.56     2.11k    84.40%
+    178597 requests in 1.00m, 284.27MB read
+    Requests/sec:   2872.08       # Good performance ?
+    Transfer/sec:      4.73MB
 
     ```
 
-    Well, that performance looks pretty good, about 3900 HTTP Reqs/second.  But NGINX can do better.  You will enable TCP keepalives to the Upstreams.  This Directive will tell NGINX to create a `pool of TCP connections to each Upstream`, and use that established connection pool to rapid-fire HTTP requests to the backends.  `No delays waiting for the TCP handshakes!`  It is considered a Best Practice to enable keepalives to the Upstream servers.
+    Well, that performance looks pretty good, about ~2900 HTTP Reqs/second.  But NGINX can do better.  You will enable TCP keepalives to the Upstreams.  This Directive will tell NGINX to create a `pool of TCP connections to each Upstream`, and use that established connection pool to rapid-fire HTTP requests to the backends.  `No delays waiting for the TCP handshakes!`  It is considered a Best Practice to enable keepalives to the Upstream servers.
 
 1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-oss/etc/nginx/conf.d`) and uncomment from the `keepalives 16` line.
 
@@ -889,22 +889,21 @@ Different backend applications may benefit from using different load balancing t
 
 1. Run the `wrk` load generator again. You should now have `least_conn` and `keepalive` both **enabled**.
 
-    After the 2 minute run of `wrk` load generation tool has finished, you should see a Summary of the statistics.  It should look similar to this:
+    After the 1 minute run of `wrk` load generation tool has finished, you should see a Summary of the statistics.  It should look similar to this:
 
     ```bash
     ##Sample output##
-    Running 2m test @ http://nginx-oss/coffee
+    Running 1m test @ http://nginx-oss/coffee
     4 threads and 200 connections
     Thread Stats   Avg      Stdev     Max   +/- Stdev
-        Latency    25.48ms   16.93ms 825.44ms   98.58%
-        Req/Sec     2.02k   281.30     3.98k    79.17%
-    2417366 requests in 2.00m, 3.76GB read
-    Requests/sec:   8056.82                             # NICE, much better!
-    Transfer/sec:     12.82MB
-
+        Latency    43.90ms   47.06ms   1.18s    98.98%
+        Req/Sec     1.24k   118.64     1.88k    77.34%
+    297076 requests in 1.00m, 473.63MB read
+    Requests/sec:   5046.17       # NICE, much better!
+    Transfer/sec:      7.89MB
     ```
 
-    >>Wow, more that **DOUBLE the performance**, with Upstream `keepalive` enabled - over 8,000 HTTP Reqs/second.  Did you see a performance increase??  Your mileage here will vary of course, depending on what kind of machine you are using for these Docker containers.
+    >>Wow, more that **DOUBLE the performance**, with Upstream `keepalive` enabled - over 5,000 HTTP Reqs/second.  Did you see a performance increase??  Your mileage here will vary of course, depending on what kind of machine you are using for these Docker containers.
 
     >Note:  In the next Lab, you will use NGINX Plus, which `does` have detailed Upstream metrics, which you will see in real-time while loadtests are being run.
 
@@ -956,7 +955,7 @@ Different backend applications may benefit from using different load balancing t
     user  nginx;
     worker_processes  4;      # Change to 4 and re-test
 
-    error_log  /var/log/nginx/error.log warn;
+    error_log  /var/log/nginx/error.log info;
     pid        /var/run/nginx.pid;
 
 
@@ -989,7 +988,7 @@ Different backend applications may benefit from using different load balancing t
     Within the `nginx-oss` container, run `top` to see the NGINX Workers at work.  Should look something like this:
 
     ```bash
-    top -n 1
+    top
     ```
 
     ```bash
@@ -1008,29 +1007,27 @@ Different backend applications may benefit from using different load balancing t
 
     ```
 
-1. Run the `wrk` load generator again for 2 minutes.
+1. Run the `wrk` load generator again for 1 minute.
 
    ```bash
-   docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d2m -H 'Host: cafe.example.com' --timeout 2s http://nginx-oss/coffee
+   docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d1m -H 'Host: cafe.example.com' --timeout 2s http://nginx-oss/coffee
    ```
 
-   After the 2 minute run of `wrk` load generation tool has finished, you should see a Summary of the statistics.  It should look similar to this:
+   After the 1 minute run of `wrk` load generation tool has finished, you should see a Summary of the statistics.  It should look similar to this:
 
     ```bash
     ##Sample output##
-    Running 2m test @ http://nginx-oss/coffee
+    Running 1m test @ http://nginx-oss/coffee
     4 threads and 200 connections
     Thread Stats   Avg      Stdev     Max   +/- Stdev
-        Latency     9.33ms    3.60ms 134.99ms   78.81%
-        Req/Sec     5.40k   721.76    10.97k    74.55%
-    6452981 requests in 2.00m, 10.03GB read
-    Socket errors: connect 0, read 0, write 0, timeout 13
-    Requests/sec:  21503.04                                 # Even better w/ 4 cores 
-    Transfer/sec:     34.23MB
-
+        Latency    25.02ms   17.42ms 292.98ms   78.38%
+        Req/Sec     2.13k   379.32     4.39k    77.92%
+    508114 requests in 1.00m, 810.35MB read
+    Requests/sec:   8456.93        # Even better w/ 4 cores
+    Transfer/sec:     13.49MB
     ```
 
-    Over 21,000 Requests/Second from a little Docker container...not too shabby!  
+    Over 8,000 Requests/Second from a little Docker container...not too shabby!  
 
     Was your Docker Desktop was humming along, with the fan on full blast?!
 
@@ -1113,10 +1110,11 @@ If you need to find the `answers` to the lab exercises, you will find the final 
 
 ![NGINX Logo](media/nginx-logo.png)
 
->If you are finished with this lab, you can use Docker Compose to shut down your test environment:
+>If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab4` folder:
 
 ```bash
-docker-compose down
+cd lab4
+docker compose down
 ```
 
 ```bash

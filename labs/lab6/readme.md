@@ -4,7 +4,7 @@
 
 In this lab, you will be exploring the integration between NGINX Plus, Prometheus and Grafana.
 
-This Solution requires the use of the NGINX provided JaveScript and Prometheus modules to collect metrics from the NGINX Plus API, and export those metrics as an HTTP html/text page, commonly called the `scaper page` because it scrapes statistics for publication.  The metrics on this export page are then read and imported into Prometheus and Grafana's time-series database.  Once these metrics are in the database, you can create many different Dashboards, Thresholds, Alerts, and other types of graphs for Visualization and Reporting.  As you can imagine, there are literally hundreds of Grafana dashboards written by users of NGINX that you can try out for free.  Grafana also allows you to create and edit your own Dashboards.
+This Solution requires the use of the NGINX provided Javascript and Prometheus modules to collect metrics from the NGINX Plus API, and export those metrics as an HTTP html/text page, commonly called the `scaper page` because it scrapes statistics for publication.  The metrics on this export page are then read and imported into Prometheus and Grafana's time-series database.  Once these metrics are in the database, you can create many different Dashboards, Thresholds, Alerts, and other types of graphs for Visualization and Reporting.  As you can imagine, there are literally hundreds of Grafana dashboards written by users of NGINX that you can try out for free.  Grafana also allows you to create and edit your own Dashboards.
 
 NGINX Plus | Prometheus | Grafana
 :-------------------------:|:-------------------------:|:-----:
@@ -34,6 +34,13 @@ By the end of the lab you will be able to:
 
 As part of your Dockerfile, your NGINX Plus container already has the added `NGINX Java Script and NGINX Prometheus dynamic module` installed during the build process.  Refer to the Dockerfile if you want to check it out.
 
+1. Ensure you are in the `lab6` folder.  Using a Terminal, run Docker Compose to build and run all the containers.
+
+    ```bash
+     cd lab6
+     docker compose up --force-recreate -d
+    ```
+
 1. Edit your `nginx.conf` file, you will make 2 changes.
 
     - Uncomment Line #8 to enable the `ngx_http_js_module` module.
@@ -45,7 +52,7 @@ As part of your Dockerfile, your NGINX Plus container already has the added `NGI
     user  nginx;
     worker_processes  auto;
 
-    error_log  /var/log/nginx/error.log notice;
+    error_log  /var/log/nginx/error.log info;
     pid        /var/run/nginx.pid;
 
     # Uncomment to enable NGINX JavaScript module
@@ -89,8 +96,8 @@ As part of your Dockerfile, your NGINX Plus container already has the added `NGI
 
 1. Once the contents of both files has been updated and saved, Docker Exec into the nginx-plus container.
 
-   ```bash
-    docker exec -it nginx-plus bin/bash
+    ```bash
+     docker exec -it nginx-plus bin/bash
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
@@ -101,7 +108,7 @@ As part of your Dockerfile, your NGINX Plus container already has the added `NGI
     docker run --name wrk --network=lab6_default --rm williamyeh/wrk -t4 -c200 -d20m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
     ```
 
-1.  Test the Prometheus scraper page.  Open your browser to http://localhost:9113/metrics.  You should see an html/text page like this one.  You will notice there are MANY statistcs available, this page is like a text version of the NGINX Plus dashboard. This page can be easily imported into your existing Performance Management and Monitoring tools.  You will see how to do this in the next section with Prometheus and Grafana.
+1. Test the Prometheus scraper page.  Open your browser to <http://localhost:9113/metrics>.  You should see an html/text page like this one.  You will notice there are MANY statistcs available, this page is like a text version of the NGINX Plus dashboard. This page can be easily imported into your existing Performance Management and Monitoring tools.  You will see how to do this in the next section with Prometheus and Grafana.
 
     Click refresh a couple times, and some of the metrics should increment.
 
@@ -113,7 +120,7 @@ As part of your Dockerfile, your NGINX Plus container already has the added `NGI
 
 <br/>
 
-![](media/prometheus-icon.png)  |![](media/grafana-icon.png)
+![prometheus](media/prometheus-icon.png)  |![grafana](media/grafana-icon.png)
 --- | ---
 
 1. Inspect your `docker-compose.yml` file, you will see it includes 2 additional Docker containers for this lab, one for a Prometheus server, and one for a Grafana server.  These have been configured to run for you, but the images will be pulled from public repos.
@@ -156,7 +163,7 @@ As part of your Dockerfile, your NGINX Plus container already has the added `NGI
     docker ps -a
     ```
 
-    ```
+    ```bash
     ##Sample output##
     CONTAINER ID   IMAGE                   COMMAND                  CREATED          STATUS          PORTS                                                                                      NAMES
     8a61c66fc511   prom/prometheus         "/bin/prometheus --c…"   36 minutes ago   Up 36 minutes   0.0.0.0:9090->9090/tcp                                                                     prometheus
@@ -176,7 +183,7 @@ Prometheus is a software package that can watch and collect statistics from many
 
 <br/>
 
-1. Using Chrome, navigate to http://localhost:9090. You should see a Prometheus webpage like this one. Search for `nginxplus_` in the query box to see a list of all the statistics that Prometheus is collecting for you.  Select `nginxplus_http_requests_total` from the list, click on Graph, and then click the "Execute" Button.  Change the Time window if needed. This will provide a graph similar to this one:
+1. Using Chrome, navigate to <http://localhost:9090>. You should see a Prometheus webpage like this one. Search for `nginxplus_` in the query box to see a list of all the statistics that Prometheus is collecting for you.  Select `nginxplus_http_requests_total` from the list, click on Graph, and then click the "Execute" Button.  Change the Time window if needed. This will provide a graph similar to this one:
 
     ![Prom Graph](media/lab6_prometheus-graph.png)
 
@@ -190,7 +197,7 @@ Prometheus is a software package that can watch and collect statistics from many
 
 Grafana is a data visualization tool, which contains a time series database and graphical web presentation tools. Grafana imports the Prometheus scraper page statistics into it's database, and allows you to create Dashboards of the statistics that are important to you.
 
-1. Log into the Web console access for Grafana at http://localhost:3000.  The default Login should be user/pass of `admin/admin`.  This will present the main Grafana page.
+1. Log into the Web console access for Grafana at <http://localhost:3000>.  The default Login should be user/pass of `admin/admin`.  This will present the main Grafana page.
 
 1. Create a Prometheus Data Source.  In the middle of the Grafana Welcome page, click on `Add Data Source`, and Select the Prometheus icon.
 
@@ -198,13 +205,35 @@ Grafana is a data visualization tool, which contains a time series database and 
 
     ![Prom Datasource](media/lab6_prometheus-datasource.png)
 
-1. Scroll to the bottom and click `Test and Save`.
+1. Scroll to the bottom and click `Save and Test`. You should see a green `Successfully queried the Prometheus API` message.
 
-1. Import the provided `labs/lab6/NGINX-Basics.json` file to see statistics like the NGINX Plus HTTP Requests Per Second and Upstream Response Times.  Click on New Dashboard, then Import.  Copy and Paste the `labs/lab6/NGINX-Basics.json` file provided.  You should see a dashboard like this one:
+1. Import the provided `labs/lab6/NGINX-Basics.json` file to see statistics like the NGINX Plus HTTP Requests Per Second and Upstream Response Times.  Click on Create New Dashboard from Home page and then Import.  Copy and Paste the `labs/lab6/NGINX-Basics.json` file provided. Click on the `Load` button. Set the data source to `prometheus` and then click on the `Import` button. You should see a dashboard like this one:
 
     ![Grafana Dashboard](media/lab6_grafana-dashboard.png)
 
     There are many different Grafana Dashboards available, and you have the option to create and build dashboards to suite your needs.  NGINX Plus provides over 240 metrics for TCP, HTTP, SSL, Virtual Servers, Locations, Rate Limits, and Upstreams.
+
+> If `wrk` load generation tool is still running, then you can stop it by pressing `ctrl + c`.
+
+>If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab6` folder:
+
+```bash
+cd lab6
+docker compose down
+```
+
+```bash
+##Sample output##
+Running 5/5
+Container nginx-plus         Removed
+Container web2               Removed
+Container prometheus         Removed
+Container web3               Removed
+Container web1               Removed
+Container grafana            Removed                            
+Network lab6_default         Removed
+
+```
 
 <br/>
 
