@@ -862,7 +862,7 @@ Now that you have some hot cars in your garage to show off, you might want to le
 
 1. Reload NGINX with `nginx -s reload` command.
 
-1. To see this in action, open your browser to <http://cars.example.com/browse> , you should see something similar to this.  If you click on one of the .jpg files, you will see the image; or the webpage if you click on the .html files.  This is a handy feature for presenting images, downloading files from directories, PDFs for documents, etc.
+1. To see this in action, open your browser to <http://cars.example.com/browse/> , you should see something similar to this.  If you click on one of the .jpg files, you will see the image; or the webpage if you click on the .html files.  This is a handy feature for presenting images, downloading files from directories, PDFs for documents, etc.
 
     ![NGINX Directory Browse](media/lab2_directory-browse.png)
 
