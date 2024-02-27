@@ -177,9 +177,7 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
 1. Test access to NGINX Plus container with Docker Exec command:
 
     ```bash
-    export CONTAINER_ID=$(docker ps -q --filter "name=nginx-plus")
-    
-    docker exec -it $CONTAINER_ID /bin/bash
+    docker exec -it nginx-plus /bin/bash
     ```
 
 1. Run some commands inside the NGINX Plus Container:
@@ -477,10 +475,16 @@ All of these metrics are available via NGINX Plus API as a Json object making it
     - Health checks success and failures
     - HTTP Header and full response times
     - SSL Handshake success and failure, session counters
+  
     These upstream metrics are very valuable to monitor your backend servers to troubleshoot issues.
 
-   ![workers](media/dashboard-workers.png)
-   In the Workers tab, you can see the stats like process id, active connections, idle connections, total request, request per second etc. for each worker process.
+    ![workers](media/dashboard-workers.png)
+
+    In the Workers tab, you can see the stats like process id, active connections, idle connections, total request, request per second etc. for each worker process.
+
+    To see these metrics open a new tab in browser to <http://cafe.example.com/coffee> and tick the refresh checkbox at bottom center of the page.
+
+    Go back to the NGINX Plus Dashboard, to observe the metrics changing.
 
 ## Active HealthChecks
 
@@ -537,8 +541,7 @@ In this section, you will enable active Healthchecks. Active healthchecks basica
 
    ```bash
    docker ps
-   export WEB3=$(docker ps -q --filter "name=web3")
-   docker stop $WEB3 
+   docker stop web3 
    ```
 
 1. Once you have stopped the container, switch back to the browser and check the status of the backend servers.
@@ -549,8 +552,7 @@ In this section, you will enable active Healthchecks. Active healthchecks basica
 1. NGINX also records health check failures in the `/var/log/nginx/error.log` file, go take a look
 
    ```bash
-   export CONTAINER_ID=$(docker ps -q --filter "name=nginx-plus")
-   docker exec -it $CONTAINER_ID more /var/log/nginx/error.log
+   docker exec -it nginx-plus more /var/log/nginx/error.log
    ```
 
    ```bash
@@ -580,10 +582,10 @@ In this section, you will explore how NGINX Plus can be reconfigured without dro
 1. Start the `wrk` load generation tool by downloading and running the following docker container.
 
    ```bash
-    docker run --network=lab5_default --rm williamyeh/wrk -t4 -c200 -d20m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
+    docker run --network=lab5_default --rm williamyeh/wrk -t4 -c200 -d5m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
    ```
 
-    The above command would run the wrk load generation tool for 20 minutes with 200 active connections hitting `/coffee` path.
+    The above command would run the wrk load generation tool for 5 minutes with 200 active connections hitting `/coffee` path.
 
 1. Inspect and edit the `upstreams.conf` file, uncomment the `least_time last_byte` load balancing algorithm which is an advance algorithm available in NGINX Plus, that monitors the response time of each backend application server and then selects the fastest backend server for serving new request coming to NGINX proxy. This is a popular feature when there is a large difference in response time for your backend servers, like when you are using different performant hardware types.
 
@@ -622,7 +624,7 @@ In this section, you will explore how NGINX Plus can be reconfigured without dro
 
         (**NOTE:** In lab environment, this is difficult to demonstrate as all the containers are on the same network with same resource allocation)
 
-    There is detailed explaination of what happens when you perform a reload in lab2. To recap, with NGINX Plus, new Worker processes are created, and begin using the new configuration immediately for all new connections and requests. The old Workers are **allowed to complete their previous task**, and then close their TCP connections naturally, **traffic in flight is not dropped!** The master process terminates the old Workers after they finish their work and close all their connections.
+    There is detailed explanation of what happens when you perform a reload in lab2. To recap, with NGINX Plus, new Worker processes are created, and begin using the new configuration immediately for all new connections and requests. The old Workers are **allowed to complete their previous task**, and then close their TCP connections naturally, **traffic in flight is not dropped!** The master process terminates the old Workers after they finish their work and close all their connections.
 
 ## NGINX Dynamic Upstream Management
 
@@ -731,6 +733,8 @@ In this section, you will make use of NGINX Plus API to get current statistics r
      curl 'http://localhost:9000/api/9/http/upstreams' | jq
     ```
 
+> If `wrk` load generation tool is still running, then you can stop it by pressing `ctrl + c`.
+
 >If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab5` folder:
 
 ```bash
@@ -756,6 +760,8 @@ Network lab5_default         Removed
 - [NGINX Plus](https://docs.nginx.com/nginx/)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
 - [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
+- [NGINX Plus API Module](https://nginx.org/en/docs/http/ngx_http_api_module.html)
+- [NGINX Plus Dynamic Upstreams]( https://docs.nginx.com/nginx/admin-guide/load-balancer/dynamic-configuration-api/)
 
 ### Authors
 
