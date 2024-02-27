@@ -52,7 +52,7 @@ As part of your Dockerfile, your NGINX Plus container already has the added `NGI
     user  nginx;
     worker_processes  auto;
 
-    error_log  /var/log/nginx/error.log notice;
+    error_log  /var/log/nginx/error.log info;
     pid        /var/run/nginx.pid;
 
     # Uncomment to enable NGINX JavaScript module

@@ -261,7 +261,7 @@ This will require a new NGINX config file, for the Server and Location Blocks. F
         server_name cafe.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/cafe.example.com.log main; 
-        error_log   /var/log/nginx/cafe.example.com_error.log notice;
+        error_log   /var/log/nginx/cafe.example.com_error.log info;
 
         location / {
             
@@ -331,7 +331,7 @@ This will require a new NGINX config file, for the Server and Location Blocks. F
         server_name cafe.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/cafe.example.com.log main; 
-        error_log   /var/log/nginx/cafe.example.com_error.log notice;
+        error_log   /var/log/nginx/cafe.example.com_error.log info;
 
         location / {
             
@@ -419,7 +419,7 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
         server_name cafe.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/cafe.example.com.log main; 
-        error_log   /var/log/nginx/cafe.example.com_error.log notice;
+        error_log   /var/log/nginx/cafe.example.com_error.log info;
 
         root /usr/share/nginx/html;         # Set the root folder for the HTML and JPG files
 
@@ -560,7 +560,7 @@ Now that you have a working NGINX Proxy, and several backends, you will be addin
         server_name cafe.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/cafe.example.com.log main_ext;         # Change this to "main_ext"
-        error_log   /var/log/nginx/cafe.example.com_error.log notice;
+        error_log   /var/log/nginx/cafe.example.com_error.log info;
 
     ...snip
 
@@ -665,7 +665,7 @@ However, this means a new TCP connection for every request, and is quite ineffic
         server_name cafe.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/cafe.example.com.log main; 
-        error_log   /var/log/nginx/cafe.example.com_error.log notice;
+        error_log   /var/log/nginx/cafe.example.com_error.log info;
 
         root /usr/share/nginx/html;         # Set the root folder for the HTML and JPG files
 
@@ -754,7 +754,7 @@ Now you need to enable some HTTP Headers, to be added to the Request.  These are
         server_name cafe.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/cafe.example.com.log main; 
-        error_log   /var/log/nginx/cafe.example.com_error.log notice;
+        error_log   /var/log/nginx/cafe.example.com_error.log info;
 
         root /usr/share/nginx/html;         # Set the root folder for the HTML and JPG files
 
@@ -955,7 +955,7 @@ Different backend applications may benefit from using different load balancing t
     user  nginx;
     worker_processes  4;      # Change to 4 and re-test
 
-    error_log  /var/log/nginx/error.log warn;
+    error_log  /var/log/nginx/error.log info;
     pid        /var/run/nginx.pid;
 
 

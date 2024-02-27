@@ -309,7 +309,7 @@ Inspect the nginx.conf file, here are some explanations:
 user  nginx;                               #Linux user
 worker_processes  auto;                    #Number of Workers, 1 per CPU core
 
-error_log  /var/log/nginx/error.log warn;  #set NGINX error log path and name and level
+error_log  /var/log/nginx/error.log info;  #set NGINX error log path and name and level
 pid        /var/run/nginx.pid;             #set NGINX master process PID file
 
 ```
@@ -468,7 +468,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
         server_name www.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/www.example.com.log main; 
-        error_log   /var/log/nginx/www.example.com_error.log notice; 
+        error_log   /var/log/nginx/www.example.com_error.log info; 
 
         location / {
             
@@ -523,7 +523,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
         server_name www2.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/www2.example.com.log main; 
-        error_log   /var/log/nginx/www2.example.com_error.log notice; 
+        error_log   /var/log/nginx/www2.example.com_error.log info; 
 
         location / {
             
@@ -606,7 +606,7 @@ server {
     server_name cafe.example.com;   # Set hostname to match in request
 
     access_log  /var/log/nginx/cafe.example.com.log main; 
-    error_log   /var/log/nginx/cafe.example.com_error.log notice; 
+    error_log   /var/log/nginx/cafe.example.com_error.log info; 
 
     location / {
         
@@ -766,7 +766,7 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
         server_name cars.example.com;   # Set hostname to match in request
 
         access_log  /var/log/nginx/cars.example.com.log main; 
-        error_log   /var/log/nginx/cars.example.com_error.log notice;
+        error_log   /var/log/nginx/cars.example.com_error.log info;
 
         root /usr/share/nginx/html;      # Set the root folder for the HTML and JPG files
 
@@ -978,7 +978,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
         access_log  /var/log/nginx/cars.example.com.log main_ext;  # Change log format to main_ext
 
-        error_log   /var/log/nginx/cars.example.com_error.log notice;
+        error_log   /var/log/nginx/cars.example.com_error.log info;
         ...
     }
 
