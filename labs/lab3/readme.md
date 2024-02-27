@@ -182,7 +182,7 @@ Now that you have a TLS cert and key for testing, you will configure NGINX to us
     ```bash
     ##Sample output##
 
-    curl: (60) SSL certificate problem: unable to get local issuer certificate
+    curl: (60) SSL certificate problem: self signed certificate
     More details here: https://curl.haxx.se/docs/sslcerts.html
     
     curl failed to verify the legitimacy of the server and therefore could not establish a secure connection to it. To learn more about this situation and how to fix it, please visit the web page mentioned above.
@@ -605,7 +605,7 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
     However, we all live in a messy Internet world, and not all apps and clients are capable of running the latest and greatest software, so being able to handle older, less secure TLS traffic is likely a requirement that you will run into.  In this next exercise, we will downgrade the TLS parameters to "Medium" security settings, so your website will accomodate older versions of TLS, namely 1.1 and 1.2.
 
-1. Inspect the `/includes/ssl/ssl_intermediate.conf` file, you will see that the TLS version is set to 1.0, 1.1, 1.2 on line #19 with the `ssl_protocols` directive.  You can modify this to meet your needs if you like.
+1. Inspect the `/includes/ssl/ssl_intermediate.conf` file, you will see that the TLS version is set to 1.0, 1.1, 1.2 on line #17 with the `ssl_protocols` directive.  You can modify this to meet your needs if you like.
 
 1. Update your `tls-cars.example.com.conf` file within your mounted folder (`labs/lab3/nginx-oss/etc/nginx/conf.d`) and change the comments to use the `/includes/ssl/ssl_intermediate.conf`, instead of the `ssl_strong.conf`.
 
@@ -804,7 +804,7 @@ As a Best Practice, you should not modify the `main` log format, but rather copy
 
     Save your `nginx.conf` file.  
 
-1. Next, modify your `tls-cars.example.com.conf` file to use this new log format:
+1. Next, modify your `tls-cars.example.com.conf` file to use this new log format. Change the log format from `main` to `main_ssl`:
 
     ```nginx
     ...snip
