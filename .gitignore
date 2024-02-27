@@ -1,4 +1,4 @@
 # Don't track these files
-nginx-repo.crt
-nginx-repo.key
+*.crt
+*.key
 .DS_Store
