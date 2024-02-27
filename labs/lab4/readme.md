@@ -96,7 +96,7 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
    ```bash
     cd lab4
-    docker compose up --force-recreate
+    docker compose up --force-recreate -d
    ```
 
 1. Verify all four containers are running:

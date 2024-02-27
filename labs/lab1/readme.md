@@ -101,7 +101,7 @@ Visual Studio Code | Docker Compose | GitHub
 
     ```bash
     cd lab1
-    docker compose up --force-recreate
+    docker compose up --force-recreate -d
 
     ```
 

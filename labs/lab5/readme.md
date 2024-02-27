@@ -115,7 +115,7 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
 
    ```bash
     cd lab5
-    docker compose up --force-recreate
+    docker compose up --force-recreate -d
    ```
 
 1. Verify all four containers are running:

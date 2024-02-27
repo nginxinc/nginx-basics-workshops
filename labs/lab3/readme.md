@@ -45,7 +45,7 @@ In this exercise, you will use `openssl` to create a Self-signed certificate and
 
    ```bash
     cd lab3
-    docker compose up --force-recreate
+    docker compose up --force-recreate -d
    ```
 
 1. After the Docker Compose has completed, and the lab3/nginx-oss container is running, Docker Exec into the nginx-oss container.
@@ -182,8 +182,8 @@ Now that you have a TLS cert and key for testing, you will configure NGINX to us
     ```bash
     ##Sample output##
 
-    curl: (60) SSL certificate problem: self signed certificate
-    More details here: https://curl.se/docs/sslcerts.html
+    curl: (60) SSL certificate problem: unable to get local issuer certificate
+    More details here: https://curl.haxx.se/docs/sslcerts.html
     
     curl failed to verify the legitimacy of the server and therefore could not establish a secure connection to it. To learn more about this situation and how to fix it, please visit the web page mentioned above.
 

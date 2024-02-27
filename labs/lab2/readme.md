@@ -122,19 +122,15 @@ Here is a quick review of the NGINX commands you should be familiar with.  Depen
 
 nginx -v                  #displays NGINX version details
 
-nginx -s quit             #graceful shutdown
+nginx -s quit             #graceful shutdown (Note: This will exit the container)
 
-nginx -s stop             #terminates all NGINX processes
+nginx -s stop             #terminates all NGINX processes (Note: This will exit the container)
 
 nginx -t                  #test configuration syntax and files
 
 nginx -T                  #dumps the current running configurations
 
 nginx -s reload           #reloads NGINX with new configuration
-
-systemctl start nginx     #start nginx processes
-
-systemctl stop nginx      #stop nginx processes
 
 ```
 
@@ -144,7 +140,7 @@ Go ahead and try some of these NGINX commands in your nginx-oss container now, s
 
    ```bash
    cd lab2
-   docker compose up --force-recreate
+   docker compose up --force-recreate -d
    ```
 
 1. Docker Exec into the nginx-oss container.
@@ -167,27 +163,6 @@ Go ahead and try some of these NGINX commands in your nginx-oss container now, s
     /etc/nginx # nginx -v
     nginx version: nginx/1.25.4
 
-    /etc/nginx # nginx -s quit
-    ...
-    2024/02/02 20:01:32 [notice] 1#1: signal 3 (SIGQUIT) received from 66, shutting down
-    2024/02/02 20:01:32 [notice] 53#53: gracefully shutting down
-    2024/02/02 20:01:32 [notice] 53#53: exiting
-    2024/02/02 20:01:32 [notice] 54#54: gracefully shutting down
-    2024/02/02 20:01:32 [notice] 54#54: exiting
-    2024/02/02 20:01:32 [notice] 1#1: signal 17 (SIGCHLD) received from 56
-    2024/02/02 20:01:32 [notice] 1#1: worker process 56 exited with code 0
-    ...
-
-    /etc/nginx # nginx -s stop
-    2024/02/02 20:06:22 [notice] 1#1: signal 15 (SIGTERM) received from 48, exiting
-    2024/02/02 20:01:32 [notice] 53#53: gracefully shutting down
-    2024/02/02 20:01:32 [notice] 53#53: exiting
-    2024/02/02 20:01:32 [notice] 54#54: gracefully shutting down
-    2024/02/02 20:01:32 [notice] 54#54: exiting
-    2024/02/02 20:01:32 [notice] 1#1: signal 17 (SIGCHLD) received from 56
-    2024/02/02 20:01:32 [notice] 1#1: worker process 56 exited with code 0
-    ...
-
     /etc/nginx # nginx -t
     nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
     nginx: configuration file /etc/nginx/nginx.conf test is successful
@@ -207,8 +182,6 @@ Go ahead and try some of these NGINX commands in your nginx-oss container now, s
     2024/02/02 20:10:04 [notice] 1#1: reconfiguring
     2024/02/02 20:10:04 [notice] 1#1: using the "epoll" event method
     ...
-
-    NOTE: systemctl commands may not be available in your container OS
 
     ```
 

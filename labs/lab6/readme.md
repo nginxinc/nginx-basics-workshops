@@ -38,7 +38,7 @@ As part of your Dockerfile, your NGINX Plus container already has the added `NGI
 
     ```bash
      cd lab6
-     docker compose up --force-recreate
+     docker compose up --force-recreate -d
     ```
 
 1. Edit your `nginx.conf` file, you will make 2 changes.
