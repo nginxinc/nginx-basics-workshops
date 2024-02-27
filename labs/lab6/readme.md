@@ -4,7 +4,7 @@
 
 In this lab, you will be exploring the integration between NGINX Plus, Prometheus and Grafana.
 
-This Solution requires the use of the NGINX provided JaveScript and Prometheus modules to collect metrics from the NGINX Plus API, and export those metrics as an HTTP html/text page, commonly called the `scaper page` because it scrapes statistics for publication.  The metrics on this export page are then read and imported into Prometheus and Grafana's time-series database.  Once these metrics are in the database, you can create many different Dashboards, Thresholds, Alerts, and other types of graphs for Visualization and Reporting.  As you can imagine, there are literally hundreds of Grafana dashboards written by users of NGINX that you can try out for free.  Grafana also allows you to create and edit your own Dashboards.
+This Solution requires the use of the NGINX provided Javascript and Prometheus modules to collect metrics from the NGINX Plus API, and export those metrics as an HTTP html/text page, commonly called the `scaper page` because it scrapes statistics for publication.  The metrics on this export page are then read and imported into Prometheus and Grafana's time-series database.  Once these metrics are in the database, you can create many different Dashboards, Thresholds, Alerts, and other types of graphs for Visualization and Reporting.  As you can imagine, there are literally hundreds of Grafana dashboards written by users of NGINX that you can try out for free.  Grafana also allows you to create and edit your own Dashboards.
 
 NGINX Plus | Prometheus | Grafana
 :-------------------------:|:-------------------------:|:-----:
@@ -205,13 +205,15 @@ Grafana is a data visualization tool, which contains a time series database and 
 
     ![Prom Datasource](media/lab6_prometheus-datasource.png)
 
-1. Scroll to the bottom and click `Test and Save`.
+1. Scroll to the bottom and click `Save and Test`. You should see a green `Successfully queried the Prometheus API` message.
 
-1. Import the provided `labs/lab6/NGINX-Basics.json` file to see statistics like the NGINX Plus HTTP Requests Per Second and Upstream Response Times.  Click on New Dashboard, then Import.  Copy and Paste the `labs/lab6/NGINX-Basics.json` file provided.  You should see a dashboard like this one:
+1. Import the provided `labs/lab6/NGINX-Basics.json` file to see statistics like the NGINX Plus HTTP Requests Per Second and Upstream Response Times.  Click on Create New Dashboard from Home page and then Import.  Copy and Paste the `labs/lab6/NGINX-Basics.json` file provided. Click on the `Load` button. Set the data source to `prometheus` and then click on the `Import` button. You should see a dashboard like this one:
 
     ![Grafana Dashboard](media/lab6_grafana-dashboard.png)
 
     There are many different Grafana Dashboards available, and you have the option to create and build dashboards to suite your needs.  NGINX Plus provides over 240 metrics for TCP, HTTP, SSL, Virtual Servers, Locations, Rate Limits, and Upstreams.
+
+> If `wrk` load generation tool is still running, then you can stop it by pressing `ctrl + c`.
 
 >If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab6` folder:
 
