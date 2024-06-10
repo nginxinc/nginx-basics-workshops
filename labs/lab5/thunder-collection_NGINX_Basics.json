@@ -1,0 +1,117 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "NGINX_Basics",
+    "collectionId": "aa3128b6-8f73-446c-91ce-1c268a424bec",
+    "dateExported": "2024-06-10T20:32:14.439Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "4036185a-a081-41f9-84cc-43e32d5710b0",
+            "colId": "aa3128b6-8f73-446c-91ce-1c268a424bec",
+            "containerId": "",
+            "name": "Check nginx_cafe servers",
+            "url": "http://localhost:9000/api/9/http/upstreams/nginx_cafe",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2024-04-24T15:43:09.151Z",
+            "modified": "2024-04-24T16:25:59.302Z",
+            "headers": []
+        },
+        {
+            "_id": "7ddd0de6-751f-4024-bb1d-ba852351fb85",
+            "colId": "aa3128b6-8f73-446c-91ce-1c268a424bec",
+            "containerId": "",
+            "name": "Disable web3 server",
+            "url": "http://localhost:9000/api/9/http/upstreams/nginx_cafe/servers/2",
+            "method": "PATCH",
+            "sortNum": 20000,
+            "created": "2024-04-24T15:43:09.152Z",
+            "modified": "2024-04-24T16:26:32.505Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"down\": true\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "d0029bd2-6201-43cc-8a15-c537d9de4a56",
+            "colId": "aa3128b6-8f73-446c-91ce-1c268a424bec",
+            "containerId": "",
+            "name": "Enable web3 server",
+            "url": "http://localhost:9000/api/9/http/upstreams/nginx_cafe/servers/2",
+            "method": "PATCH",
+            "sortNum": 30000,
+            "created": "2024-04-24T15:43:09.153Z",
+            "modified": "2024-04-24T16:26:58.525Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"down\": false\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "78e8a595-c98d-4584-8bd6-c26fb9db8801",
+            "colId": "aa3128b6-8f73-446c-91ce-1c268a424bec",
+            "containerId": "",
+            "name": "NGINX Info",
+            "url": "http://localhost:9000/api/9/nginx",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2024-04-24T15:43:09.154Z",
+            "modified": "2024-04-24T16:27:16.741Z",
+            "headers": []
+        },
+        {
+            "_id": "85e7964c-1f9d-4131-be8f-0ce3d2900053",
+            "colId": "aa3128b6-8f73-446c-91ce-1c268a424bec",
+            "containerId": "",
+            "name": "NGINX Connections",
+            "url": "http://localhost:9000/api/9/connections",
+            "method": "GET",
+            "sortNum": 50000,
+            "created": "2024-04-24T15:43:09.155Z",
+            "modified": "2024-04-24T16:27:40.272Z",
+            "headers": []
+        },
+        {
+            "_id": "2c298f4c-fdd0-430a-b2bf-b4848ddfa3fb",
+            "colId": "aa3128b6-8f73-446c-91ce-1c268a424bec",
+            "containerId": "",
+            "name": "NGINX Server Zones",
+            "url": "http://localhost:9000/api/9/http/server_zones",
+            "method": "GET",
+            "sortNum": 60000,
+            "created": "2024-04-24T15:43:09.156Z",
+            "modified": "2024-04-24T16:28:00.475Z",
+            "headers": []
+        },
+        {
+            "_id": "31449d2e-4215-4664-9edb-0b7cd0fe1397",
+            "colId": "aa3128b6-8f73-446c-91ce-1c268a424bec",
+            "containerId": "",
+            "name": "NGINX Location Zones",
+            "url": "http://localhost:9000/api/9/http/location_zones",
+            "method": "GET",
+            "sortNum": 70000,
+            "created": "2024-04-24T15:43:09.157Z",
+            "modified": "2024-04-24T16:28:18.289Z",
+            "headers": []
+        },
+        {
+            "_id": "52bfc8e5-2509-407a-936f-675dcae58544",
+            "colId": "aa3128b6-8f73-446c-91ce-1c268a424bec",
+            "containerId": "",
+            "name": "NGINX Upstreams",
+            "url": "http://localhost:9000/api/9/http/upstreams",
+            "method": "GET",
+            "sortNum": 80000,
+            "created": "2024-04-24T15:43:09.158Z",
+            "modified": "2024-04-24T16:28:33.883Z",
+            "headers": []
+        }
+    ],
+    "ref": "K5hI3R8LcODbC-ENfkR7OT5k3G8_W77Q3-KAfqKprNiHHlejx-FXD90E4KjqhyJoq1mtNJVTvTkZHekiEr-Jdg"
+}
