@@ -643,9 +643,10 @@ In this section, you will manage your backend servers dynamically using NGINX Pl
 1. If you look at the `HTTP Upstreams` tab within NGINX Plus dashboard you can clearly see all three backend servers are serving the incoming request from the load generation tool.
    ![dashboard with equal load](media/dashboard_with_load.png)
 
-1. Open `Postman` tool and look into the `NGINX_Basics` collection.
+1. Open `Thunder Client` extension tool within visual studio and look into the `NGINX_Basics` collection.
+    ![Thunder Client extension](media/thunder_client_extension.png) 
 
-   (**Note:** If you are not familiar with postman and would rather prefer running command on terminal then please use the `curl` equivalent command provided in each step)
+   (**Note:** If you are not familiar with Thunder Client and would rather prefer running commands on terminal then please use the `curl` equivalent command provided in each step)
 
 1. Open `Check nginx_cafe servers` request and execute the call by clicking on `Send` button. You can confirm from the response that the upstream, nginx_cafe, has three backend servers. Also note that server `web3` has `id=2`. You will use this `id` in subsequent API calls in this section.
     ![postman check server](media/postman_check_servers.png)
