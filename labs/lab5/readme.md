@@ -38,7 +38,7 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
 - You must have a license for NGINX Plus
 - You must have Docker installed and running
 - You must have Docker-compose installed
-- (Optional) You should have Postman API tool to make calls to NGINX Plus API.
+- (Optional) You should have Thunder Client extension tool to make calls to NGINX Plus API.
 - (Optional) You should have Visual Studio Code installed to work through the NGINX configuration files.
 - See `Lab0` for instructions on setting up your system for this Workshop
 
@@ -655,6 +655,7 @@ In this section, you will manage your backend servers dynamically using NGINX Pl
    (**Note:** You can find the `NGINX_Basics.API_collection.json` file within the `lab5` directory. If you are not familiar with Thunder Client and would rather prefer running commands on terminal then please use the `curl` equivalent command provided in each step)
 
 1. Open `Check nginx_cafe servers` request and execute the call by clicking on `Send` button. You can confirm from the response that the upstream, nginx_cafe, has three backend servers. Also note that server `web3` has `id=2`. You will use this `id` in subsequent API calls in this section.
+
     ![thunderclient check server](media/thunderclient_check_servers.png)
 
     ```bash
@@ -662,8 +663,9 @@ In this section, you will manage your backend servers dynamically using NGINX Pl
      curl 'http://localhost:9000/api/9/http/upstreams/nginx_cafe' | jq
     ```
 
-1. You will now set `web3` server as `down` which would inform the NGINX master process to not direct any traffic to that server. Within postman, open `Disable web3 server` request and execute the call by clicking on `Send` button.
-    ![postman disable server](media/postman_disable_server.png)
+1. You will now set `web3` server as `down` which would inform the NGINX master process to not direct any traffic to that server. Within Thunder Client extension, open `Disable web3 server` request and execute the call by clicking on `Send` button.
+
+    ![thunderclient disable server](media/thunderclient_disable_server.png)
 
     ```bash
      #[Optional] curl command if not using Thunder Client
@@ -675,10 +677,12 @@ In this section, you will manage your backend servers dynamically using NGINX Pl
     ```
 
 1. If you check your NGINX Plus Dashboard, you will notice the `web3` server has turned `grey` and also is marked as `down`. You will also notice that it is not taking any active traffic.
+
    ![disabled web3](media/dashboard_disabled_web3.png)
   
-1. You are notified that the `web3` server has been patched and the maintenance has finished. It can now be added back to the load balancer to serve client traffic. You will now set `web3` server as `down=false` which would inform the NGINX master process to again resume sending traffic to that server. Within postman, open `Enable web3 server` request and execute the call by clicking on `Send` button.
-   ![postman enable server](media/postman_enable_server.png)
+1. You are notified that the `web3` server has been patched and the maintenance has finished. It can now be added back to the load balancer to serve client traffic. You will now set `web3` server as `down=false` which would inform the NGINX master process to again resume sending traffic to that server. Within Thunder Client extension, open `Enable web3 server` request and execute the call by clicking on `Send` button.
+
+   ![thunderclient enable server](media/thunderclient_enable_server.png)
 
    ```bash
      #[Optional] curl command if not using Thunder Client
@@ -690,6 +694,7 @@ In this section, you will manage your backend servers dynamically using NGINX Pl
     ```
 
 1. If you check your NGINX Plus Dashboard, you will notice the `web3` server has turned back `green` and is also marked as `up`. You will also notice that it is now again taking equal amount of active traffic.
+   
    ![disabled web3](media/dashboard_enabled_web3.png)
 
 ## NGINX Live Activity Monitoring JSON feed
@@ -700,40 +705,45 @@ In this section, you will make use of NGINX Plus API to get current statistics r
 
    (**Note:** You can find the `NGINX_Basics.API_collection.json` file within the `lab5` directory. If you are not familiar with Thunder Client and would rather prefer running commands on terminal then please use the `curl` equivalent command provided in each step.)
 
-2. Open `NGINX Info` request and execute the call by clicking on `Send` button.`/api/[api-version]/nginx` is used to retrieve basic version, uptime and identification information.
-    ![postman NGINX Info](media/postman_nginx_info.png)
+1. Open `NGINX Info` request and execute the call by clicking on `Send` button.`/api/[api-version]/nginx` is used to retrieve basic version, uptime and identification information.
+
+    ![thunderclient NGINX Info](media/thunderclient_nginx_info.png)
 
     ```bash
      #[Optional] curl command if not using Thunder Client
      curl 'http://localhost:9000/api/9/nginx' | jq
     ```
 
-3. Open `NGINX Connections` request and execute the call by clicking on `Send` button.`/api/[api-version]/connections` is used to retrieve total active and idle connections
-    ![postman NGINX Connections](media/postman_connections.png)
+1. Open `NGINX Connections` request and execute the call by clicking on `Send` button.`/api/[api-version]/connections` is used to retrieve total active and idle connections
+
+    ![thunderclient NGINX Connections](media/thunderclient_connections.png)
 
     ```bash
      #[Optional] curl command if not using Thunder Client
      curl 'http://localhost:9000/api/9/connections' | jq
     ```
 
-4. Open `NGINX Server Zones` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/server_zones` is used to retrieve request and response counts for each HTTP Server group.
-    ![postman NGINX Server Zones](media/postman_serverzones.png)
+1. Open `NGINX Server Zones` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/server_zones` is used to retrieve request and response counts for each HTTP Server group.
+
+    ![thunderclient NGINX Server Zones](media/thunderclient_serverzones.png)
 
     ```bash
      #[Optional] curl command if not using Thunder Client
      curl 'http://localhost:9000/api/9/http/server_zones' | jq
     ```
 
-5. Open `NGINX Location Zones` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/location_zones` is used to retrieve request and response counts for each HTTP Location group.
-    ![postman NGINX Location Zones](media/postman_locationzones.png)
+1. Open `NGINX Location Zones` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/location_zones` is used to retrieve request and response counts for each HTTP Location group.
+
+    ![thunderclient NGINX Location Zones](media/thunderclient_locationzones.png)
 
     ```bash
      #[Optional] curl command if not using Thunder Client
      curl 'http://localhost:9000/api/9/http/location_zones' | jq
     ```
 
-6. Open `NGINX Upstreams` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/upstreams` is used to retrieve request and response counts, response time, health‑check status, and uptime statistics per server in each HTTP upstream group.
-    ![postman NGINX Upstreams](media/postman_upstreams.png)
+1. Open `NGINX Upstreams` request and execute the call by clicking on `Send` button.`/api/[api-version]/http/upstreams` is used to retrieve request and response counts, response time, health‑check status, and uptime statistics per server in each HTTP upstream group.
+
+    ![thunderclient NGINX Upstreams](media/thunderclient_upstreams.png)
 
     ```bash
      #[Optional] curl command if not using Thunder Client

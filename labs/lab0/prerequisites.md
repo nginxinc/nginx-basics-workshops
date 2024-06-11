@@ -20,7 +20,7 @@ By the end of this prerequisite instructions, you will be ready to do the Worksh
 1. Docker Compose
 1. Chrome or other modern browser
 1. Visual Studio Code, or other test/code editor
-1. Postman or any other API platform that helps running API requests.
+1. Thunder Client VSCode extension or any other API platform that helps running API requests.
 
 ## Administrative Requirements
 
@@ -41,9 +41,9 @@ By the end of this prerequisite instructions, you will be ready to do the Worksh
 
 - [https://code.visualstudio.com/download](https://code.visualstudio.com/download)
 
-## Optional - Install Postman Tool
+## Optional - Install Thunder Client extension Tool
 
-- [https://www.postman.com/downloads/](https://www.postman.com/downloads/)
+- [https://www.thunderclient.com/](https://marketplace.visualstudio.com/items?itemName=rangav.vscode-thunder-client)
 
 ## Cloning the Workshop Repository locally
 
