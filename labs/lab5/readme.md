@@ -452,7 +452,11 @@ All of these metrics are available via NGINX Plus API as a Json object making it
     }
     ```
 
-1. Once you have edited the two config files, reload your NGINX config:
+1. Once you have edited the two config files, reload your NGINX config from within the NGINX container:
+
+   ```bash
+   docker exec -it nginx-plus /bin/bash
+   ```
 
    ```bash
    nginx -t
@@ -641,18 +645,20 @@ In this section, you will manage your backend servers dynamically using NGINX Pl
     The above command would run the wrk load generation tool for 20 minutes with 200 active connections hitting `/coffee` path.
 
 1. If you look at the `HTTP Upstreams` tab within NGINX Plus dashboard you can clearly see all three backend servers are serving the incoming request from the load generation tool.
+
    ![dashboard with equal load](media/dashboard_with_load.png)
 
 1. Open `Thunder Client` extension tool within visual studio and look into the `NGINX_Basics` collection.
+
     ![Thunder Client extension](media/thunder_client_extension.png) 
 
-   (**Note:** If you are not familiar with Thunder Client and would rather prefer running commands on terminal then please use the `curl` equivalent command provided in each step)
+   (**Note:** You can find the `NGINX_Basics.API_collection.json` file within the `lab5` directory. If you are not familiar with Thunder Client and would rather prefer running commands on terminal then please use the `curl` equivalent command provided in each step)
 
 1. Open `Check nginx_cafe servers` request and execute the call by clicking on `Send` button. You can confirm from the response that the upstream, nginx_cafe, has three backend servers. Also note that server `web3` has `id=2`. You will use this `id` in subsequent API calls in this section.
     ![postman check server](media/postman_check_servers.png)
 
     ```bash
-     #[Optional] curl command if not using postman
+     #[Optional] curl command if not using Thunder Client
      curl 'http://localhost:9000/api/9/http/upstreams/nginx_cafe' | jq
     ```
 
@@ -660,7 +666,7 @@ In this section, you will manage your backend servers dynamically using NGINX Pl
     ![postman disable server](media/postman_disable_server.png)
 
     ```bash
-     #[Optional] curl command if not using postman
+     #[Optional] curl command if not using Thunder Client
      curl --request PATCH 'http://localhost:9000/api/9/http/upstreams/nginx_cafe/servers/2' \
     --header 'Content-Type: application/json' \
     --data '{
@@ -675,7 +681,7 @@ In this section, you will manage your backend servers dynamically using NGINX Pl
    ![postman enable server](media/postman_enable_server.png)
 
    ```bash
-     #[Optional] curl command if not using postman
+     #[Optional] curl command if not using Thunder Client
      curl --request PATCH 'http://localhost:9000/api/9/http/upstreams/nginx_cafe/servers/2' \
     --header 'Content-Type: application/json' \
     --data '{
@@ -690,15 +696,15 @@ In this section, you will manage your backend servers dynamically using NGINX Pl
 
 In this section, you will make use of NGINX Plus API to get current statistics returned in a JSON-formatted document. You can request complete statistics at `/api/[api-version]/`, where `[api-version]` is the version number of the NGINX Plus API. This API is extremely useful, as it contains all NGINX Plus metrics(over 240 metrics), which you can pull into a central monitoring tool of your choice. You will do this in future lab exercise.
 
-1. Open `Postman` tool and look into the `NGINX_Basics` collection.
+1. Open `Thunder Client` extension tool within visual studio and look into the `NGINX_Basics` collection.
 
-   (**Note:** You can find the `postman collection.json` file within the `lab5` directory. If you are not familiar with postman tool and would rather prefer running commands on terminal then please use the `curl` equivalent command provided in each step.)
+   (**Note:** You can find the `NGINX_Basics.API_collection.json` file within the `lab5` directory. If you are not familiar with Thunder Client and would rather prefer running commands on terminal then please use the `curl` equivalent command provided in each step.)
 
 2. Open `NGINX Info` request and execute the call by clicking on `Send` button.`/api/[api-version]/nginx` is used to retrieve basic version, uptime and identification information.
     ![postman NGINX Info](media/postman_nginx_info.png)
 
     ```bash
-     #[Optional] curl command if not using postman
+     #[Optional] curl command if not using Thunder Client
      curl 'http://localhost:9000/api/9/nginx' | jq
     ```
 
@@ -706,7 +712,7 @@ In this section, you will make use of NGINX Plus API to get current statistics r
     ![postman NGINX Connections](media/postman_connections.png)
 
     ```bash
-     #[Optional] curl command if not using postman
+     #[Optional] curl command if not using Thunder Client
      curl 'http://localhost:9000/api/9/connections' | jq
     ```
 
@@ -714,7 +720,7 @@ In this section, you will make use of NGINX Plus API to get current statistics r
     ![postman NGINX Server Zones](media/postman_serverzones.png)
 
     ```bash
-     #[Optional] curl command if not using postman
+     #[Optional] curl command if not using Thunder Client
      curl 'http://localhost:9000/api/9/http/server_zones' | jq
     ```
 
@@ -722,7 +728,7 @@ In this section, you will make use of NGINX Plus API to get current statistics r
     ![postman NGINX Location Zones](media/postman_locationzones.png)
 
     ```bash
-     #[Optional] curl command if not using postman
+     #[Optional] curl command if not using Thunder Client
      curl 'http://localhost:9000/api/9/http/location_zones' | jq
     ```
 
@@ -730,7 +736,7 @@ In this section, you will make use of NGINX Plus API to get current statistics r
     ![postman NGINX Upstreams](media/postman_upstreams.png)
 
     ```bash
-     #[Optional] curl command if not using postman
+     #[Optional] curl command if not using Thunder Client
      curl 'http://localhost:9000/api/9/http/upstreams' | jq
     ```
 
