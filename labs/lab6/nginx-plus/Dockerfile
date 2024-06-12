@@ -12,7 +12,7 @@ RUN chmod 644 /etc/ssl/nginx/*
 RUN apt-get update && apt-get install -y apt-transport-https lsb-release ca-certificates curl wget jq gnupg2 net-tools bash bash-completion
 
 # Download and add the NGINX signing key:
-RUN wget https://cs.nginx.com/static/keys/nginx_signing.key && apt-key add nginx_signing.key 
+RUN wget https://nginx.org/keys/nginx_signing.key && apt-key add nginx_signing.key 
 
 # Add NGINX Plus repository:
 RUN printf "deb https://pkgs.nginx.com/plus/ubuntu `lsb_release -cs` nginx-plus\n" | tee /etc/apt/sources.list.d/nginx-plus.list
