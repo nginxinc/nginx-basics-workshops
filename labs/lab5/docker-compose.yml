@@ -2,7 +2,6 @@
 # NGINX webservers with ingress-demo pages
 # NGINX Basics, Jan 2024
 # Chris Akker, Shouvik Dutta
-version: '3.3'
 services:
   nginx-plus:                  # NGINX Plus Web / Load Balancer
     hostname: nginx-plus
