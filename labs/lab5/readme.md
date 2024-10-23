@@ -171,6 +171,7 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
   
     You would be using these urls in later sections/exercise. You should verify these are working correctly using curl or browser.
     /coffee | /tea
+
     :-------: | :-------:
     ![coffee-url](media/coffee-url.png) | ![tea-url](media/tea-url.png)
 
@@ -571,7 +572,7 @@ In this section, you will enable active Healthchecks. Active healthchecks basica
 1. Once you have investigated and resolved the issues with `web3` backend server you can start it again using below command.
 
    ```bash
-    docker start $WEB3
+    docker start web3
    ```
 
    After 2 successive health checks, NGINX will detect `web3` backend server is healthy again and begin sending active traffic to it. Observe the NGINX Plus dashboard. You can see that the status of `web3` backend server is now green.
