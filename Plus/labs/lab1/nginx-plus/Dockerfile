@@ -28,7 +28,7 @@ RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y nginx-
 # Remove nginx repository key/cert from docker
 RUN rm -rf /etc/ssl/nginx \
 # Remove default nginx config
-&& rm /etc/nginx/conf.d/default.conf \
+# && rm /etc/nginx/conf.d/default.conf \
 # Required for this demo: Create State file folder and set permissions
 && mkdir -p /var/lib/nginx/state \
 && chown -R nginx /var/lib/nginx/state \
@@ -45,7 +45,11 @@ RUN chown -R nginx:nginx /etc/nginx \
 # && ln -sf /dev/stdout /var/log/nginx/access.log \
 # && ln -sf /dev/stderr /var/log/nginx/error.log \
  # Remove the cert/keys from the image
- && rm /etc/ssl/nginx/nginx-repo.crt /etc/ssl/nginx/nginx-repo.key
+&& rm /etc/ssl/nginx/nginx-repo.crt /etc/ssl/nginx/nginx-repo.key
+
+# COPY /usr/share/nginx/html (Nginx files) directory
+COPY usr/share/nginx/html /usr/share/nginx/html
+RUN chown -R nginx:nginx /usr/share/nginx/html
 
 # EXPOSE ports, HTTP 80, HTTP 8080, HTTPS 443 and, Nginx status page 9000
 EXPOSE 80 443 8080 9000
