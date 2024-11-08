@@ -1,4 +1,4 @@
-# NGINX as a Web Server
+# Build Test Lab with NGINX Plus
 
 ## Introduction
 

@@ -12,11 +12,14 @@ NGINX OSS | Docker
 
 By the end of the lab you will be able to:
 
-- Build and run an `NGINX Opensource Docker` image
+- Pull and run an `NGINX Plus Docker` image
 - Build your Workshop enviroment with Docker Compose
 - Verify Container build with NGINX tests
-- Configure NGINX Extended Access Logging
 - Configure NGINX for Load Balancing
+- Configure NGINX Extended Access Logging
+- Configure and test Nginx Active Health Checks
+- Explore Nginx load balancing algorithms
+- Configure and test Persistence
 - Add NGINX features following Best Practices
 
 ## Pre-Requisites

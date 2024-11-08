@@ -1,4 +1,4 @@
-# Build and Run NGINX Plus on Docker
+# NGINX Plus Logs, Logging and Troubleshooting
 
 ## Introduction
 

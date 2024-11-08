@@ -28,19 +28,19 @@ By the end of this Workshop, you will have a working, operational NGINX Plus Doc
 
 #### Lab 0: Workshop pre-work (Choose any one)
 
-- [Lab 0: Workshop pre-work using F5 provided workshop environment](lab0/readme.md)
+- [Lab 0: Workshop pre-work using F5 provided UDF environment](lab0/readme.md)
   
 - [Lab 0: Workshop pre-work using your own system](lab0/prerequisites.md)
 
-#### Lab 1: Build and Run NGINX Plus on Docker
+#### Lab 1: Build and Run NGINX Plus Docker container
 
 - [Lab 1: Build and Run NGINX Plus on Docker](lab1/readme.md)
 
-#### Lab 2: NGINX as a Web Server
+#### Lab 2: Build Test Lab with NGINX Plus
 
-- [Lab 2: NGINX as a Web Server](lab2/readme.md)
+- [Lab 2: Build Test Lab with NGINX Plus](lab2/readme.md)
 
-#### Lab 3: NGINX Web Server with TLS
+#### Lab 3: NGINX Plus with TLS
 
 - [Lab 3: NGINX Web Server with TLS](lab3/readme.md)
 
@@ -48,7 +48,7 @@ By the end of this Workshop, you will have a working, operational NGINX Plus Doc
 
 - [Lab 4: NGINX Reverse Proxy and HTTP Load Balancing](lab4/readme.md)
 
-#### Lab 5: Build and Run NGINX Plus on Docker
+#### Lab 5: NGINX Plus Logs, Logging and Troubleshooting
 
 - [Lab 5: Build and Run NGINX Plus on Docker](lab5/readme.md)
 

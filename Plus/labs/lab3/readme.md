@@ -1,4 +1,4 @@
-# NGINX Web Server with TLS
+# NGINX Plus with TLS
 
 ## Introduction
 
@@ -9,7 +9,7 @@ In this Lab, NGINX as a webserver with HTTPS TLS termination will be introduced.
 By the end of the lab you will be able to:
 
 - Create a Self-signed TLS certificate and key
-- Configure NGINX webserver to use a TLS cert and key
+- Configure NGINX to use a TLS cert and key
 - Configure TLS settings
 - Add some TLS Best Practice configurations
 - Test and validate TLS traffic components and settings
@@ -121,7 +121,7 @@ In this exercise, you will use `openssl` to create a Self-signed certificate and
 
 <br/>
 
-## NGINX webserver with TLS
+## NGINX with TLS
 
 <br/>
 
@@ -875,7 +875,7 @@ Network lab3_default         Removed
 In this lab, you learned the following NGINX / Docker topics.
 
 - Create a Self-signed TLS certificate and key
-- Configure NGINX webserver to use a TLS cert and key
+- Configure NGINX to use a TLS cert and key
 - Configure TLS settings
 - Add some TLS Best Practice configurations
 - Test and validate TLS traffic components and settings
