@@ -51,7 +51,7 @@ RUN chown -R nginx:nginx /etc/nginx \
 COPY usr/share/nginx/html /usr/share/nginx/html
 RUN chown -R nginx:nginx /usr/share/nginx/html
 
-# EXPOSE ports, HTTP 80, HTTP 8080, HTTPS 443 and, Nginx status page 9000
-EXPOSE 80 443 8080 9000
+# EXPOSE ports, HTTP 80, HTTP 8080, HTTPS 443, Nginx API / status page 9000, Prometheus Exporter page 9113
+EXPOSE 80 443 8080 9000 9113
 STOPSIGNAL SIGTERM
 CMD ["nginx", "-g", "daemon off;"]

@@ -1,6 +1,5 @@
-# NGINX Plus Proxy with tools build
-# NGINX webservers with ingress-demo pages
-# NGINX Plus Basics, Oct 2024
+# NGINX Plus with tools build
+# NGINX Plus Basics, Nov 2024
 # Chris Akker, Shouvik Dutta, Adam Currier
 #
 services:
@@ -18,24 +17,3 @@ services:
         - 443:443     # Open for HTTPS
         - 9000:9000   # Open for Plus Dashboard page / API
     restart: always     
-  web1:
-      hostname: web1
-      container_name: web1
-      image: nginxinc/ingress-demo            # Image from Docker Hub
-      ports:
-        - "80"                                # Open for HTTP
-        - "443"                               # Open for HTTPS
-  web2:
-      hostname: web2
-      container_name: web2
-      image: nginxinc/ingress-demo
-      ports:
-        - "80"
-        - "433"
-  web3:
-      hostname: web3
-      container_name: web3
-      image: nginxinc/ingress-demo
-      ports:
-        - "80"
-        - "443"

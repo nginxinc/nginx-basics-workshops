@@ -10,9 +10,9 @@
 
 <br/>
 
-This Workshop will introduce NGINX Webserver and Reverse Proxy with hands-on practice through self-paced lab exercises.  
+This Workshop will introduce NGINX Plus Webserver and Reverse Proxy with hands-on practice through self-paced lab exercises.  
 
-You will learn about `NGINX Plus`, the Commerical version of NGINX, with no prior experience required. The lab exercises provided will teach you by example how to install, configure, test, operate, troubleshoot, and fix NGINX; using common commands, tools, and applications. There are dozens of use cases for NGINX, this Basics Workshop will focus on the most common ones for new users and deployments. This Workshop content is designed to run in almost any environment that can host Docker and Linux containers, for broad appeal and consumption by users.
+You will learn about `NGINX Plus`, the Commerical version of NGINX, with no prior experience required. The lab exercises provided will teach you by example how to install, configure, test, operate, troubleshoot, and fix NGINX; using common commands, tools, and applications. There are dozens of use cases for NGINX, this Basics Workshop will focus on the most common ones for new users and deployments. This Workshop content is designed to run in almost any environment that can host Docker and Linux containers, for broad appeal and consumption by many users.
 
 <br/>
 
@@ -22,7 +22,7 @@ You will learn about `NGINX Plus`, the Commerical version of NGINX, with no prio
 
 These Hands-On Lab Exercises are designed to be independent, with later labs adding additional services and features as you progress through them. Completing the labs in sequential order is highly recommended.
 
-By the end of this Workshop, you will have a working, operational NGINX Plus Docker environment, routing traffic to and from backend web application servers, with the necessary skills to deploy and operate NGINX for your own Modern Applications. Thank You for taking the time to attend this NGINXpert Workshop!
+By the end of this Workshop, you will have a working, operational NGINX Plus Docker test environment, routing traffic to and from backend web application servers, with the necessary skills to deploy and operate NGINX for your own Modern Applications. Thank You for taking the time to attend this NGINXpert Workshop!
 
 ## Lab Outline
 
@@ -58,7 +58,7 @@ By the end of this Workshop, you will have a working, operational NGINX Plus Doc
 
 <br/>
 
-Click [Lab1: Build and Run NGINX Opensource on Docker](lab1/readme.md) to get started!
+Click [Lab1: Build and Run NGINX Plus on Docker](lab1/readme.md) to get started!
 
 ------------
 
@@ -66,3 +66,4 @@ Click [Lab1: Build and Run NGINX Opensource on Docker](lab1/readme.md) to get st
 
 - Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
 - Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
+- Adam Currier - Solutions Architect - Community and Alliances @ F5, Inc.

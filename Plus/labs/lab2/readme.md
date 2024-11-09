@@ -4,7 +4,7 @@
 
 <br/>
 
-In this lab, NGINX as a web server will be introduced, basic web and content serving concepts will be covered.  A quick review of HTTP and URLs is presented, as your NGINX configurations will follow these HTTP principles.
+In this lab, you will run NGINX as a web server, basic web and content serving concepts will be covered.  A quick review of HTTP and URLs is presented, as your NGINX configurations will follow these HTTP principles.
 
 <br/>
 
@@ -15,7 +15,7 @@ In this lab, NGINX as a web server will be introduced, basic web and content ser
 By the end of the lab you will be able to:
 
 - Describe NGINX server operations
-- Have a basic understanding of HTTP Requests and URLs
+- Review HTTP Requests and URLs
 - Create NGINX configurations for basic web content
 - Create and edit simple NGINX configs following best practices
 - Be familiar with NGINX logging files, formats, variables
@@ -110,6 +110,51 @@ http {
 
 <br/>
 
+### Pull the Nginx Plus container from the Nginx Registry
+
+In the next exercise, you will pull the Nginx Plus container from the official F5 Container Registry, using only your JWT Token file.  This is a safe, fast, and convenient way to run Nginx, without needing to build your own Docker image.
+
+1. Copy your `nginx-repo.jwt` file to the labs/lab2 folder.  Using the contents of your nginx-repo.jwt file, create an environment variable with the contents of the file:
+
+```bash
+cd lab2
+export JWT=$(cat nginx-repo.jwt)
+
+```
+
+Verify the $JWT is populated:
+
+```bash
+echo $JWT
+
+```
+```
+## Sample output
+eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCI
+...snip
+d41BhtS4fGLzD985rk
+
+```
+
+<< docker login not working >>
+
+1. Login into the Nginx Private Registry, as shown:
+
+```bash
+docker login private-registry.nginx.com --username=$JWT --password=none
+
+```
+
+1. Pull the Nginx Plus image, as shown:
+
+```bash
+docker pull private-registry.nginx.com/nginx-plus/base:nginx-plus-r32-debian-bookworm
+
+```
+
+
+<br/>
+
 ### Introduction to NGINX Commands
 
 <br/>
@@ -134,25 +179,29 @@ nginx -s reload           #reloads NGINX with new configuration
 
 ```
 
-Go ahead and try some of these NGINX commands in your nginx-oss container now, so you are familiar with them.  Open a second Terminal, so you can Watch the docker logs while you try these different commands.  It is recommended that you use 2 Terminals, one for issuing commands, and one for watching logs.
+### Run Nginx Plus
 
-1. Ensure you are in the `lab2` folder. Using a Terminal, run Docker Compose to build and run your NGINX OSS container:
+Go ahead and try some of these NGINX commands in your nginx-plus container now, so you are familiar with them.  Open a second Terminal, so you can Watch the docker logs while you try these different commands.  It is recommended that you use 2 Terminals, one for issuing commands, and one for watching logs.
+
+1. Ensure you are in the `lab2` folder. Using a Terminal, use Docker Compose to run your NGINX Plus container:
 
    ```bash
    cd lab2
-   docker compose up --force-recreate -d
+   docker run command here
+
    ```
 
-1. Docker Exec into the nginx-oss container.
+1. Docker Exec into the nginx-plus container.
 
     ```bash
-    docker exec -it nginx-oss /bin/bash
+    docker exec -it nginx-plus /bin/bash
+
     ```
 
-1. In a second Terminal, watch the nginx-oss container's log file, and watch as you send various NGINX commands.
+1. In a second Terminal, watch the nginx-plus container's log file, and watch as you send various NGINX commands.
 
     ```bash
-    docker logs nginx-oss --follow
+    docker logs nginx-plus --follow
     ```
 
     It should look similar to this:
@@ -455,7 +504,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
     ```
 
-1. Navigate to the `labs/lab2/nginx-oss/etc/nginx/conf.d` folder.  Remember, this is the default folder for NGINX HTTP configuration files that is volume mounted to the container.
+1. Navigate to the `labs/lab2/nginx-plus/etc/nginx/conf.d` folder.  Remember, this is the default folder for NGINX HTTP configuration files that is volume mounted to the container.
 
 1. Within this folder, create a new file called `www.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
@@ -481,14 +530,14 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
     ```
 
-1. Once the content of the file has been saved, Docker Exec into the nginx-oss container.
+1. Once the content of the file has been saved, Docker Exec into the nginx-plus container.
 
     ```bash
-    docker exec -it nginx-oss /bin/bash
+    docker exec -it nginx-plus /bin/bash
 
     ```
 
-1. As the `labs/lab2/nginx-oss/etc/nginx/conf.d` folder is volume mounted to the `nginx-oss` container, the new file that you created should appear within the container under `/etc/nginx/conf.d` folder.
+1. As the `labs/lab2/nginx-plus/etc/nginx/conf.d` folder is volume mounted to the `nginx-plus` container, the new file that you created should appear within the container under `/etc/nginx/conf.d` folder.
 
 1. Test the new config file with `nginx -t`.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
 
@@ -512,7 +561,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
      You have reached www.example.com, location /
     ```
 
-1. Within the same folder (`labs/lab2/nginx-oss/etc/nginx/conf.d`), create a new file called `www2.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
+1. Within the same folder (`labs/lab2/nginx-plus/etc/nginx/conf.d`), create a new file called `www2.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
     ```nginx
 
@@ -595,7 +644,7 @@ In this exercise, you will continue to learn how NGINX routes requests, by looki
 
     ```
 
-1. Within the mounted folder (`labs/lab2/nginx-oss/etc/nginx/conf.d`), create a new file called `cafe.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
+1. Within the mounted folder (`labs/lab2/nginx-plus/etc/nginx/conf.d`), create a new file called `cafe.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
 ```nginx
 
@@ -755,7 +804,7 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 
     ```
 
-1. Within the mounted folder (`labs/lab2/nginx-oss/etc/nginx/conf.d`),  create a new file called `cars.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
+1. Within the mounted folder (`labs/lab2/nginx-plus/etc/nginx/conf.d`),  create a new file called `cars.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
     ```nginx
 
@@ -915,7 +964,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
     As a Best Practice, you should not modify this `main` log format, but rather copy this one and create a new one with your changes.  The `include` directive is also introduced here, because it makes your NGINX configurations more concise, uniform, and consistent.  As you will likely want to use the same access log format for multiple websites, you will define it ONCE, but use it for every server block, instead of duplicating the log format config for every website.  If you need to make a change to your log format, you can update it in one file, but it would apply to all your websites/server blocks.
 
-1. Inspect `main_ext.conf`file that can be found within `labs/lab2/nginx-oss/etc/nginx/includes/log_formats` folder:
+1. Inspect `main_ext.conf`file that can be found within `labs/lab2/nginx-plus/etc/nginx/includes/log_formats` folder:
 
     ```nginx
     # Extended Metrics Log Format
@@ -936,7 +985,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
 1. Notice we have added a few new fields using $variables, like the $server_name, $request_time, etc.  You can modify this as you like to suit your needs.
 
-1. Similar to `/etc/nginx/conf.d` folder we have volume mounted `etc/nginx/includes` folder. So any changes that you make within this folder locally will sync up within the running `nginx-oss` container.
+1. Similar to `/etc/nginx/conf.d` folder we have volume mounted `etc/nginx/includes` folder. So any changes that you make within this folder locally will sync up within the running `nginx-plus` container.
 
 1. Now you need to tell NGINX where to find these new log format definitions. Edit your `nginx.conf`, uncomment line #24 to add your `/includes/log_formats` folder as a search location:
 
@@ -988,10 +1037,10 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
 1. Reload NGINX with `nginx -s reload` command.  If all was correct, it will reload and now your cars.example.com website will be using a new access log.  Let's go check.
 
-1. `cars.example.com` access logs are written within a custom file(`/var/log/nginx/cars.example.com.log`) which is also passed as one of the parameters to the `access_log` directive. Within the `nginx-oss`container, tail this log file, and watch as you send a couple requests.
+1. `cars.example.com` access logs are written within a custom file(`/var/log/nginx/cars.example.com.log`) which is also passed as one of the parameters to the `access_log` directive. Within the `nginx-plus`container, tail this log file, and watch as you send a couple requests.
 
     ```bash
-    docker exec -it nginx-oss /bin/bash
+    docker exec -it nginx-plus /bin/bash
 
     tail -f /var/log/nginx/cars.example.com.log
     ```
@@ -1018,7 +1067,7 @@ docker compose down
 ```bash
 ##Sample output##
 Running 2/2
-Container nginx-oss          Removed                            
+Container nginx-plus          Removed                            
 Network lab2_default         Removed
 
 ```
@@ -1046,6 +1095,7 @@ Network lab2_default         Removed
 
 - Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
 - Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
+- Adam Currier - Solutions Architect - Community and Alliances @ F5, Inc.
 
 -------------
 
