@@ -9,7 +9,7 @@ COPY etc/ssl/nginx/nginx-repo.* /etc/ssl/nginx/
 RUN chmod 644 /etc/ssl/nginx/* 
 
 # Install prerequisite packages:
-RUN apt-get update && apt-get install -y apt-transport-https lsb-release ca-certificates curl wget gnupg2 net-tools
+RUN apt-get update && apt-get install -y apt-transport-https lsb-release ca-certificates curl wget gnupg2 net-tools vim tree
 
 # Download and add the NGINX signing key:
 RUN wget https://nginx.org/keys/nginx_signing.key && apt-key add nginx_signing.key 

@@ -440,6 +440,7 @@ All of these metrics are available via NGINX Plus API as a JSON object making it
     ```bash
     cd lab1
     docker compose down
+    
     ```
 
     ```bash

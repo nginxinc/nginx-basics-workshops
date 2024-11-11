@@ -110,9 +110,9 @@ http {
 
 <br/>
 
-### Pull the Nginx Plus container from the Nginx Registry
+### Optional Exercise - Pull the Nginx Plus container from the Nginx Registry
 
-In the next exercise, you will pull the Nginx Plus container from the official F5 Container Registry, using only your JWT Token file.  This is a safe, fast, and convenient way to run Nginx, without needing to build your own Docker image.
+In the next exercise, you will pull the Nginx Plus container from the official Nginx Container Private Registry, using only your JWT Token file.  This is a safe, fast, and convenient way to download and run Nginx Plus, without needing to build your own Docker image.
 
 1. Copy your `nginx-repo.jwt` file to the labs/lab2 folder.  Using the contents of your nginx-repo.jwt file, create an environment variable with the contents of the file:
 
@@ -152,44 +152,75 @@ docker pull private-registry.nginx.com/nginx-plus/base:nginx-plus-r32-debian-boo
 
 ```
 
-
-<br/>
-
-### Introduction to NGINX Commands
-
-<br/>
-
-NGINX runs as several Linux processes, so you must be familiar with the basic commands to control NGINX, and understand what happens when you issue commands to NGINX.  Like most Linux processes, the Host OS is responsible for starting/stopping/enable/disable the initial state of the nginx process when the Linux OS is booted.
-
-Here is a quick review of the NGINX commands you should be familiar with.  Depending on your Linux system, you may need to prefix these commands with `sudo`.
+1. Verify the image was pulled, as shown:
 
 ```bash
-
-nginx -v                  #displays NGINX version details
-
-nginx -s quit             #graceful shutdown (Note: This will exit the container)
-
-nginx -s stop             #terminates all NGINX processes (Note: This will exit the container)
-
-nginx -t                  #test configuration syntax and files
-
-nginx -T                  #dumps the current running configurations
-
-nginx -s reload           #reloads NGINX with new configuration
+docker image list
 
 ```
+
+```bash
+## Sample output
+REPOSITORY                                               TAG                 IMAGE ID       CREATED             SIZE
+private-registry.nginx.com/nginx-plus/nginx-plus/base nginx-plus-r32-debian-bookworm  a947bb41179b   18 hours ago       239MB
+
+```
+
+Now you can tag it and push it to a private Registry if needed.
+
+<br/>
 
 ### Run Nginx Plus
 
 Go ahead and try some of these NGINX commands in your nginx-plus container now, so you are familiar with them.  Open a second Terminal, so you can Watch the docker logs while you try these different commands.  It is recommended that you use 2 Terminals, one for issuing commands, and one for watching logs.
 
-1. Ensure you are in the `lab2` folder. Using a Terminal, use Docker Compose to run your NGINX Plus container:
+1. >NOTE:  Make sure you ran `docker compose down` from the lab1 folder, before starting Lab2!
+
+1. Ensure you are in the `lab2` folder.  Using the Visual Studio Terminal, run Docker Compose to build and run the above container.
 
    ```bash
-   cd lab2
-   docker run command here
+    cd lab2
+    docker compose up --force-recreate -d
 
    ```
+   >If you encounter any errors during the Nginx Plus build process, or starting the containers, you must fix them before proceeding.  The most common errors are related to the nginx-repo files missing or expired or invalid.
+
+1. Verify your `nginx-plus:workshop` container is up and running:
+
+    ```bash
+    docker ps
+
+    ```
+
+    ```bash
+    ###Sample output###
+    CONTAINER ID   IMAGE                   COMMAND                  CREATED          STATUS          PORTS                                                                        NAMES
+    701272e031e2   nginx-plus:workshop   "nginx -g 'daemon of…"   34 seconds ago   Up 33 seconds   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 8080/tcp, 0.0.0.0:9000->9000/tcp, 9113/tcp   nginx-plus
+
+    ```
+
+1. Test curl access to your NGINX Plus container welcome page and Dashboard:
+
+    ```bash
+    curl http://localhost
+
+    ```
+    You should see the Nginx Welcome page.
+
+    Now also test with Chrome or a browser, go to http://localhost, you should see the same page.
+
+    ![NGINX Welcome](media/lab2_nginx-welcome.png)
+
+    ```bash
+    curl http://localhost:9000/dashboard.html
+
+    ```
+    You should see the Nginx Plus Dashboard page.
+
+    Now also test with Chrome or a browser, go to http://localhost:9000/dashboard.html, you should see the same page.
+
+    ![NGINX Welcome](media/lab2_dashboard.png)
+
 
 1. Docker Exec into the nginx-plus container.
 
@@ -233,6 +264,30 @@ Go ahead and try some of these NGINX commands in your nginx-plus container now, 
     ...
 
     ```
+
+### Introduction to NGINX Commands
+
+<br/>
+
+NGINX runs as several Linux processes, so you must be familiar with the basic commands to control NGINX, and understand what happens when you issue commands to NGINX.  Like most Linux processes, the Host OS is responsible for starting/stopping/enable/disable the initial state of the nginx process when the Linux OS is booted.
+
+Here is a quick review of the NGINX commands you should be familiar with.  Depending on your Linux system, you may need to prefix these commands with `sudo`.
+
+```bash
+
+nginx -v                  #displays NGINX version details
+
+nginx -s quit             #graceful shutdown (Note: This will exit the container)
+
+nginx -s stop             #terminates all NGINX processes (Note: This will exit the container)
+
+nginx -t                  #test configuration syntax and files
+
+nginx -T                  #dumps the current running configurations
+
+nginx -s reload           #reloads NGINX with new configuration
+
+```
 
 <br/>
 
@@ -460,7 +515,7 @@ nginx
 │   ├── cafe.example.com.conf     # server and location contexts for each website
 │   ├── cars.example.com.conf
 │   ├── default.conf
-│   ├── stub_status.conf
+│   ├── dashboard.conf
 │   ├── www.example.com.conf
 │   └── www2.example.com.conf
 ├── includes                      # Include other shared config files
@@ -506,7 +561,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
 1. Navigate to the `labs/lab2/nginx-plus/etc/nginx/conf.d` folder.  Remember, this is the default folder for NGINX HTTP configuration files that is volume mounted to the container.
 
-1. Within this folder, create a new file called `www.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
+1. Within this folder, create a new file called `www.example.com.conf`, and copy/paste the example provided.
 
     ```nginx
 
@@ -545,9 +600,10 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
    ```bash
    nginx -s reload
+
    ```
 
-1. Test access to your new website, using terminal, curl to localhost:
+1. Test access to your new website, using terminal, curl to 127.0.0.1:
 
     ```bash
      # Run curl from outside of container
@@ -561,7 +617,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
      You have reached www.example.com, location /
     ```
 
-1. Within the same folder (`labs/lab2/nginx-plus/etc/nginx/conf.d`), create a new file called `www2.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
+1. Within the same folder (`labs/lab2/nginx-plus/etc/nginx/conf.d`), create a new file called `www2.example.com.conf`, and type in below commands.  Copy/paste using the example provided:
 
     ```nginx
 
@@ -617,12 +673,12 @@ Congrats, you have reached www2.example.com, the base path /
 
 ```
 
-Now you see that the `Host Based Routing` is working correctly, because you provided the Host Header that NGINX needs to select the correct virtual `Server{}` block.  Some important items to understand with Host Headers and Host Based Routing:
+Now you see that the `Host Based Routing` is working correctly, because you provided the `Host Header` that NGINX needs to select the correct virtual `Server{}` block.  Some important items to understand with Host Headers and Host Based Routing:
 
 - NGINX is using the `same IP Address and TCP port` ( listen 80 ) for *both* of these hostnames.  You can literally run thousands of websites with unique hostnames on just one IP address:port.  NGINX will route the incoming request to the matching Server block as expected.
 - The `default_server` parameter is used as a last resort Server block, it is used when none of the hostnames in the request are a match.  This is an optional parameter, you do not have to declare a default_server if it is not needed.
 - The `return` directive used in the exercises above is a quick and easy way to test Server and Location blocks in NGINX, it can be used to verify NGINX is routing your requests to the proper block.
-- The HTTP Host Header is required for HTTP/1.1 and later protocols, so the `server_name directive` will be a common element of your NGINX configurations that must be correct!
+- The HTTP Host Header is required for HTTP/1.1 and later protocols, so the `server_name directive` will be a required common element of your NGINX configurations that must be correct!
 
 <br/>
 
@@ -644,7 +700,7 @@ In this exercise, you will continue to learn how NGINX routes requests, by looki
 
     ```
 
-1. Within the mounted folder (`labs/lab2/nginx-plus/etc/nginx/conf.d`), create a new file called `cafe.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
+1. Within the mounted folder (`labs/lab2/nginx-plus/etc/nginx/conf.d`), create a new file called `cafe.example.com.conf`, and type in below commands.  Copy/paste using the example provided:
 
 ```nginx
 
@@ -697,28 +753,34 @@ server {
 
    ```bash
    nginx -s reload
+
    ```
 
-1. Test your new /paths with curl, don't forget your Host Header:
+1. Test your new /paths with curl, do you need the Host Header?:
 
     ```bash
-    curl 127.0.0.1 -H "Host: cafe.example.com"
+    curl cafe.example.com
+
     ```
 
     ```bash
-    curl 127.0.0.1/coffee -H "Host: cafe.example.com"
+    curl cafe.example.com/coffee
+
     ```
 
     ```bash
-    curl 127.0.0.1/tea -H "Host: cafe.example.com"
+    curl cafe.example.com/tea
+
     ```
 
     ```bash
-    curl 127.0.0.1/hours -H "Host: cafe.example.com"
+    curl cafe.example.com/hours
+
     ```
 
     ```bash
-    curl 127.0.0.1/hours/closed -H "Host: cafe.example.com"
+    curl cafe.example.com/hours/closed
+
     ```
 
     ```bash
@@ -745,7 +807,11 @@ server {
 
     ```
 
-    > **NOTE:**  You added an NGINX variable, `$uri` to the return directive, to echo back what the request URI path that was received.  There are many more NGINX variables that can be used like this.  Let's use more of these `NGINX $variables` to build a simple `debug` page, that will echo back some of the important information you might need when working/testing NGINX:
+    > **NOTE:**  Look closely at the `return directive` in your config - you added an NGINX variable, `$uri`, to echo back what the request URI path that was received.  There are many more NGINX variables that can be used like this.  Let's use more of these `NGINX $variables` to build a simple `debug` page, that will echo back some of the important information you might need when working/testing NGINX:
+
+<br/>
+
+### Optional Lab Exercise - Create an Nginx DEBUG page
 
 1. Update the file `cafe.example.com.conf` to add a new `location` block called `/debug`, open the file and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
@@ -786,7 +852,7 @@ If you like this debug page, feel free to explore and ADD additional Request and
 
 <br/>
 
-### NGINX Static HTML pages
+### Optional Lab Exercise - NGINX Static HTML pages
 
 <br/>
 
@@ -888,7 +954,7 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 
 <br/>
 
-### NGINX Directory Browsing
+### Optional Lab Exercise - NGINX Directory Browsing
 
 <br/>
 
@@ -923,7 +989,7 @@ Now that you have some hot cars in your garage to show off, you might want to le
 
 In this exercise, you will learn about NGINX logging.  There are only 2 logs that you need to worry about.  The NGINX error.log, and the access.logs.
 
-1. The NGINX `error.log`, despite its name, it also used to record other important information at boot and runtime:
+1. The NGINX `error.log`, despite its name, it also used to record other important information at NGINX boot and runtime:
 
     - NGINX binary start/stop/reload messages
     - NGINX version and binary file details
@@ -1011,11 +1077,12 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
         include /etc/nginx/conf.d/*.conf;
     }
+
     ```
 
 1. Save your `nginx.conf` file, and test your NGINX config by running `nginx -t` command from within the container.
 
-1. Next, enable your `cars.example.com` website to use this new log format. To do so you need to modify `cars.example.com.conf` file to make use of the new log format by updating the log format from `main` to `main_ext`:
+1. Next, enable your `cafe.example.com` website to use this new log format. To do so you need to modify `cafe.example.com.conf` file to make use of the new log format by updating the log format from `main` to `main_ext`:
 
     ```nginx
 
@@ -1023,11 +1090,11 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
         
         listen 80;      # Listening on port 80 on all IP addresses on this machine
 
-        server_name cars.example.com;   # Set hostname to match in request
+        server_name cafe.example.com;   # Set hostname to match in request
 
-        access_log  /var/log/nginx/cars.example.com.log main_ext;  # Change log format to main_ext
+        access_log  /var/log/nginx/cafe.example.com.log main_ext;  # Change log format to main_ext
 
-        error_log   /var/log/nginx/cars.example.com_error.log info;
+        error_log   /var/log/nginx/cafe.example.com_error.log info;
         ...
     }
 
@@ -1037,23 +1104,24 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
 1. Reload NGINX with `nginx -s reload` command.  If all was correct, it will reload and now your cars.example.com website will be using a new access log.  Let's go check.
 
-1. `cars.example.com` access logs are written within a custom file(`/var/log/nginx/cars.example.com.log`) which is also passed as one of the parameters to the `access_log` directive. Within the `nginx-plus`container, tail this log file, and watch as you send a couple requests.
+1. `cafe.example.com` access logs are written within a custom file(`/var/log/nginx/cafe.example.com.log`) which is also passed as one of the parameters to the `access_log` directive. Within the `nginx-plus`container, tail this log file, and watch as you send a couple requests.
 
     ```bash
     docker exec -it nginx-plus /bin/bash
 
-    tail -f /var/log/nginx/cars.example.com.log
+    tail -f /var/log/nginx/cafe.example.com.log
+
     ```
 
-    It should look similar to this:
+    Use curl or your browser to `http://cafe.example.com/coffee`.  The access log should look similar to this:
 
     ```bash
-    192.168.65.1 - - [01/Feb/2024:20:27:46 +0000] "GET /rcf.html HTTP/1.1" 200 462 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" "-"
-    192.168.65.1 - - [01/Feb/2024:20:27:46 +0000] "GET /rcf.jpg HTTP/1.1" 200 132435 "http://localhost/rcf.html" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" "-"
+    ## Sample output
+    remote_addr="192.168.65.1", [time_local=11/Nov/2024:22:57:16 +0000], request="GET /coffee HTTP/1.1", status="200", http_referer="-", body_bytes_sent="52", Host="cafe.example.com", sn="cafe.example.com", request_time=0.000, http_user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36", http_x_forwarded_for="-", request_length="604",
 
     ```
 
-    You see one request for the rcf.html page, and a second request for the rcf.jpg image
+    You see the GET request for the coffee page, with metadata from the Nginx $varibles.
 
 <br/>
 
@@ -1062,6 +1130,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 ```bash
 cd lab2
 docker compose down
+
 ```
 
 ```bash

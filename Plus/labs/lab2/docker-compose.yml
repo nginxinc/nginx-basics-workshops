@@ -6,7 +6,8 @@ services:
   nginx-plus:                  # NGINX Plus Web / Load Balancer
     hostname: nginx-plus
     container_name: nginx-plus
-    build: nginx-plus          # Build new container, using /nginx-plus/Dockerfile
+    #build: ./nginx-plus          # Build new container, using /nginx-plus/Dockerfile
+    image: nginx-plus:workshop          # Run nginx-plus container
     volumes:
         - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d        # Copy these folders to container
         - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
