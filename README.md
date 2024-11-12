@@ -46,7 +46,7 @@ The Hands On lab exercises are written for users with a host running multiple Do
 
 1. A Docker host, with [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed and running.
 
-2. Admin access to your local computer to install and run various software packages.  See the [prerequisites.md](labs/lab0/prerequisites.md) file within`labs/lab0` folder for details on setting up your computer for this Workshop.
+2. Admin access to your local computer to install and run various software packages.  See the  [OSS prerequisites.md](OSS/labs/lab0/prerequisites.md) file, or [Plus prerequisites.md](Plus/labs/lab0/prerequisites.md) file in the `lab0 folder` for details on setting up your computer for this Workshop.
 
 3. Admin access to your local `/etc/hosts` file is also needed. The lab uses the FQDN hostnames: `www.example.com`,`www2.example.com`,`cars.example.com`,`cafe.example.com`. For hostname resolution you will need to add these hostnames to your local DNS hosts file.
 
@@ -55,17 +55,18 @@ The Hands On lab exercises are written for users with a host running multiple Do
    ```bash
     # NGINX OSS/Plus Basics lab hostnames (local docker hosts)
     127.0.0.1 example.com www.example.com www2.example.com cars.example.com cafe.example.com
+
    ```
 
      > **Note on Docker DNS:**
      >
      > DNS resolution between containers is provided by default using the bridged network by docker networking, and NGINX has been pre-configured to use the Docker internal DNS server (127.0.0.11) to provide DNS resolution between the containers.  Your Docker environment may be different.
 
-4. An NGINX Plus subscription or Trial license will be required to complete the NGINX PLUS lab exercises. You can request a free 30-day Trial from [NGINX Plus Trial](https://www.nginx.com/free-trial-request/).  An email with download links to the license files will normally arrive within a few hours of submitting a request.
+4. An NGINX Plus subscription or Trial license will be required to complete the NGINX PLUS lab exercises. You can request a free 30-day Trial from [NGINX Plus Trial](https://www.f5.com/trials/free-trial-nginx-plus-and-nginx-app-protect).  An email with download links to the license files will normally arrive within a few hours of submitting a request.
 
 ### How to use the Lab Guides
 
-To ensure understanding of every step, every line which is to be entered by the user is preceded by `$>`. This is intentional so the user must type and enter each line, instead of bulk copy/paste. It is highly recommended that you type ALL the commands yourself, to facilitate better understanding and retention of this content.  (Insert Mavin typing memory retention study results here).
+To ensure understanding of every step, take the time to read and understand what each line is doing in the Docker and Nginx files, they are there for a reason.  If you do not understand it, ask questions, use Google, ask your instructor.  It is highly recommended that you type ALL the commands yourself, to facilitate better understanding and retention of this content.  (Insert Mavin typing memory retention study results here).
 
 ## The Workshop environment
 
@@ -73,14 +74,17 @@ To ensure understanding of every step, every line which is to be entered by the 
 
 1. The user's computer, which will host all the Docker containers, and provide a Desktop UI for using various apps, like Chrome, Visual Studio Code, Postman, Terminal.
 
-1. See [prerequisites.md](labs/lab0/prerequisites.md) file within`labs/lab0` folder, for details on installing the required software for your platform.  You will likely need full administrative privleges to properly install and configure the software.
+1. See [OSS prerequisites.md](OSS/labs/lab0/prerequisites.md) file within`labs/lab0` folder, or the [Plus prerequisites.md](Plus/labs/lab0/prerequisites.md) file within`labs/lab0` folder for details on installing the required software for your platform.  You will likely need full administrative privleges to properly install and configure the software.
 
 1. As you progress through the lab exercises, you will be adding more containers, and more features and options to NGINX.  **It is important that you complete the lab exercises in the order presented in this Workshop, so that you can see and learn how to configure NGINX properly, and complete all exercises successfully.**
+
+   >**For Nginx Plus labs, you must start at Lab1, as the Nginx Plus container is built in Lab1, and re-used for the additional labs.**
 
 1. The docker containers used are as follows:
    - NGINX Opensource ADC/load balancer, named `nginx-oss`
    - NGINX Plus ADC/load balancer, named `nginx-plus`
    - Web servers #1, 2, and 3; named `web1`, `web2` and `web3` respectively.
+   - Prometheus and Grafana, named as such.
 
 1. Further details of the docker containers:
 
@@ -91,7 +95,7 @@ To ensure understanding of every step, every line which is to be entered by the 
 
      (NGINX web servers that serve simple HTML pages containing the Hostname, IP address and port, request URI, local time, request id, and other metadata.)
 
-1. **Lab Summary page** can be read with a web browser starting at [labs/readme.md](labs/readme.md).
+1. **Lab Summary page** can be read with a web browser starting at [OSS labs/readme.md](OSS/labs/readme.md) or [Plus labs/readme.md](Plus/labs/readme.md).
 
 >NOTE:  All the container images are built on your computer, so they will be available `after` the Workshop, so you can use them for further learning, testing and as reference material. All the documentation and sample config files, including the Lab Guides, will also be available on NGINX's `GitHub` repo.  As you make changes to your config files, you will need to make copies or back them up yourself.
 
@@ -99,80 +103,48 @@ To ensure understanding of every step, every line which is to be entered by the 
 
 This is the workshop Docker environment for the lab exercises:
 
-```diagram
-                                             (nginx-cafe upstream: 
-                                             web1:80, web2:80, web3:80)
-                      +---------------+                        
-                      |               |       +-----------------+
-+-------------------->|               |       |                 |
-www.example.com       |               +------>|      web1       |
-HTTP/Port 80          |               |       |  (nginx-cafe)   |
-                      |               |       |                 |
-+-------------------->|               |       +-----------------+
-www2.example.com      |               |
-HTTP-HTTPS redirect   |               |       +-----------------+
-HTTP/Port 80          |  nginx-oss /  |       |                 |
-                      |  nginx-plus   +------>|     web2        |                     
-+-------------------->|     (ADC)     |       |  (nginx-cafe)   |
-cars.example.com      |               |       |                 |
-HTTPS/Port 80         |               |       +-----------------+
-                      |               |             
-+-------------------->|               |       +-----------------+         
-cars.example.com      |               |       |                 |
-HTTP/Port 443         |               +------>|     web3        | 
-                      |               |       |  (nginx-cafe)   |
-+-------------------->|               |       |                 |
-cafe.example.com      |               |       +-----------------+
-HTTP/Port 80          |               |
-                      |               |     
-+-------------------->|               |        
-NGINX Dashboard/      |               | 
-API                   |               |
-HTTP/Port 9000        |               | 
-                      |               |  
-                      |               |       
-                      +---------------+                                                                                    
-```
+![NGINX Basics Lab diagram](media/nginx-basics-diagram.png)
+
+<br/>
 
 ## Build and run the Workshop environment
 
 Please make sure all the Prerequisites have been met before running the steps below.
 
-### Build the Lab containers
+### Build the Lab containers at the beginning of each LabX.
 
-As outlined above, you will have a one NGINX OSS or NGINX Plus ADC/load balancer (`nginx-oss`/`nginx-plus`) and
-three NGINX OSS webservers (`web1`, `web2` and `web3`)
+As outlined above, you will have one NGINX OSS or NGINX Plus ADC/load balancer (`nginx-oss`or`nginx-plus`) and three NGINX OSS webservers (`web1`, `web2` and `web3`), and a Prometheus and a Grafana container.
 
-If using NGINX Plus ADC/load balancer then before you start the build, you need to copy your NGINX Plus repo key and certificate files
-(`nginx-repo.key` and `nginx-repo.crt`) into the proper directory,  `nginx-plus/etc/ssl/nginx/`.  Docker will use these files to download the appropriate NGINX Plus files, then build your stack:
+If using the NGINX Plus ADC/load balancer, `before` you start the build, you need to copy your NGINX Plus repo key and certificate files (`nginx-repo.key` and `nginx-repo.crt` and `nginx-repo.jwt`) into the proper directory,  `nginx-plus/etc/ssl/nginx/`.  Docker Compose will use these files to download the appropriate NGINX Plus files, then build your stack:
 
 ```bash
 # Enter working directory (Replace lab x with the lab that you plan to run) 
 $> cd nginx-basics/labs/[lab x]
 
-# *Next check only applicable for NGINX Plus related labs (lab 5 onwards)
+# *Next check only applicable for NGINX Plus related labs
 # Make sure your Nginx Plus repo key and certificate exist here
 $> ls nginx-plus/etc/ssl/nginx/nginx-*
-nginx-repo.crt              nginx-repo.key
+nginx-repo.crt nginx-repo.key nginx-repo.jwt
 
 # Downloaded docker images and build
 $> docker-compose pull
 $> docker-compose build --no-cache
+
 ```
 
 -----------------------
-> See other other useful [`docker`](labs/useful-docker-commands.md) and
-> [`docker-compose`](labs/useful-docker-compose-commands.md) commands
+> See other other useful [`docker`](Plus/labs/useful-docker-commands.md) and
+> [`docker-compose`](Plus/labs/useful-docker-compose-commands.md) commands.
 
 -----------------------
 
 #### Start the Demo stack
 
-Run `docker-compose` in the foreground so you can see real-time log output to the
-terminal:
+Change to the labX folder, and run `docker-compose` in the foreground so you can see real-time log output to the terminal:
 
 ```bash
 $> docker-compose up
+
 ```
 
 Or, if you made changes to any of the Docker containers or NGINX configurations, run:
@@ -180,18 +152,22 @@ Or, if you made changes to any of the Docker containers or NGINX configurations,
 ```bash
 # Recreate containers and start demo
 $> docker-compose up --force-recreate
+
 ```
 
 **Confirm** all the containers are running by executing below command.
 
 ```bash
 $> docker ps
+
 ```
 
-For NGINX Plus related labs(lab5 onwards), you can access the NGINX API on **HTTP / Port 9000**
+For NGINX Plus related labs, you can access the NGINX Dashboard or API on **HTTP / Port 9000**
 ([`http://localhost:9000`](http://localhost:9000))
 
 **This completes the Introduction.**
+
+<br/>
 
 ## References
 
@@ -203,11 +179,14 @@ For NGINX Plus related labs(lab5 onwards), you can access the NGINX API on **HTT
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 
+<br/>
+
 ### Authors
 
 - Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
 - Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
+- Adam Currier - Solutions Architect - Community and Alliances @ F5, Inc.
 
 -----------------------
 
-Click the labs summary readme to get started ([labs/readme.md](labs/readme.md))
+Click either lab summary Readme to get started ([OSS labs](OSS/labs/readme.md) or [Plus labs](Plus/labs/readme.md)).
