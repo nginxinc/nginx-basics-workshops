@@ -322,12 +322,12 @@ It is important to understand the details about what NGINX does, when you change
    ```
 
 - Once the master process configuration validation is successful, then NGINX will do the following:
-  
-  1. With NGINX OSS, new Workers are created, and the old Worker processes are immediately shutdown, along with all existing TCP connections.  After the master process spawns new Worker processes, and they begin handling new connections and traffic based on the new configuration.  Any traffic in flight is usually dropped.
 
-  1. With NGINX Plus, new Worker processes are created, and begin using the new configuration immediately for all new connections and requests.  The old Workers are allowed to complete their previous task, and then close their TCP connections naturally, traffic in flight is not dropped!  The master process terminates the old Workers after they finish their work and close all their connections.  This is called Dynamic Reconfiguration in NGINX Plus documentation.
+    - With NGINX Plus, new Worker processes are created, and begin using the new configuration immediately for all new connections and requests.  The old Workers are allowed to complete their previous task, and then close their TCP connections naturally, traffic in flight is not dropped!  The master process terminates the old Workers after they finish their work and close all their connections.  This is called Dynamic Reconfiguration in NGINX Plus documentation.  You can see this yourself with the Linux `top` command, watching the Nginx Worker processes when you reload Nginx.
 
-- The nginx master process writes log information about the reload to the error.log so you can see what happened when, like shown below:
+    - With NGINX OSS, new Workers are created, and the old Worker processes are immediately shutdown, along with all existing TCP connections.  After the master process spawns new Worker processes, and they begin handling new connections and traffic based on the new configuration.  Any traffic in flight can be dropped!
+
+- The Nginx master process writes log information about the reload to the error.log so you can see what happened when, like shown below:
 
 ```bash
 #Sample output for "nginx -s reload" command##
@@ -1154,7 +1154,7 @@ Network lab2_default         Removed
 ## References
 
 - [NGINX Beginner's Guide](https://nginx.org/en/docs/beginners_guide.html)
-- [NGINX OSS](https://nginx.org/en/docs/)
+- [NGINX Plus](https://docs.nginx.com/nginx/)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
 - [Controlling NGINX](https://docs.nginx.com/nginx/admin-guide/basic-functionality/runtime-control/)
 - [NGINX Config Files](https://docs.nginx.com/nginx/admin-guide/basic-functionality/managing-configuration-files/)
