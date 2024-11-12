@@ -1,0 +1,193 @@
+{
+    "info": {
+        "_postman_id": "d975c73f-4890-4f0c-baa9-98639a9baefb",
+        "name": "NGINX_Basics",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": ""
+    },
+    "item": [
+        {
+            "name": "Check nginx_cafe servers",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:9000/api/9/http/upstreams/nginx_cafe",
+                    "path": [
+                        "api",
+                        "9",
+                        "http",
+                        "upstreams",
+                        "nginx_cafe"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "9000"
+                }
+            }
+        },
+        {
+            "name": "Disable web3 server",
+            "request": {
+                "method": "PATCH",
+                "url": {
+                    "raw": "http://localhost:9000/api/9/http/upstreams/nginx_cafe/servers/2",
+                    "path": [
+                        "api",
+                        "9",
+                        "http",
+                        "upstreams",
+                        "nginx_cafe",
+                        "servers",
+                        "2"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "9000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n    \"down\": true\n}"
+                }
+            }
+        },
+        {
+            "name": "Enable web3 server",
+            "request": {
+                "method": "PATCH",
+                "url": {
+                    "raw": "http://localhost:9000/api/9/http/upstreams/nginx_cafe/servers/2",
+                    "path": [
+                        "api",
+                        "9",
+                        "http",
+                        "upstreams",
+                        "nginx_cafe",
+                        "servers",
+                        "2"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "9000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n    \"down\": false\n}"
+                }
+            }
+        },
+        {
+            "name": "NGINX Info",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:9000/api/9/nginx",
+                    "path": [
+                        "api",
+                        "9",
+                        "nginx"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "9000"
+                }
+            }
+        },
+        {
+            "name": "NGINX Connections",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:9000/api/9/connections",
+                    "path": [
+                        "api",
+                        "9",
+                        "connections"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "9000"
+                }
+            }
+        },
+        {
+            "name": "NGINX Server Zones",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:9000/api/9/http/server_zones",
+                    "path": [
+                        "api",
+                        "9",
+                        "http",
+                        "server_zones"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "9000"
+                }
+            }
+        },
+        {
+            "name": "NGINX Location Zones",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:9000/api/9/http/location_zones",
+                    "path": [
+                        "api",
+                        "9",
+                        "http",
+                        "location_zones"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "9000"
+                }
+            }
+        },
+        {
+            "name": "NGINX Upstreams",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:9000/api/9/http/upstreams",
+                    "path": [
+                        "api",
+                        "9",
+                        "http",
+                        "upstreams"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "9000"
+                }
+            }
+        }
+    ]
+}

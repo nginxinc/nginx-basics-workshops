@@ -1,4 +1,5 @@
 # Don't track these files
 *.crt
 *.key
+*.jwt
 .DS_Store
