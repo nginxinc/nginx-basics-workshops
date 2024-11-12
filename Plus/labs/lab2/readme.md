@@ -22,6 +22,12 @@ By the end of the lab you will be able to:
 
 <br/>
 
+NGINX Plus | Docker
+:-------------------------:|:-------------------------:
+![NGINX Plus](media/nginx-plus-icon.png)  |![Docker](media/docker-icon.png)
+
+<br/>
+
 ## Prerequisites
 
 <br/>
