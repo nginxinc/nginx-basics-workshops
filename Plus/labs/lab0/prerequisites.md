@@ -2,20 +2,19 @@
 
 ## Introduction
 
-In order to complete the Lab exercises in this Workshop on your own computer and not use F5 provided workshop environment, your computer should meet with the following license, hardware, software, and access requirements. If you are unable to meet these basic requirements, you will likely not be able to complete the Labs as written.  It is highly recommended that you have the minimum requirements.
+In order to complete the Lab exercises in this Workshop on your own computer and not use the F5 provided workshop environment, your computer should meet with the following license, hardware, software, and access requirements. If you are unable to meet these basic requirements, you will likely not be able to complete the Labs as written.  It is highly recommended that you have the minimum requirements.
 
 ## Learning Objectives
 
-By the end of this Prerequisite instructions, you will be ready to do the Workshop lab exercises in your own system:
+By the end of this Prerequisite instructions, you will be ready to do the Workshop lab exercises in your own system.
 
 ## NGINX Plus License Requirements
 
 1. You must have an NGINX Plus Commercial license/subscription for this Workshop.
-2. You must download the `nginx-repo.crt` and `nginx-repo.key` files from your MyF5 account.
+2. You must download the `nginx-repo.crt` and `nginx-repo.key` and `nginx-repo.jwt` files from your MyF5 account.
 3. If you do not have a current license, you can request a 30-Day Trial License for free, here: https://www.f5.com/trials/free-trial-nginx-plus-and-nginx-app-protect . It takes several minutes for the F5 Licensing system to send you an email, with a `one-time download link` to the License files.  `Save the nginx-repo.* files to your local storage`, you will need them before you start the Workshop.  (NOTE: the nginx-repo.jwt file is not needed for this workshop, but download it for the Nginx Plus Ingress Workshop if you are interested in learning about Nginx Plus Ingress Controller for Kubernetes - your next NGINXperts Workshop!).
 4. If you do not have access to Nginx Plus, you can still take the NGINX OSS Basics Workshop, and get familiar with NGINX Open Source.
 
-< TODO - do we need instructions here for downloading nginx-repo files from MyF5 ? >
 
 ## Hardware Requirments
 
@@ -25,6 +24,7 @@ By the end of this Prerequisite instructions, you will be ready to do the Worksh
 
 ## Software Requirements
 
+1. Git
 1. Docker Engine
 1. Docker Compose
 1. Chrome or other modern browser
@@ -60,6 +60,7 @@ Once you have setup your system make sure to clone this repository locally in yo
 
 ```bash
 git clone https://github.com/nginxinc/nginx-basics-workshops.git
+
 ```
 
 <br/>

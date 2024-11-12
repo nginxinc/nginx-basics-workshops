@@ -8,15 +8,44 @@ You will build a Docker container running the Plus version of NGINX, which requi
 
 By the end of the lab you will be able to:
 
+- Review the History and Architecture of NGINX
 - Build an `NGINX Plus Docker` image
 - Run this NGINX Plus image, and test it
 - Configure and Test the NGINX Plus Dashboard
 
+<br/>
+
+## The History and Architecture of NGINX
+
+NGINX | NGINX
+:-------------------------:|:-------------------------:
+![NGINX Plus](media/nginx-plus-icon.png)|![NGINX Logo](media/nginx-logo.png)
+
+NGINX was written in 2002 by Igor Sysov while he was working at rambler.ru, a web company providing Internet Search content.  As Rambler continued to grow, Igor kept hitting the practical limit of 10,000 simultaneous HTTP requests with Apache HTTP server.  The only way to handle more traffic was to buy and run more servers.  So he wrote NGINX to solve the `C10k concurrency problem` - how do you handle more than 10,000 concurrent requests on a single Linux server.  
+
+Igor created a new TCP connection and request handling concept called the `NGINX Worker`.  The Workers are Linux processes that continually wait for incoming TCP connections, and immediately handle the Request, and deliver the Response.  It is based on event-driven computer program logic written in the `native C programming language`, which is well-known for its speed and power.  Importantly, NGINX Workers can use any CPU, and can scale in performance as the compute hardware scales up, providing a nearly linear performance curve.  There are many articles written and available about this NGINX Worker architecture if you are interested in reading more about it.  
+
+Another architecural concept in NGINX worth noting, is the `NGINX Master` process.  The master process interacts with the Linux OS, controls the Workers, reads and validates config files before using them, writes to error and logging files, and performs other NGINX and Linux management tasks.  It is considered the Control plane process, while the Workers are considered the Data plane processes.  The `separation of Control functions from Data handling functions` is also very beneficial to handling high concurrency, high volume web traffic.
+
+NGINX also uses a `Shared Memory model`, where common elements are equally accessed by all Workers.  This reduces the overall memory footprint considerably, making NGINX very lightweight, and ideal for containers and other small compute environments.  You can literally run NGINX off a legacy floppy disk!
+
+In the `NGINX Architectural` diagram below, you can see these different core components of NGINX, and how they relate to each other.  You will notice that Control and Management type functions are separate and independent from the Data flow functions of the Workers that are handling the traffic.  You will find links to NGINX core architectures and concepts in the References section.
+
+>> It is this unique architecture that makes NGINX so powerful and efficient.
+
+![NGINX Architecture](media/lab1_nginx-architecture.png)
+
+- In 2004, NGINX was released as open source software (OSS).  It rapidly gained popularity and has been adopted by millions of websites.
+
+- In 2013, NGINX Plus was released, providing additional features and Commercial Support for Enterprise customers. 
+
+<br/>
+
+## So what is NGINX Plus?  
+
 NGINX Plus | Docker
 :-------------------------:|:-------------------------:
 ![NGINX Plus](media/nginx-plus-icon.png)  |![Docker](media/docker-icon.png)
-
-## So what is NGINX Plus?  
 
 NGINX Plus is the `Commercial version of NGINX`, with additional Enterprise features on top of the base NGINX Opensource OSS build. Here is a Summary list of the Plus features:
 
