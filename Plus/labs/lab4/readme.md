@@ -2,17 +2,17 @@
 
 ## Introduction
 
-In this lab, you will build a test lab environment using NGINX and Docker.  This will require that you build and run NGINX Opensource as a `Reverse Proxy Load Balancer` in a Docker container.  Then you will run three NGINX demo web servers, to be used as your `backend` web servers.  After all the containers are running, you will test and verify each container, the NGINX Proxy and the web servers.  All of these NGINX containers will be used as a learning platform to complete the remaining Lab Exercises.  It is important to build and run these NGINX containers correctly to complete the exercises and receive the most benefit from the Workshop.
+In this lab, you will build a test lab environment using NGINX Plus and Docker.  This will require that you build and run NGINX Plus as a `Reverse Proxy and Load Balancer` in a Docker container.  Then you will run three NGINX demo web servers, to be used as your `backend` web servers.  After all the containers are running, you will test and verify each container, the NGINX Proxy and the web servers.  All of these NGINX containers will be used as a learning platform to complete the remaining Lab Exercises.  It is important to build and run these NGINX containers correctly to complete the exercises and receive the most benefit from the Workshop.
 
-NGINX OSS | Docker
+NGINX Plus | Docker
 :-------------------------:|:-------------------------:
-![NGINX OSS](media/nginx-icon.png)  |![Docker](media/docker-icon.png)
+![NGINX Plus](media/nginx-plus-icon.png)  |![Docker](media/docker-icon.png)
   
 ## Learning Objectives
 
 By the end of the lab you will be able to:
 
-- Pull and run an `NGINX Plus Docker` image
+- Compose and run an `NGINX Plus Docker` image
 - Build your Workshop enviroment with Docker Compose
 - Verify Container build with NGINX tests
 - Configure NGINX for Load Balancing
@@ -24,6 +24,7 @@ By the end of the lab you will be able to:
 
 ## Pre-Requisites
 
+- Nginx-Plus container from Lab1
 - You must have Docker installed and running
 - You must have Docker-compose installed
 - See `Lab0` for instructions on setting up your system for this Workshop
@@ -33,31 +34,33 @@ By the end of the lab you will be able to:
 
 ## Build the Workshop Environment with Docker Compose
 
-For this lab you will build/run 4 Docker containers.  The first one will be used as an NGINX-OSS reverse proxy, and other 3 will be used for upstream backend web servers.
+For this lab you will run 4 Docker containers.  The first one will be used as an NGINX-Plus reverse proxy, and other 3 will be used for upstream backend web servers.
 
-![Lab4 diagram](media/lab4_lab-diagram.png)
+![Lab4 diagram](media/lab4_plus-diagram.png)
 
-### Configure the NGINX-OSS Docker build parameters
+<br/>
 
-1. Inspect the Dockerfile, located in the `labs/lab4/nginx-oss` folder.  Notice the `FROM` build parameter uses the `NGINX Alpine mainline` image, and also the `RUN apk add` command, which installs additional tool libraries in the image.  These tools are needed for copy/edit of files, and to run various tests while using the container in the exercises.  NOTE: you can choose a different NGINX base image if you like, but these lab exercises are written to use the Alpine image.
+### Configure the NGINX-Plus Docker build parameters
 
-    ```bash
-    FROM nginx:mainline-alpine
-    RUN apk add --no-cache curl ca-certificates bash bash-completion jq wget vim
+<br/>
 
-    ```
+1. NOTE:  This lab exercise uses the `nginx-plus` container that you built in Lab1.
 
-1. Inspect the `docker-compose.yml` file, located in the `labs/lab4` folder.  Notice you are building and running the NGINX-OSS web and Proxy container, (using the modified `/nginx-oss/Dockerfile` from the previous step).  
+1. Inspect the `docker-compose.yml` file, located in the `labs/lab4` folder.  Notice you are running the NGINX-Plus web and Proxy container, from Lab1.  
 
     ```bash
     ...
-    nginx-oss:                  # NGINX OSS Web / Load Balancer
-        hostname: nginx-oss
-        build: nginx-oss          # Build new container, using /nginx-oss/Dockerfile
-        volumes:                  # Sync these folders to container
-            - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
-            - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d
-            - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
+
+    services:
+    nginx-plus:                     # NGINX Plus Web / Load Balancer
+        hostname: nginx-plus
+        container_name: nginx-plus
+        image: nginx-plus:workshop  # From Lab1
+        volumes:                    # Sync these folders to container
+            - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+            - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d
+            - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
+            - ./nginx-plus/usr/share/nginx/html:/usr/share/nginx/html
         links:
             - web1:web1
             - web2:web2
@@ -65,8 +68,8 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
         ports:
             - 80:80       # Open for HTTP
             - 443:443     # Open for HTTPS
-            - 9000:9000   # Open for stub status page
-        restart: always 
+            - 9000:9000   # Open for API / dashboard page
+        restart: always
 
     ```
 
@@ -100,6 +103,7 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
    ```bash
     cd lab4
     docker compose up --force-recreate -d
+
    ```
 
 1. Verify all four containers are running:
@@ -112,10 +116,10 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
     ```bash
     ##Sample output##
     CONTAINER ID   IMAGE                   COMMAND                  CREATED       STATUS       PORTS                                                              NAMES
-    6ede3846edc3   lab4-nginx-oss          "/docker-entrypoint.…"   3 hours ago   Up 3 hours   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:9000->9000/tcp   nginx-oss
-    e4887e475a14   nginxinc/ingress-demo   "/docker-entrypoint.…"   3 hours ago   Up 3 hours   0.0.0.0:56086->80/tcp, 0.0.0.0:56087->443/tcp                      web1
-    a0a5b33bcf68   nginxinc/ingress-demo   "/docker-entrypoint.…"   3 hours ago   Up 3 hours   443/tcp, 0.0.0.0:56084->80/tcp, 0.0.0.0:56085->433/tcp             web2
-    51dec7d94c6f   nginxinc/ingress-demo   "/docker-entrypoint.…"   3 hours ago   Up 3 hours   0.0.0.0:56082->80/tcp, 0.0.0.0:56081->443/tcp                      web3
+    ab101e69c186   nginx-plus:workshop     "nginx -g 'daemon of…"   5 seconds ago   Up 4 seconds   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 8080/tcp, 0.0.0.0:9000->9000/tcp, 9113/tcp   nginx-plus
+    d671b5befb6c   nginxinc/ingress-demo   "/docker-entrypoint.…"   5 seconds ago   Up 5 seconds   0.0.0.0:52783->80/tcp, 0.0.0.0:52782->443/tcp                                          web1
+    ec14194174bd   nginxinc/ingress-demo   "/docker-entrypoint.…"   5 seconds ago   Up 5 seconds   443/tcp, 0.0.0.0:52781->80/tcp, 0.0.0.0:52780->433/tcp                                 web2
+    08898f34ad49   nginxinc/ingress-demo   "/docker-entrypoint.…"   5 seconds ago   Up 5 seconds   0.0.0.0:52785->80/tcp, 0.0.0.0:52784->443/tcp                                          web3
 
     ```
 
@@ -142,12 +146,12 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
     ```
 
-    Check all three, just to be sure.  Exit the Docker Exec when you are finished by typing in `exit` within the container terminal.
+    Check all three, just to be sure.  Quit the Docker Exec when you are finished by typing in `exit` within the container terminal.
 
-1. Test the NGINX OSS container, verify it also sends back a response to a curl request:
+1. Test the NGINX Plus container, verify it also sends back a response to a curl request:
 
     ```bash
-    docker exec -it nginx-oss bin/sh   # log into nginx-oss container
+    docker exec -it nginx-plus bin/bash   # log into nginx-plus container
 
     ```
 
@@ -171,62 +175,19 @@ For this lab you will build/run 4 Docker containers.  The first one will be used
 
     ```
 
-    Congrats - you should see the `Welcome to nginx!` page. Exit the Docker Exec when you are finished by typing in `exit` within the container terminal.
+    Congrats - you should see the `Welcome to nginx!` page. Quit the Docker Exec when you are finished by typing in `exit` within the container terminal.
 
 <br/>
 
-### NGINX Status Page
+### NGINX Plus Dashboard Page
 
 <br/>
 
-NGINX also includes a status page, which shows some basic metrics about the traffic going through NGINX, such as:
-    - Active Connections
-    - Connections Accepted, Handled
-    - Total number of Requests
-    - Reading, writing, and waiting counters.
+1. Test your Nginx Plus Dashboard with Chrome, is it working on http://localhost:9000/dashboard.html ?
 
-These are helpful when looking at if/how NGINX is handling traffic.
+    If all these are working as expected, you are safe to proceed with the following lab exercises.  If not, address any issues before you continue.  Remember, the Nginx Plus Dashboard configuration is in the /etc/nginx/conf.d folder, `dashboard.conf` file.  The actual dashboard.html is in the `user/share/nginx/html` folder.
 
-1. Inspect the `stub_status.conf` file located in the `/etc/nginx/conf.d` folder.  You will see that it is listening on port 9000, and using the URL of `/basic_status`.  This has been provided for you to monitor your traffic, there is a link in the [References](#references) section with more information on the `stub_status module`.
-
-    ```nginx
-    # ngx_http_stub_status_module (available in NGINX OSS)
-    # provides Basic Status information
-
-    server {
-        listen 9000;              # Listener for Stub Status
-        
-        location /basic_status {
-            stub_status;
-        }
-
-        # Redirect requests for "/" to "/basic_status"
-        location / {
-            return 301 /basic_status;
-        }
-    }
-
-    ```
-
-1. Give that a try, test access to the NGINX `stub_status` page, on port 9000:
-
-    ```bash
-    curl http://localhost:9000/basic_status
-
-    ```
-
-    ```bash
-    ##Sample output##
-    Active connections: 1
-    server accepts handled requests
-    56 56 136
-    Reading: 0 Writing: 1 Waiting: 0
-
-    ```
-
-1. Try it in a browser at <http://localhost:9000/basic_status>. It should looks similar to this:
-
-    ![NGINX Status](media/lab4_nginx-status.png)
+    ![NGINX Dashboard](media/lab4_dashboard.png)
 
 <br/>
 
@@ -234,28 +195,28 @@ These are helpful when looking at if/how NGINX is handling traffic.
 
 <br/>
 
-Now that you know all 4 containers are working with the NGINX Welcome page, and the basic_status page, you can build and test the **NGINX OSS Proxy and Load Balancing** functions.  You will use a new NGINX `proxy_pass` Directive. You will start with Reverse Proxy configuration, test it out then add the Upstream backends and test out Load Balancing.
+Now that you know all 4 containers are working with the NGINX Welcome page, and the Plus Dashboard page, you can build and test the **NGINX Plus Proxy and Load Balancing** functions.  You will use a new NGINX `proxy_pass` Directive. You will first start with a Reverse Proxy configuration, test it out then add the Upstream backends and test out Load Balancing.
 
 Using your previous lab exercise experience, you will configure a new NGINX configuration for the `cafe.example.com` website.  It will be very similar to `cars.example.com.conf` from lab3.  
 
-This will require a new NGINX config file, for the Server and Location Blocks. Follow below steps to create the new config file:
+This will require a new NGINX config file, for the Server and Location Blocks. Follow below steps to create the new config files:
 
-1. Navigate to the `labs/lab4/nginx-oss/etc/nginx/conf.d` folder. Remember, this is the default folder for NGINX HTTP configuration files that is volume mounted to the container.
+Using Visual Studio, navigate to the `labs/lab4/nginx-plus/etc/nginx/conf.d` folder. Remember, this is the default folder for NGINX HTTP configuration files that is volume mounted to the container.
 
 1. Within this folder, create a new file called `cafe.example.com.conf`, which will be the config file for the Server and Location blocks for this new website.  
 
     However, instead of a Location block that points to a folder with html content on disk, you will tell NGINX to `proxy_pass` the request to one of your three web containers instead.  
 
     >This will show you how to unlock the amazing power of NGINX...
-    >>it can serve it's own content,
+    >>it can serve it's own WEB content,
     >>> or **content from another web server!**
 
-1. Type in the below commands within `cafe.example.com.conf` file. You don't need to type the comments. Don't just copy/paste these lines, type them by hand so you learn.
+1. Copy/paste the example provided here, in your `cafe.example.com.conf` file.  
 
     ```nginx
     # cafe.example.com HTTP
     # NGINX Basics Workshop
-    # Feb 2024, Chris Akker, Shouvik Dutta
+    # Nov 2024, Chris Akker, Shouvik Dutta, Adam Currier
     #
     server {
         
@@ -277,13 +238,14 @@ This will require a new NGINX config file, for the Server and Location Blocks. F
     
     ```
 
-1. Once the content of the file has been saved, Docker Exec into the nginx-oss container.
+1. Once the content of the file has been saved, Docker Exec into the nginx-plus container.
 
    ```bash
-    docker exec -it nginx-oss bin/bash
+    docker exec -it nginx-plus bin/bash
+
     ```
 
-1. As the `labs/lab4/nginx-oss/etc/nginx/conf.d` folder is volume mounted to the `nginx-oss` container, the new file that you created should appear within the container under `/etc/nginx/conf.d` folder.
+1. As the `labs/lab4/nginx-plus/etc/nginx/conf.d` folder is volume mounted to the `nginx-plus` container, the new file that you created should appear within the container under `/etc/nginx/conf.d` folder, verify this.
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
 
@@ -292,40 +254,45 @@ This will require a new NGINX config file, for the Server and Location Blocks. F
     ```bash
     # Run curl from outside of container
     curl -s http://cafe.example.com |grep Server
+
     ```
 
     ```bash
      ##Sample outputs##
       
-     #Run 1
+     #Test 1
       Server: nginx/1.25.4
       <p class="smaller"><span>Server Name:</span> <span>web1</span></p>   # web1
       <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.4:80</font></span></p>
       
-     #Run 2
+     #Test 2
       Server: nginx/1.25.4
       <p class="smaller"><span>Server Name:</span> <span>web1</span></p>   # web1
       <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.4:80</font></span></p>
 
-     #Run 3
+     #Test 3
       Server: nginx/1.25.4
       <p class="smaller"><span>Server Name:</span> <span>web1</span></p>   # web1
       <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.4:80</font></span></p>
 
     ```
 
-    Likewise, your browser refreshes should show you the "Out of stock" graphic and webpage for web1.  If you like, change the `proxy_pass` to `web2` or `web3`, and see what happens.
+    Likewise, your browser refreshes should show you the "Out of stock" graphic and webpage for web1.  
+    
+    ![Lab4 Web1](media/lab4_nginx-web1.png)
+    
+    If you like, change the `proxy_pass` to `web2` or `web3`, and see what happens.
 
-    >This is called a `Direct proxy_pass`, where you are telling NGINX to Proxy the request to another server.  You can also use a FQDN name, or an IP:port with proxy_pass.  In this lab environment, Docker is providing the IP for web1.
+    >This is called a `Direct proxy_pass`, where you are telling NGINX to Proxy the request to another server.  You can also use a FQDN name, or an IP:port with proxy_pass.  In this lab environment, Docker DNS is providing the IP for web1.
 
 1. You can even use proxy_pass in front of a public website.  Try that, with `nginx.org`. What do you think, can you use a Docker container on your desktop to deliver someone else's website?  No, that `can't` be that easy, can it ?
 
-1. Update the file `cafe.example.com.conf` within the same mounted folder(`labs/lab4/nginx-oss/etc/nginx/conf.d`) and change the `proxy_pass` directive as shown in below config snippet:
+1. Update the file `cafe.example.com.conf` within the same mounted folder(`labs/lab4/nginx-plus/etc/nginx/conf.d`) and change the `proxy_pass` directive as shown in below config snippet:
 
     ```nginx
     # cafe.example.com HTTP
     # NGINX Basics Workshop
-    # Feb 2024, Chris Akker, Shouvik Dutta
+    # Nov 2024, Chris Akker, Shouvik Dutta, Adam Currier
     #
     server {
         
@@ -340,17 +307,17 @@ This will require a new NGINX config file, for the Server and Location Blocks. F
             
             # New NGINX Directive, "proxy_pass", tells NGINX to proxy traffic to another website.
             
-
             proxy_pass http://nginx.org;    # Send all requests to nginx.org website 
         }
     } 
     
     ```
 
-1. Once the content of the file has been updated and saved, Docker Exec into the nginx-oss container.
+1. Once the content of the file has been updated and saved, Docker Exec into the nginx-plus container.
 
    ```bash
-    docker exec -it nginx-oss bin/bash
+    docker exec -it nginx-plus bin/bash
+
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
@@ -372,11 +339,11 @@ You see the `proxy_pass` working for one backend webserver, but what about the o
 
 You will now configure the `NGINX Upstream Block`, which is a `list of backend servers` that can be used by NGINX Proxy for load balancing requests.
 
-1. Within the mounted folder (`labs/lab4/nginx-oss/etc/nginx/conf.d`), create a new file called `upstreams.conf`, which will be the config file for the Upstream Block with three backends - web1, web2, and web3. Type in the below commands within the new file.
+1. Within the mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`), create a new file called `upstreams.conf`, which will be the config file for the Upstream Block with three backends - web1, web2, and web3. Type in the below commands within the new file.
 
     ```nginx
-    # NGINX Basics, OSS Proxy to three upstream NGINX containers
-    # Chris Akker, Shouvik Dutta - Feb 2024
+    # NGINX Basics, Plus Proxy to three upstream NGINX containers
+    # Nov 2024 - Chris Akker, Shouvik Dutta, Adam Currier
     #
     # nginx_cafe servers
 
@@ -413,7 +380,7 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
     ```nginx
     # cafe.example.com HTTP
     # NGINX Basics Workshop
-    # Feb 2024, Chris Akker, Shouvik Dutta
+    # Nov 2024, Chris Akker, Shouvik Dutta, Adam Currier
     #
     server {
         
@@ -438,10 +405,11 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
     
     ```
 
-1. Once the content of the file has been updated and saved, Docker Exec into the nginx-oss container.
+1. Once the content of the file has been updated and saved, Docker Exec into the nginx-plus container.
 
    ```bash
-    docker exec -it nginx-oss bin/bash
+    docker exec -it nginx-plus bin/bash
+
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
@@ -474,7 +442,7 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
 
     ```
 
-    You should see `Server Names` like `web1`, `web2`, and `web3` as NGINX load balances all three backends - your NGINX-OSS is now a Reverse Proxy, and load balancing traffic to 3 web containers! Notice the `Server Address`, with the IP address of each upstream container.  Note:  Your IP addresses will likely be different.
+    You should see `Server Names` like `web1`, `web2`, and `web3` as NGINX load balances all three backends - your NGINX-Plus is now a Reverse Proxy, and load balancing traffic to 3 web containers! Notice the `Server Address`, with the IP address of each upstream container.  Note:  Your IP addresses will likely be different.
 
 1. Test again, this time using a browser, click `Refresh` at least 3 times:
 
@@ -486,7 +454,7 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
     :-------------------------:|:-------------------------:|:-------------------------:
     ![NGINX Web1](media/lab4_nginx-web1.png)  |![NGINX Web2](media/lab4_nginx-web2.png) |![NGINX Web3](media/lab4_nginx-web3.png)
 
->This is called an `Upstream proxy_pass`, where you are telling NGINX to Proxy the request to a list of servers in the upstream, and load balance them.
+>This is called an `Upstream proxy_pass`, where you are telling NGINX to Proxy the request to a list of servers in the upstream block, and load balance them.
 
 1. These backend application do have the following multiple paths which can also be used for testing. Feel free to try them out:
    - [http://cafe.example.com/coffee](http://cafe.example.com/coffee)
@@ -497,6 +465,95 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
    - [http://cafe.example.com/cosmo](http://cafe.example.com/cosmo)
    - [http://cafe.example.com/mojito](http://cafe.example.com/mojito)
    - [http://cafe.example.com/daiquiri](http://cafe.example.com/daiquiri)
+
+<br/>
+
+### Update the Nginx Plus Dashboard
+
+Now that you have a server, location, and upstream block defined, you can add these to the Nginx Plus Dashboard so you can see the traffic.  Nginx uses a `status_zone` and `zone` Directives to allocate memory for storing the metrics, and making them available for display in the Dashboard.  The Status_Zone is used in the Server and Location blocks, the Zone is used for the Upstream block.
+
+1. Add the `status_zone` to the `cafe.example.com.conf` server and location blocks, follow this example:
+
+```nginx
+    # cafe.example.com HTTP
+    # NGINX Basics Workshop
+    # Nov 2024, Chris Akker, Shouvik Dutta, Adam Currier
+    #
+    server {
+        
+        listen 80;      # Listening on port 80 on all IP addresses on this machine
+
+        server_name cafe.example.com;   # Set hostname to match in request
+        status_zone cafe-VirtualServer;   # Add metrics for Virtual Server
+
+        access_log  /var/log/nginx/cafe.example.com.log main; 
+        error_log   /var/log/nginx/cafe.example.com_error.log info;
+
+        location / {
+            
+            status_zone /;   # Add metrics for location
+
+            # New NGINX Directive, "proxy_pass", tells NGINX to proxy traffic to another server.
+            
+            proxy_pass http://nginx_cafe;        # Send requests to upstreams
+        }
+
+    } 
+
+```
+
+Test and Reload your Nginx config.
+
+1. Add the `zone` directive to your Upstream block, in `upstreams.conf`, as follows:
+
+```nginx
+    # NGINX Basics, Plus Proxy to three upstream NGINX containers
+    # Nov 2024 - Chris Akker, Shouvik Dutta, Adam Currier
+    #
+    # nginx_cafe servers
+
+    upstream nginx_cafe {         # Upstream block, the name is "nginx_cafe"
+
+    #
+       zone nginx_cafe 256k;           # Add metrics for backend servers
+
+        # Load Balancing Algorithms supported by NGINX
+        # - Round Robin (Default if nothing specified)
+        # - Least Connections
+        # - IP Hash
+        # - Hash (Any generic Hash)
+
+        # Load Balancing Algorithms supported by NGINX Plus
+        # - Least Time Last Byte / Header
+        # - Random Two     
+
+        # Uncomment for Least Time Last Byte algorithm      
+        # least_time last_byte;
+
+        # From Docker-Compose:
+        server web1:80;
+        server web2:80;
+        server web3:80;
+
+        #Uncomment for IP Hash persistence
+        # ip_hash;
+
+        # Uncomment for keepalive TCP connections to upstreams
+        # keepalive 16;
+
+    }
+
+```
+
+Test and Reload your Nginx config.
+
+1. Now check out your Plus Dashboard, at http://localhost:9000/dashboard.html.  What do you see?
+
+There should be two new Tabs at the Top.  `HTTP Zones` are for your Virtual Servers and Location blocks.  `HTTP Upstreams` are for your backends.  Hit refresh serveral times on your cafe.example.com browser, while watching the Dashboard.  You will see the metrics values changing in RealTime.
+
+![HTTP Zones](media/dashboard-http-zones.png)
+
+![HTTP Upstreams](media/dashboard-http-upstreams.png)
 
 <br/>
 
@@ -549,18 +606,19 @@ Now that you have a working NGINX Proxy, and several backends, you will be addin
                             
     ```
 
-1. You will use the Extended log_format for the next few exercises.  Update your `cafe.example.com.conf` file within your mounted folder (`labs/lab4/nginx-oss/etc/nginx/conf.d`) to use the `main_ext` log format:
+1. You will use the Extended log_format for the next few exercises.  Update your `cafe.example.com.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) to use the `main_ext` log format:
 
     ```nginx
     # cars.example.com HTTP
     # NGINX Basics Workshop
-    # Feb 2024, Chris Akker, Shouvik Dutta
+    # Nov 2024, Chris Akker, Shouvik Dutta, Adam Currier
     #
     server {
         
         listen 80;      # Listening on port 80 on all IP addresses on this machine
 
         server_name cafe.example.com;   # Set hostname to match in request
+        status_zone cafe-VirtualServer;
 
         access_log  /var/log/nginx/cafe.example.com.log main_ext;         # Change this to "main_ext"
         error_log   /var/log/nginx/cafe.example.com_error.log info;
@@ -569,18 +627,18 @@ Now that you have a working NGINX Proxy, and several backends, you will be addin
 
     ```
 
-1. Once the content of the file has been updated and saved, Docker Exec into the nginx-oss container.
+1. Once the content of the file has been updated and saved, Docker Exec into the nginx-plus container.
 
    ```bash
-    docker exec -it nginx-oss bin/bash
+    docker exec -it nginx-plus bin/bash
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
 
-1. Test your new log format.  Docker Exec into your nginx-oss container.  Tail the `/var/log/nginx/cafe.example.com.log` access log file, and you will see the new Extended Log Format.
+1. Test your new log format.  Docker Exec into your nginx-plus container.  Tail the `/var/log/nginx/cafe.example.com.log` access log file, and you will see the new Extended Log Format.
 
     ```bash
-    docker exec -it nginx-oss bin/bash
+    docker exec -it nginx-plus bin/bash
     tail -f /var/log/nginx/cafe.example.com.log
 
     ```
@@ -633,7 +691,7 @@ In this next exercise, you will define these HTTP Protocol Headers, and then tel
 
 However, this means a new TCP connection for every request, and is quite inefficient.  Modern apps mostly run HTTP/1.1, so you will tell NGINX to use HTTP/1.1 for Proxied requests, which allows NGINX to re-use TCP connections for multiple requests.  (This is commonly called HTTP keepalives, or HTTP pipelining).
 
-1. Inspect the `keepalive.conf`, located in the `labs/lab4/nginx-oss/etc/nginx/includes` folder.  Notice that there are three Directives and Headers required for HTTP/1.1 to work correctly:
+1. Inspect the `keepalive.conf`, located in the `labs/lab4/nginx-plus/etc/nginx/includes` folder.  Notice that there are three Directives and Headers required for HTTP/1.1 to work correctly:
 
     - HTTP Protocol = Use the `$proxy_protocol_version` variable to set it to `1.1`.
     - HTTP Connection Header = should be blank, `""`, the default is `Close`.
@@ -654,7 +712,7 @@ However, this means a new TCP connection for every request, and is quite ineffic
 
     ```
 
-1. Update your `cafe.example.com.conf` file within your mounted folder (`labs/lab4/nginx-oss/etc/nginx/conf.d`) to use the HTTP/1.1 protocol to communicate with the Upstreams. You will make use of an `include` directive here:
+1. Update your `cafe.example.com.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) to use the HTTP/1.1 protocol to communicate with the Upstreams. You will make use of an `include` directive here:
 
     ```nginx
     # cafe.example.com HTTP
@@ -684,10 +742,10 @@ However, this means a new TCP connection for every request, and is quite ineffic
     } 
     ```
 
-1. Once the content of the file has been updated and saved, Docker Exec into the nginx-oss container.
+1. Once the content of the file has been updated and saved, Docker Exec into the nginx-plus container.
 
    ```bash
-    docker exec -it nginx-oss bin/bash
+    docker exec -it nginx-plus bin/bash
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
@@ -724,7 +782,7 @@ However, this means a new TCP connection for every request, and is quite ineffic
 
 Now you need to enable some HTTP Headers, to be added to the Request.  These are often need to relay information between the HTTP client and the backend server. These Headers are in addition to the HTTP Protocol control headers.
 
-1. Inspect the `proxy_headers.conf` in the `labs/lab4/nginx-oss/etc/nginx/includes` folder.  You will see that some custom HTTP Headers are being added.
+1. Inspect the `proxy_headers.conf` in the `labs/lab4/nginx-plus/etc/nginx/includes` folder.  You will see that some custom HTTP Headers are being added.
 
     ```nginx
     #Nginx Basics - Feb 2024
@@ -743,7 +801,7 @@ Now you need to enable some HTTP Headers, to be added to the Request.  These are
 
     ```
 
-1. Update your `cafe.example.com.conf` file within your mounted folder (`labs/lab4/nginx-oss/etc/nginx/conf.d`) to use the `proxy_headers.conf` added to the config using an `include` directive:
+1. Update your `cafe.example.com.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) to use the `proxy_headers.conf` added to the config using an `include` directive:
 
     ```nginx
     # cafe.example.com HTTP
@@ -775,10 +833,10 @@ Now you need to enable some HTTP Headers, to be added to the Request.  These are
     } 
     ```
 
-1. Once the content of the file has been updated and saved, Docker Exec into the nginx-oss container.
+1. Once the content of the file has been updated and saved, Docker Exec into the nginx-plus container.
 
    ```bash
-    docker exec -it nginx-oss bin/bash
+    docker exec -it nginx-plus bin/bash
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
@@ -793,7 +851,7 @@ Different backend applications may benefit from using different load balancing t
 
 1. NGINX's default Load Balancing algorithm is round-robin.  In this next lab exercise, you will use the `least connections` algorithm to send more traffic to different backends based on their active TCP connection counts.  
 
-1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-oss/etc/nginx/conf.d`) to enable Least Connections, as follows:
+1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) to enable Least Connections, as follows:
 
     ```nginx
 
@@ -824,20 +882,20 @@ Different backend applications may benefit from using different load balancing t
 
     ```
 
-1. Once the content of the file has been updated and saved, Docker Exec into the nginx-oss container.
+1. Once the content of the file has been updated and saved, Docker Exec into the nginx-plus container.
 
    ```bash
-    docker exec -it nginx-oss bin/bash
+    docker exec -it nginx-plus bin/bash
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
 
-1. If you open the NGINX Basic Status page at <http://localhost:9000/basic_status>, and refresh it every 3-4 seconds while you run the `wrk` load generation tool at your nginx-oss Load Balancer:  
+1. If you open the NGINX Basic Status page at <http://localhost:9000/basic_status>, and refresh it every 3-4 seconds while you run the `wrk` load generation tool at your nginx-plus Load Balancer:  
 
     `wrk` load generation tool is a docker container that will download and run, with 4 threads, at 200 connections, for 1 minute:
 
     ```bash
-    docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d1m -H 'Host: cafe.example.com' --timeout 2s http://nginx-oss/coffee
+    docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d1m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
     ```
 
     In the `basic_status` page, you should notice about 200 Active Connections, and the number of `server requests` should be increasing rapidly.  Unfortunately, there is no easy way to monitor the number of TCP connections to Upstreams when using NGINX Opensource.  But good news, you `will` see all the Upstream metrics in the next lab with NGINX Plus!
@@ -846,7 +904,7 @@ Different backend applications may benefit from using different load balancing t
 
     ```bash
     ##Sample output##
-    Running 1m test @ http://nginx-oss/coffee
+    Running 1m test @ http://nginx-plus/coffee
     4 threads and 200 connections
     Thread Stats   Avg      Stdev     Max   +/- Stdev
         Latency    68.41ms   30.72ms   1.28s    98.85%
@@ -859,7 +917,7 @@ Different backend applications may benefit from using different load balancing t
 
     Well, that performance looks pretty good, about ~2900 HTTP Reqs/second.  But NGINX can do better.  You will enable TCP keepalives to the Upstreams.  This Directive will tell NGINX to create a `pool of TCP connections to each Upstream`, and use that established connection pool to rapid-fire HTTP requests to the backends.  `No delays waiting for the TCP handshakes!`  It is considered a Best Practice to enable keepalives to the Upstream servers.
 
-1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-oss/etc/nginx/conf.d`) and uncomment from the `keepalives 16` line.
+1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) and uncomment from the `keepalives 16` line.
 
     ```nginx
     ...snip
@@ -882,10 +940,10 @@ Different backend applications may benefit from using different load balancing t
 
     ```
 
-1. Once the content of the file has been updated and saved, Docker Exec into the nginx-oss container.
+1. Once the content of the file has been updated and saved, Docker Exec into the nginx-plus container.
 
    ```bash
-    docker exec -it nginx-oss bin/bash
+    docker exec -it nginx-plus bin/bash
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
@@ -896,7 +954,7 @@ Different backend applications may benefit from using different load balancing t
 
     ```bash
     ##Sample output##
-    Running 1m test @ http://nginx-oss/coffee
+    Running 1m test @ http://nginx-plus/coffee
     4 threads and 200 connections
     Thread Stats   Avg      Stdev     Max   +/- Stdev
         Latency    43.90ms   47.06ms   1.18s    98.98%
@@ -912,7 +970,7 @@ Different backend applications may benefit from using different load balancing t
 
 1. In this next lab exercise, you will use the `weighted` algorithm to send more traffic to different backends. 
 
-1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-oss/etc/nginx/conf.d`) to modify the `server`entries to set an administrative ratio, as follows:
+1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) to modify the `server`entries to set an administrative ratio, as follows:
 
     ```nginx
     ...snip
@@ -934,10 +992,10 @@ Different backend applications may benefit from using different load balancing t
 
     ```
 
-1. Once the content of the file has been updated and saved, Docker Exec into the nginx-oss container.
+1. Once the content of the file has been updated and saved, Docker Exec into the nginx-plus container.
 
    ```bash
-    docker exec -it nginx-oss bin/bash
+    docker exec -it nginx-plus bin/bash
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
@@ -952,7 +1010,7 @@ Different backend applications may benefit from using different load balancing t
 
     So that is not too bad for a single CPU docker container.  But didn't you hear that NGINX performance improves with the number of CPUs in the machine?
 
-1. Check your `nginx.conf` file within `labs\lab4\nginx-oss` folder... does it say `worker_processes   1;` near the top?  Hmmm, NGINX is configured to use only one Worker and therefore only one CPU core.  You will change it to `FOUR`, and re-test.  Assuming you have at least 4 cores that Docker and NGINX can use:
+1. Check your `nginx.conf` file within `labs\lab4\nginx-plus` folder... does it say `worker_processes   1;` near the top?  Hmmm, NGINX is configured to use only one Worker and therefore only one CPU core.  You will change it to `FOUR`, and re-test.  Assuming you have at least 4 cores that Docker and NGINX can use:
 
     ```nginx
     user  nginx;
@@ -974,21 +1032,21 @@ Different backend applications may benefit from using different load balancing t
 
 1. Save the `nginx.conf` file with above changes.
 
-1. Also update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-oss/etc/nginx/conf.d`) to remove the `server weight=x` parameter from all three servers, and set the load balancing algorithm back to `least_conn`.  
+1. Also update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) to remove the `server weight=x` parameter from all three servers, and set the load balancing algorithm back to `least_conn`.  
 
-1. Once the both the file has been updated and saved, Docker Exec into the nginx-oss container.
+1. Once the both the file has been updated and saved, Docker Exec into the nginx-plus container.
 
    (**NOTE:** nginx.conf file is also volume mounted to the container so all local changes should reflect in your container)
 
    ```bash
-    docker exec -it nginx-oss bin/bash
+    docker exec -it nginx-plus bin/bash
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
 
 1. You should now have `4 workers`, `least_conn` and `keepalive` **enabled**.  Run the WRK test again. You are going to CRANK IT UP!
 
-    Within the `nginx-oss` container, run `top` to see the NGINX Workers at work.  Should look something like this:
+    Within the `nginx-plus` container, run `top` to see the NGINX Workers at work.  Should look something like this:
 
     ```bash
     top
@@ -1013,14 +1071,14 @@ Different backend applications may benefit from using different load balancing t
 1. Run the `wrk` load generator again for 1 minute.
 
    ```bash
-   docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d1m -H 'Host: cafe.example.com' --timeout 2s http://nginx-oss/coffee
+   docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d1m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
    ```
 
    After the 1 minute run of `wrk` load generation tool has finished, you should see a Summary of the statistics.  It should look similar to this:
 
     ```bash
     ##Sample output##
-    Running 1m test @ http://nginx-oss/coffee
+    Running 1m test @ http://nginx-plus/coffee
     4 threads and 200 connections
     Thread Stats   Avg      Stdev     Max   +/- Stdev
         Latency    25.02ms   17.42ms 292.98ms   78.38%
@@ -1048,10 +1106,10 @@ With many legacy applications, the HTTP client and server must create a temporal
 
 With NGINX, there are several configuration options for this, but in this next lab exercise, you will use the most common option called `ip hash`.  This will allow NGINX to send requests to the same backend based on the client's IP Address.
 
-1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-oss/etc/nginx/conf.d`) to include IP Hash persistance, as follows:
+1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) to include IP Hash persistance, as follows:
 
     ```nginx
-    # NGINX Basics, OSS Proxy to three upstream NGINX web servers
+    # NGINX Basics, Plus Proxy to three upstream NGINX web servers
     # Chris Akker, Shouvik Dutta - Feb 2024
     #
     # nginx-cafe servers 
@@ -1081,10 +1139,10 @@ With NGINX, there are several configuration options for this, but in this next l
 
     ```
 
-1. Once the content of the file has been updated and saved, Docker Exec into the nginx-oss container.
+1. Once the content of the file has been updated and saved, Docker Exec into the nginx-plus container.
 
    ```bash
-    docker exec -it nginx-oss bin/bash
+    docker exec -it nginx-plus bin/bash
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
@@ -1123,7 +1181,7 @@ docker compose down
 ```bash
 ##Sample output##
 Running 5/5
-Container nginx-oss          Removed
+Container nginx-plus         Removed
 Container web2               Removed
 Container web3               Removed
 Container web1               Removed                            
@@ -1137,8 +1195,7 @@ Network lab4_default         Removed
 
 ## References:
 
-- [NGINX OSS](https://nginx.org/en/docs/)
-- [NGINX Status Module](http://nginx.org/en/docs/http/ngx_http_stub_status_module.html)
+- [NGINX Plus](https://docs.nginx.com/nginx/)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
 - [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
 - [NGINX Variables](https://nginx.org/en/docs/varindex.html)
