@@ -2,12 +2,14 @@
 
 ## Introduction
 
-In this lab, you will build a test lab environment using NGINX Plus and Docker.  This will require that you build and run NGINX Plus as a `Reverse Proxy and Load Balancer` in a Docker container.  Then you will run three NGINX demo web servers, to be used as your `backend` web servers.  After all the containers are running, you will test and verify each container, the NGINX Proxy and the web servers.  All of these NGINX containers will be used as a learning platform to complete the remaining Lab Exercises.  It is important to build and run these NGINX containers correctly to complete the exercises and receive the most benefit from the Workshop.
+In this lab, you will build a test lab environment using NGINX Plus and Docker.  This will require that you run NGINX Plus as a `Reverse Proxy and Load Balancer` in a Docker container.  Then you will run three NGINX demo web servers, to be used as your `backend` web servers.  After all the containers are running, you will test and verify each container, the NGINX Proxy and the web servers.  All of these NGINX containers will be used as a learning platform to complete the remaining Lab Exercises.  It is important to run these NGINX containers correctly to complete the exercises and receive the most benefit from the Workshop.
 
 NGINX Plus | Docker
 :-------------------------:|:-------------------------:
 ![NGINX Plus](media/nginx-plus-icon.png)  |![Docker](media/docker-icon.png)
-  
+
+<br/>
+
 ## Learning Objectives
 
 By the end of the lab you will be able to:
@@ -15,14 +17,14 @@ By the end of the lab you will be able to:
 - Compose and run an `NGINX Plus Docker` image
 - Build your Workshop enviroment with Docker Compose
 - Verify Container build with NGINX tests
-- Configure NGINX for Load Balancing
+- Configure NGINX for Proxy and Load Balancing
 - Configure NGINX Extended Access Logging
-- Configure and test Nginx Active Health Checks
-- Explore Nginx load balancing algorithms
+- Explore NGINX load balancing algorithms
+- Run an HTTP Load Test tool
 - Configure and test Persistence
 - Add NGINX features following Best Practices
 
-## Pre-Requisites
+## Prerequisites
 
 - Nginx-Plus container from Lab1
 - You must have Docker installed and running
@@ -30,11 +32,11 @@ By the end of the lab you will be able to:
 - See `Lab0` for instructions on setting up your system for this Workshop
 - Familiarity with basic Linux commands and commandline tools
 - Familiarity with basic Docker concepts and commands
-- Familiarity with basic HTTP protocol
+- Proficient with the HTTP protocol
 
 ## Build the Workshop Environment with Docker Compose
 
-For this lab you will run 4 Docker containers.  The first one will be used as an NGINX-Plus reverse proxy, and other 3 will be used for upstream backend web servers.
+For this lab you will run 4 Docker containers.  The first one will be used as an NGINX-Plus reverse proxy and load balancer, and other 3 will be used for backend web servers.
 
 ![Lab4 diagram](media/lab4_plus-diagram.png)
 
@@ -73,7 +75,7 @@ For this lab you will run 4 Docker containers.  The first one will be used as an
 
     ```
 
-    Also notice in the `docker-compose.yml` you are running three Docker NGINX webserver containers, using an image from Docker Hub.  These will be your upstreams, backend webservers for the exercises.
+    Also notice in the `docker-compose.yml` you are running three Docker NGINX webserver containers, using a demo image from Docker Hub.  These will be your upstreams, backend webservers for the exercises.
 
     ```bash
     ...
@@ -114,7 +116,7 @@ For this lab you will run 4 Docker containers.  The first one will be used as an
     ```
 
     ```bash
-    ##Sample output##
+    ## Sample output ##
     CONTAINER ID   IMAGE                   COMMAND                  CREATED       STATUS       PORTS                                                              NAMES
     ab101e69c186   nginx-plus:workshop     "nginx -g 'daemon of…"   5 seconds ago   Up 4 seconds   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 8080/tcp, 0.0.0.0:9000->9000/tcp, 9113/tcp   nginx-plus
     d671b5befb6c   nginxinc/ingress-demo   "/docker-entrypoint.…"   5 seconds ago   Up 5 seconds   0.0.0.0:52783->80/tcp, 0.0.0.0:52782->443/tcp                                          web1
@@ -136,7 +138,7 @@ For this lab you will run 4 Docker containers.  The first one will be used as an
     ```
 
     ```bash
-    ##Sample outputs##
+    ## Sample outputs ##
 
     <p class="smaller"><span>Server Name:</span> <span>web1</span></p>   # web1
 
@@ -161,7 +163,7 @@ For this lab you will run 4 Docker containers.  The first one will be used as an
     ```
 
     ```bash
-    ##Sample outputs##
+    ## Sample output ##
    <!DOCTYPE html>
     <html>
     <head>
@@ -183,9 +185,9 @@ For this lab you will run 4 Docker containers.  The first one will be used as an
 
 <br/>
 
-1. Test your Nginx Plus Dashboard with Chrome, is it working on http://localhost:9000/dashboard.html ?
+1. Test your Nginx Plus Dashboard with Chrome, is it working on http://localhost:9000/dashboard.html?
 
-    If all these are working as expected, you are safe to proceed with the following lab exercises.  If not, address any issues before you continue.  Remember, the Nginx Plus Dashboard configuration is in the /etc/nginx/conf.d folder, `dashboard.conf` file.  The actual dashboard.html is in the `user/share/nginx/html` folder.
+    If all 4 containers and the Dashboard are working as expected, you are safe to proceed with the following lab exercises.  If not, address any issues before you continue.  Remember, the Nginx Plus Dashboard configuration is in the /etc/nginx/conf.d folder, `dashboard.conf` file.  The actual /dashboard.html is in the `user/share/nginx/html` folder.
 
     ![NGINX Dashboard](media/lab4_dashboard.png)
 
@@ -197,7 +199,7 @@ For this lab you will run 4 Docker containers.  The first one will be used as an
 
 Now that you know all 4 containers are working with the NGINX Welcome page, and the Plus Dashboard page, you can build and test the **NGINX Plus Proxy and Load Balancing** functions.  You will use a new NGINX `proxy_pass` Directive. You will first start with a Reverse Proxy configuration, test it out then add the Upstream backends and test out Load Balancing.
 
-Using your previous lab exercise experience, you will configure a new NGINX configuration for the `cafe.example.com` website.  It will be very similar to `cars.example.com.conf` from lab3.  
+Using your previous lab exercise experience, you will configure a new NGINX configuration for the `cafe.example.com` website.  
 
 This will require a new NGINX config file, for the Server and Location Blocks. Follow below steps to create the new config files:
 
@@ -258,7 +260,7 @@ Using Visual Studio, navigate to the `labs/lab4/nginx-plus/etc/nginx/conf.d` fol
     ```
 
     ```bash
-     ##Sample outputs##
+     ## Sample outputs ##
       
      #Test 1
       Server: nginx/1.25.4
@@ -281,9 +283,9 @@ Using Visual Studio, navigate to the `labs/lab4/nginx-plus/etc/nginx/conf.d` fol
     
     ![Lab4 Web1](media/lab4_nginx-web1.png)
     
-    If you like, change the `proxy_pass` to `web2` or `web3`, and see what happens.
+    Optional Exercise: If you like, change the `proxy_pass` to `web2` or `web3`, and see what happens.
 
-    >This is called a `Direct proxy_pass`, where you are telling NGINX to Proxy the request to another server.  You can also use a FQDN name, or an IP:port with proxy_pass.  In this lab environment, Docker DNS is providing the IP for web1.
+    >This is called a `Direct proxy_pass`, where you are telling NGINX to Proxy the request to another web server.  You can also use an FQDN name, or an IP:port with proxy_pass.  In this lab environment, Docker DNS is providing the IP for web1.
 
 1. You can even use proxy_pass in front of a public website.  Try that, with `nginx.org`. What do you think, can you use a Docker container on your desktop to deliver someone else's website?  No, that `can't` be that easy, can it ?
 
@@ -307,6 +309,8 @@ Using Visual Studio, navigate to the `labs/lab4/nginx-plus/etc/nginx/conf.d` fol
             
             # New NGINX Directive, "proxy_pass", tells NGINX to proxy traffic to another website.
             
+            # proxy_pass http://web1;       # Send all request to web1
+
             proxy_pass http://nginx.org;    # Send all requests to nginx.org website 
         }
     } 
@@ -423,19 +427,19 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
     ```
 
     ```bash
-     ##Sample output##
+     ## Sample outputs ##
 
-     # Run1
+     # Test 1
       Server: nginx/1.25.4
       <p class="smaller"><span>Server Name:</span> <span>web1</span></p>   # web1
       <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.4:80</font></span></p>
 
-     # Run2
+     # Test 2
       Server: nginx/1.25.4
       <p class="smaller"><span>Server Name:</span> <span>web2</span></p>   # web2
       <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.3:80</font></span></p>
 
-     # Run3
+     # Test 3
       Server: nginx/1.25.4
       <p class="smaller"><span>Server Name:</span> <span>web3</span></p>   # web3
       <p class="smaller"><span>Server Address:</span> <span><font color="green">172.28.0.2:80</font></span></p>
@@ -470,90 +474,91 @@ You will now configure the `NGINX Upstream Block`, which is a `list of backend s
 
 ### Update the Nginx Plus Dashboard
 
-Now that you have a server, location, and upstream block defined, you can add these to the Nginx Plus Dashboard so you can see the traffic.  Nginx uses a `status_zone` and `zone` Directives to allocate memory for storing the metrics, and making them available for display in the Dashboard.  The Status_Zone is used in the Server and Location blocks, the Zone is used for the Upstream block.
+Now that you have a server, location, and upstream block defined, you can add these to the Nginx Plus Dashboard so you can see the traffic and metrics.  Nginx uses the  `status_zone` and `zone` Directives to allocate memory for storing the metrics, and making them available for display in the Dashboard.  The `status_zone` is used in the Server and Location blocks, the `zone` is used for the Upstream block.
 
-1. Add the `status_zone` to the `cafe.example.com.conf` server and location blocks, follow this example:
+1. Uncomment the `status_zone` directive in the `cafe.example.com.conf` server and location blocks, follow this example:
 
-```nginx
-    # cafe.example.com HTTP
-    # NGINX Basics Workshop
-    # Nov 2024, Chris Akker, Shouvik Dutta, Adam Currier
-    #
-    server {
-        
-        listen 80;      # Listening on port 80 on all IP addresses on this machine
-
-        server_name cafe.example.com;   # Set hostname to match in request
-        status_zone cafe-VirtualServer;   # Add metrics for Virtual Server
-
-        access_log  /var/log/nginx/cafe.example.com.log main; 
-        error_log   /var/log/nginx/cafe.example.com_error.log info;
-
-        location / {
+    ```nginx
+        # cafe.example.com HTTP
+        # NGINX Basics Workshop
+        # Nov 2024, Chris Akker, Shouvik Dutta, Adam Currier
+        #
+        server {
             
-            status_zone /;   # Add metrics for location
+            listen 80;      # Listening on port 80 on all IP addresses on this machine
 
-            # New NGINX Directive, "proxy_pass", tells NGINX to proxy traffic to another server.
+            server_name cafe.example.com;   # Set hostname to match in request
             
-            proxy_pass http://nginx_cafe;        # Send requests to upstreams
+            # Uncomment the status_zone directive below to add metrics to the Dashboard
+            status_zone cafe-VirtualServer;
+
+            access_log  /var/log/nginx/cafe.example.com.log main; 
+            error_log   /var/log/nginx/cafe.example.com_error.log info;
+
+            location / {
+                
+                # Uncomment the status_zone directive below to add metrics to the Dashboard
+                status_zone /;
+
+                # New NGINX Directive, "proxy_pass", tells NGINX to proxy traffic to another server.
+                
+                proxy_pass http://nginx_cafe;        # Send requests to upstreams
+            }
+
+        } 
+
+    ```
+
+1. Uncomment the `zone` directive to your Upstream block, in `upstreams.conf`, as follows:
+
+    ```nginx
+        # NGINX Basics, Plus Proxy to three upstream NGINX containers
+        # Nov 2024 - Chris Akker, Shouvik Dutta, Adam Currier
+        #
+        # nginx_cafe servers
+
+        upstream nginx_cafe {         # Upstream block, the name is "nginx_cafe"
+
+        # Uncomment the zone directive below to add metrics to the Dashboard
+        zone nginx_cafe 256k;
+
+            # Load Balancing Algorithms supported by NGINX
+            # - Round Robin (Default if nothing specified)
+            # - Least Connections
+            # - IP Hash
+            # - Hash (Any generic Hash)
+
+            # Load Balancing Algorithms supported by NGINX Plus
+            # - Least Time Last Byte / Header
+            # - Random Two     
+
+            # Uncomment for Least Time Last Byte algorithm      
+            # least_time last_byte;
+
+            # From Docker-Compose:
+            server web1:80;
+            server web2:80;
+            server web3:80;
+
+            #Uncomment for IP Hash persistence
+            # ip_hash;
+
+            # Uncomment for keepalive TCP connections to upstreams
+            # keepalive 16;
+
         }
 
-    } 
+    ```
 
-```
-
-Test and Reload your Nginx config.
-
-1. Add the `zone` directive to your Upstream block, in `upstreams.conf`, as follows:
-
-```nginx
-    # NGINX Basics, Plus Proxy to three upstream NGINX containers
-    # Nov 2024 - Chris Akker, Shouvik Dutta, Adam Currier
-    #
-    # nginx_cafe servers
-
-    upstream nginx_cafe {         # Upstream block, the name is "nginx_cafe"
-
-    #
-       zone nginx_cafe 256k;           # Add metrics for backend servers
-
-        # Load Balancing Algorithms supported by NGINX
-        # - Round Robin (Default if nothing specified)
-        # - Least Connections
-        # - IP Hash
-        # - Hash (Any generic Hash)
-
-        # Load Balancing Algorithms supported by NGINX Plus
-        # - Least Time Last Byte / Header
-        # - Random Two     
-
-        # Uncomment for Least Time Last Byte algorithm      
-        # least_time last_byte;
-
-        # From Docker-Compose:
-        server web1:80;
-        server web2:80;
-        server web3:80;
-
-        #Uncomment for IP Hash persistence
-        # ip_hash;
-
-        # Uncomment for keepalive TCP connections to upstreams
-        # keepalive 16;
-
-    }
-
-```
-
-Test and Reload your Nginx config.
+1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
 
 1. Now check out your Plus Dashboard, at http://localhost:9000/dashboard.html.  What do you see?
 
-There should be two new Tabs at the Top.  `HTTP Zones` are for your Virtual Servers and Location blocks.  `HTTP Upstreams` are for your backends.  Hit refresh serveral times on your cafe.example.com browser, while watching the Dashboard.  You will see the metrics values changing in RealTime.
+    There should be new Tabs at the Top.  `HTTP Zones` are for your Virtual Servers and Location blocks.  `HTTP Upstreams` are for your backends.  Hit refresh serveral times on your cafe.example.com browser, while watching the Dashboard.  You will see the metrics values changing in realtime, as the Dashboard will update every second.
 
-![HTTP Zones](media/dashboard-http-zones.png)
+    ![HTTP Zones](media/dashboard-http-zones.png)
 
-![HTTP Upstreams](media/dashboard-http-upstreams.png)
+    ![HTTP Upstreams](media/dashboard-http-upstreams.png)
 
 <br/>
 
@@ -561,7 +566,7 @@ There should be two new Tabs at the Top.  `HTTP Zones` are for your Virtual Serv
 
 <br/>
 
-Now that you have a working NGINX Proxy, and several backends, you will be adding and using additional NGINX Directives, Variables, and testing them out.  In order to better see the results of these new Directives on your proxied traffic, you need better and more information in your Access logs.  The default NGINX `main` access log_format only contains a fraction of the information you need, so you will  `extend` it to include much more information, especially about the Upstream backend servers.
+Now that you have a working NGINX Proxy, and several backends, you will be adding and using additional NGINX Directives, Variables, and testing them out.  In order to better see the results of these new Directives on your proxied traffic, you need better and more information in your Access logs.  The default NGINX `main` access log_format only contains a fraction of the information you need, so you will  `extend` it to includemore information, especially about the Upstream backend servers.
 
 1. In this next exercise, you will use a new `log_format` which has additional $variables added the access.log, so you can see this metadata.  You will use the Best Practice of defining the log format ONCE, but potentially use it in many Server blocks.
 
@@ -631,6 +636,7 @@ Now that you have a working NGINX Proxy, and several backends, you will be addin
 
    ```bash
     docker exec -it nginx-plus bin/bash
+
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
@@ -643,7 +649,7 @@ Now that you have a working NGINX Proxy, and several backends, you will be addin
 
     ```
 
-1. Watch your new log format.  Using curl or your browser, hit the `cafe.example.com` website a few times.
+1. While watching your new log format, use curl or your browser, and hit the `cafe.example.com` website a few times.
 
     It should look something like this (comments and line breaks added for clarity):
 
@@ -679,27 +685,35 @@ Now that you have a working NGINX Proxy, and several backends, you will be addin
 
 <br/>
 
-### NGINX Proxy Protocol and Keep-alives
+### NGINX HTTP Protocol and Keep-alives
 
 <br/>
 
-Now that you have Reverse Proxy and load balancing working, you need to think about what information should be passed to and from the backend servers.  After all, if you insert a Proxy in between the client and the server, you might lose some important information in the request or the response.  `NGINX proxy_headers` are used to restore this information, and add additional information as well using NGINX $variables.  Proxy headers are also used to control the HTTP protocol itself, which you will do first.
+Now that you have Reverse Proxy and load balancing working, you need to ensure proper information is passed to and from the backend servers.  After all, if you insert a Proxy in between the client and the server, you might lose some important information in the request or the response.  `NGINX proxy_headers` are used to restore this information, and add additional information as well using NGINX $variables.  Proxy headers are also used to control the HTTP protocol itself, which you will do first.
 
 In this next exercise, you will define these HTTP Protocol Headers, and then tell NGINX to use them in your `cafe.example.com` Server block, so that every request and response will now include these new headers.  
 
 **NOTE:** When NGINX proxies a request to an Upstream, it uses the HTTP/1.0 protocol by default, for legacy compatibility.  
 
-However, this means a new TCP connection for every request, and is quite inefficient.  Modern apps mostly run HTTP/1.1, so you will tell NGINX to use HTTP/1.1 for Proxied requests, which allows NGINX to re-use TCP connections for multiple requests.  (This is commonly called HTTP keepalives, or HTTP pipelining).
+However, this means a `new TCP connection for every request`, and is quite inefficient.  Modern apps mostly run HTTP/1.1, so you will tell NGINX to use HTTP/1.1 for Proxied requests, which allows NGINX to re-use TCP connections for multiple requests.  (This is commonly called HTTP keepalives, or HTTP pipelining).  And don't forget - HTTP/1.1 is `mandatory` for Host Headers as well, which is usually required.
+
+<br/>
+
+Chrome | Curl
+:-------------------------:|:-------------------------:
+![Chrome](media/chrome-icon.png)  |![Curl](media/curl-icon.png)
+
+<br/>
 
 1. Inspect the `keepalive.conf`, located in the `labs/lab4/nginx-plus/etc/nginx/includes` folder.  Notice that there are three Directives and Headers required for HTTP/1.1 to work correctly:
 
     - HTTP Protocol = Use the `$proxy_protocol_version` variable to set it to `1.1`.
     - HTTP Connection Header = should be blank, `""`, the default is `Close`.
-    - HTTP Host = the HTTP/1.1 protocol requires a Host Header be set, `$host`
+    - HTTP Host = the HTTP/1.1 protocol requires the Host Header be set, `$host`
 
     ```nginx
     #Nginx Basics - Feb 2024
-    #Chris Akker, Shouvik Dutta
+    #Chris Akker, Shouvik Dutta, Adam Currier
     #
     # Default is HTTP/1.0 to upstreams, HTTP keepalives needed for HTTP/1.1
     proxy_http_version 1.1;
@@ -717,35 +731,41 @@ However, this means a new TCP connection for every request, and is quite ineffic
     ```nginx
     # cafe.example.com HTTP
     # NGINX Basics Workshop
-    # Feb 2024, Chris Akker, Shouvik Dutta
+    # Nov 2024, Chris Akker, Shouvik Dutta, Adam Currier
     #
     server {
         
         listen 80;      # Listening on port 80 on all IP addresses on this machine
 
         server_name cafe.example.com;   # Set hostname to match in request
+        
+        # Uncomment the zone directive below to add metrics to the Dashboard
+        status_zone cafe-VirtualServer;
 
-        access_log  /var/log/nginx/cafe.example.com.log main; 
+        access_log  /var/log/nginx/cafe.example.com.log main_ext; 
         error_log   /var/log/nginx/cafe.example.com_error.log info;
 
-        root /usr/share/nginx/html;         # Set the root folder for the HTML and JPG files
-
         location / {
+            # Uncomment the status_zone directive below to add metrics to the Dashboard
+            status_zone /;
             
             # Uncomment to enable HTTP keepalives
-
             include includes/keepalive.conf;     # Use HTTP/1.1 keepalives
             
-            proxy_pass http://nginx_cafe;        # Proxy AND load balance to a list of servers
+            # New NGINX Directive, "proxy_pass", tells NGINX to proxy traffic to another server.
+            
+            proxy_pass http://nginx_cafe;        # Send requests to upstreams
         }
 
     } 
+
     ```
 
 1. Once the content of the file has been updated and saved, Docker Exec into the nginx-plus container.
 
    ```bash
     docker exec -it nginx-plus bin/bash
+
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
@@ -770,7 +790,7 @@ However, this means a new TCP connection for every request, and is quite ineffic
 
     ```
 
-1. Using your browser, open its "Dev Tools", or "Inspect" option, so you can see the browser's debugging metadata.  Visit your website, <http://cafe.example.com>.  If you click on the Network Tab, and then the first object, you will see the Request and Response Headers, and should find that `Connection:` = `keep-alive`
+1. Using your browser, open its "Dev Tools", or Right-Click "Inspect" option, so you can see the browser's debugging metadata.  Visit your website, <http://cafe.example.com>.  If you click on the Network Tab, and then the first object, you will see the Request and Response Headers, and should find `Connection:` = `keep-alive` in both the Request and the Response Headers.
 
     ![Chrome keep-alive](media/lab4_chrome-keepalive.png)
 
@@ -780,13 +800,13 @@ However, this means a new TCP connection for every request, and is quite ineffic
 
 <br/>
 
-Now you need to enable some HTTP Headers, to be added to the Request.  These are often need to relay information between the HTTP client and the backend server. These Headers are in addition to the HTTP Protocol control headers.
+Now you need to enable some HTTP Headers, to be added to the Request.  These are often needed to relay information between the HTTP client and the backend server. These Headers are in addition to the HTTP Protocol control headers.
 
 1. Inspect the `proxy_headers.conf` in the `labs/lab4/nginx-plus/etc/nginx/includes` folder.  You will see that some custom HTTP Headers are being added.
 
     ```nginx
-    #Nginx Basics - Feb 2024
-    #Chris Akker, Shouvik Dutta
+    #Nginx Basics - Nov 2024
+    #Chris Akker, Shouvik Dutta, Adam Currier
     #
     ## Set Headers to the proxied servers ##
 
@@ -806,52 +826,66 @@ Now you need to enable some HTTP Headers, to be added to the Request.  These are
     ```nginx
     # cafe.example.com HTTP
     # NGINX Basics Workshop
-    # Feb 2024, Chris Akker, Shouvik Dutta
+    # Nov 2024, Chris Akker, Shouvik Dutta, Adam Currier
     #
     server {
         
         listen 80;      # Listening on port 80 on all IP addresses on this machine
 
         server_name cafe.example.com;   # Set hostname to match in request
+        
+        # Uncomment the zone directive below to add metrics to the Dashboard
+        status_zone cafe-VirtualServer;
 
-        access_log  /var/log/nginx/cafe.example.com.log main; 
+        access_log  /var/log/nginx/cafe.example.com.log main_ext; 
         error_log   /var/log/nginx/cafe.example.com_error.log info;
 
-        root /usr/share/nginx/html;         # Set the root folder for the HTML and JPG files
-
         location / {
+            # Uncomment the status_zone directive below to add metrics to the Dashboard
+            status_zone /;
             
-            # Uncomment to enable custom headers and HTTP keepalives
+            # Uncomment to enable HTTP keepalives and Request Headers
+            include includes/keepalive.conf;       # Use HTTP/1.1 keepalives
 
-            include includes/proxy_headers.conf; # Add Request Headers
-
-            include includes/keepalive.conf;     # Use HTTP/1.1 and keep-alives
+            include includes/proxy_headers.conf;   # Add Request Headers
             
-            proxy_pass http://nginx_cafe;        # Proxy AND load balance to a list of servers
+            # New NGINX Directive, "proxy_pass", tells NGINX to proxy traffic to another server.
+            
+            proxy_pass http://nginx_cafe;          # Send requests to upstreams
         }
 
     } 
+
     ```
 
 1. Once the content of the file has been updated and saved, Docker Exec into the nginx-plus container.
 
    ```bash
     docker exec -it nginx-plus bin/bash
+
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
 
-<br/>
-
-### NGINX Load Balancing Algorithms and Load Testing
+1. Using your browser, and Dev Tools, did you find the Proxy Request Headers?
 
 <br/>
 
-Different backend applications may benefit from using different load balancing techniques.  NGINX support both legacy and more modern algorithms for different use cases.  You will configure and test several of these algorithms, put them under a Loadtest, and observe the results.  Then you will add/change some Directives to improve performance, and Loadtest again and see if it made any difference.
+## NGINX Load Balancing Algorithms and Load Testing
 
-1. NGINX's default Load Balancing algorithm is round-robin.  In this next lab exercise, you will use the `least connections` algorithm to send more traffic to different backends based on their active TCP connection counts.  
+<br/>
 
-1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) to enable Least Connections, as follows:
+NGINX Plus | WRK
+:-------------------------:|:-------------------------:
+![NGINX Plus](media/nginx-plus-icon.png)  |![WRK](media/wrk-icon.jpg)
+
+<br/>   
+
+Different backend applications may benefit from using different load balancing techniques.  NGINX support both legacy and more modern algorithms for different use cases.  You will configure and test several of these algorithms, put them under a Loadtest, and observe the results.  Then you will add/change some NGINX Settings/Directives to improve performance, and Loadtest again and see if it made any difference.
+
+1. NGINX's default Load Balancing algorithm is round-robin, if not specified in the upstream block.  In this next lab exercise, you will use the Plus `least_time last_byte` algorithm to send more traffic to different backends based on the response time.  
+
+1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) to enable Least Time Last Byte, as follows:
 
     ```nginx
 
@@ -864,8 +898,8 @@ Different backend applications may benefit from using different load balancing t
         # - Hash (Any generic Hash)     
 
         
-        # Uncomment for Least Connections algorithm
-        least_conn;
+        # Uncomment for Least Time Last Byte algorithm
+        least_time last_byte;
 
         # Docker-compose:
         server web1:80;
@@ -886,19 +920,28 @@ Different backend applications may benefit from using different load balancing t
 
    ```bash
     docker exec -it nginx-plus bin/bash
+
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
 
-1. If you open the NGINX Basic Status page at <http://localhost:9000/basic_status>, and refresh it every 3-4 seconds while you run the `wrk` load generation tool at your nginx-plus Load Balancer:  
+1. While watching your NGINX Plus Dashboard at <http://localhost:9000/dashboard.html>, run the `wrk` load generation tool at your nginx-plus LoadBalancer:  
 
     `wrk` load generation tool is a docker container that will download and run, with 4 threads, at 200 connections, for 1 minute:
 
     ```bash
     docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d1m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
+
     ```
 
-    In the `basic_status` page, you should notice about 200 Active Connections, and the number of `server requests` should be increasing rapidly.  Unfortunately, there is no easy way to monitor the number of TCP connections to Upstreams when using NGINX Opensource.  But good news, you `will` see all the Upstream metrics in the next lab with NGINX Plus!
+    Or, if you have an ARM processor (Mac M1/2), try this:
+
+    ```bash
+    docker run --name wrk --network=lab4_default --rm elswork/wrk -t4 -c200 -d1m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
+
+    ```
+
+    In the `HTTP Upstreams` page, you should notice about 200 Active Connections, and the number of `server requests` should be increasing rapidly. 
 
     After the 1 minute run of `wrk` load generation tool has finished, you should see a Summary of the statistics.  It should look similar to this:
 
@@ -910,20 +953,20 @@ Different backend applications may benefit from using different load balancing t
         Latency    68.41ms   30.72ms   1.28s    98.85%
         Req/Sec   747.52     81.56     2.11k    84.40%
     178597 requests in 1.00m, 284.27MB read
-    Requests/sec:   2872.08       # Good performance ?
+    Requests/sec:   2872.08                     # Good performance ?
     Transfer/sec:      4.73MB
 
     ```
 
-    Well, that performance looks pretty good, about ~2900 HTTP Reqs/second.  But NGINX can do better.  You will enable TCP keepalives to the Upstreams.  This Directive will tell NGINX to create a `pool of TCP connections to each Upstream`, and use that established connection pool to rapid-fire HTTP requests to the backends.  `No delays waiting for the TCP handshakes!`  It is considered a Best Practice to enable keepalives to the Upstream servers.
+    Well, that performance looks pretty good, about ~2900 HTTP Reqs/second (how much do you get?).  But NGINX can do better.  You will enable TCP keepalives to the Upstreams.  This Directive will tell NGINX to create a `pool of TCP connections to each Upstream`, and use that established connection pool to rapid-fire HTTP requests to the backends.  `No delays waiting for the TCP 3-way handshakes!`  It is considered a Best Practice to enable keepalives to the Upstream servers.
 
-1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) and uncomment from the `keepalives 16` line.
+1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) and uncomment the `keepalives 16` line.
 
     ```nginx
     ...snip
 
-        # Uncomment for Least Connections algorithm
-        least_conn;
+        # Uncomment for Least Time Last Byte algorithm
+        least_time last_byte;
 
         # Docker-compose:
         server web1:80;
@@ -944,11 +987,12 @@ Different backend applications may benefit from using different load balancing t
 
    ```bash
     docker exec -it nginx-plus bin/bash
+
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
 
-1. Run the `wrk` load generator again. You should now have `least_conn` and `keepalive` both **enabled**.
+1. Run the `wrk` load generator again. You should now have `least_time last_byte` and `keepalive` both **enabled**.
 
     After the 1 minute run of `wrk` load generation tool has finished, you should see a Summary of the statistics.  It should look similar to this:
 
@@ -960,15 +1004,18 @@ Different backend applications may benefit from using different load balancing t
         Latency    43.90ms   47.06ms   1.18s    98.98%
         Req/Sec     1.24k   118.64     1.88k    77.34%
     297076 requests in 1.00m, 473.63MB read
-    Requests/sec:   5046.17       # NICE, much better!
-    Transfer/sec:      7.89MB
+    Requests/sec:   7046.17       # NICE, much better!
+    Transfer/sec:      9.89MB
+
     ```
 
-    >>Wow, more that **DOUBLE the performance**, with Upstream `keepalive` enabled - over 5,000 HTTP Reqs/second.  Did you see a performance increase??  Your mileage here will vary of course, depending on what kind of machine you are using for these Docker containers.
+    >>Wow, more that **DOUBLE the performance**, with Upstream `keepalive` enabled - over 6,000 HTTP Reqs/second.  Did you see a performance increase??  Your mileage here will vary of course, depending on what kind of machine you are using for these Docker containers.
 
-    >Note:  In the next Lab, you will use NGINX Plus, which `does` have detailed Upstream metrics, which you will see in real-time while loadtests are being run.
+    ![Cafe with Keepalive](media/lab4_cafe-perf-keepalive.png)
 
-1. In this next lab exercise, you will use the `weighted` algorithm to send more traffic to different backends. 
+    >But this points out a very important concept to be aware of: NGINX uses HTTP/1.0 to all upstreams by default.  HTTP/1.0 is limited to a single TCP connection for a single HTTP object on the web page.  If you have hundreds of web objects, you will need hundreds of TCP connections.  This is a large waste of time and resources, so adding TCP Keepalives and HTTP/1.1 will make a significant improvement in performance in most cases.
+
+Optional Exercise: In this next lab exercise, you will use the `weighted` algorithm to send more traffic to different backends. 
 
 1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) to modify the `server`entries to set an administrative ratio, as follows:
 
@@ -996,6 +1043,7 @@ Different backend applications may benefit from using different load balancing t
 
    ```bash
     docker exec -it nginx-plus bin/bash
+
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
@@ -1004,13 +1052,17 @@ Different backend applications may benefit from using different load balancing t
 
 1. For a fun test, hit it again with `wrk`...what do you observe?  Do admin weights help or hurt performance?  
 
-    ![Docker Dashboard](media/lab4_docker-perf-weighted.png)
-
+    ![Cafe Weighted Dashboard](media/lab4_cafe-perf-weighted.png)
+    
     Only the results will tell you for sure, checking the Docker Desktop Dashboard - looks like the CPU ratio on the web containers matches the `weight` values for the Upstreams.
+
+    ![Docker Dashboard](media/lab4_docker-perf-weighted.png)
 
     So that is not too bad for a single CPU docker container.  But didn't you hear that NGINX performance improves with the number of CPUs in the machine?
 
-1. Check your `nginx.conf` file within `labs\lab4\nginx-plus` folder... does it say `worker_processes   1;` near the top?  Hmmm, NGINX is configured to use only one Worker and therefore only one CPU core.  You will change it to `FOUR`, and re-test.  Assuming you have at least 4 cores that Docker and NGINX can use:
+Can NGINX go faster?   Yes, if you give it more resources.  Let's try `adding some CPU horsepower` and see what happens!!
+
+1. Check your `nginx.conf` file within `labs/lab4/nginx-plus` folder... does it say `worker_processes   1;` near the top?  Hmmm, NGINX is configured to use only one Worker and therefore only one CPU core.  You will change it to `FOUR`, and re-test.  Assuming you have at least 4 cores that Docker and NGINX can use:
 
     ```nginx
     user  nginx;
@@ -1032,24 +1084,26 @@ Different backend applications may benefit from using different load balancing t
 
 1. Save the `nginx.conf` file with above changes.
 
-1. Also update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) to remove the `server weight=x` parameter from all three servers, and set the load balancing algorithm back to `least_conn`.  
+1. Also update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) to remove the `server weight=x` parameter from all three servers, and set the load balancing algorithm back to `least_time last_byte` if you completed the Optional Exercise.  
 
-1. Once the both the file has been updated and saved, Docker Exec into the nginx-plus container.
+1. Once the both the files has been updated and saved, Docker Exec into the nginx-plus container.
 
-   (**NOTE:** nginx.conf file is also volume mounted to the container so all local changes should reflect in your container)
+   (**NOTE:** nginx.conf file is also volume mounted to the container so all local changes should be reflected in your container)
 
    ```bash
     docker exec -it nginx-plus bin/bash
+
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
 
-1. You should now have `4 workers`, `least_conn` and `keepalive` **enabled**.  Run the WRK test again. You are going to CRANK IT UP!
+1. You should now have `4 workers`, `least_time last_byte` and `keepalive` **enabled**.  Run the WRK test again. **CRANK IT UP!**
 
     Within the `nginx-plus` container, run `top` to see the NGINX Workers at work.  Should look something like this:
 
     ```bash
     top
+
     ```
 
     ```bash
@@ -1072,6 +1126,7 @@ Different backend applications may benefit from using different load balancing t
 
    ```bash
    docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d1m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
+
    ```
 
    After the 1 minute run of `wrk` load generation tool has finished, you should see a Summary of the statistics.  It should look similar to this:
@@ -1086,15 +1141,16 @@ Different backend applications may benefit from using different load balancing t
     508114 requests in 1.00m, 810.35MB read
     Requests/sec:   8456.93        # Even better w/ 4 cores
     Transfer/sec:     13.49MB
+
     ```
 
     Over 8,000 Requests/Second from a little Docker container...not too shabby!  
 
-    Was your Docker Desktop was humming along, with the fan on full blast?!
+    Was your Docker Desktop humming along, with the CPU fan on full blast?! NGINX is making it work hard.
 
     ![Docker Dashboard](media/lab4_docker-perf-4core.png)
 
-    Summary:  NGINX can and will use whatever hardware resources you provide.  And as you can see, you were shown just a few settings, but there are **MANY** NGINX configuration parameters that affect performance.  Only time, experience, and rigorous testing will determine which NGINX Directives and values will work best for Load Balancing your application.
+    Summary:  NGINX can and will use whatever hardware resources you provide.  And as you can see, you were shown just a few settings, but there are **MANY** NGINX configuration parameters that affect performance.  Only time, experience, and rigorous testing will determine which NGINX Directives and values will work best for Load Balancing your applications.
 
 <br/>
 
@@ -1102,66 +1158,111 @@ Different backend applications may benefit from using different load balancing t
 
 <br/>
 
-With many legacy applications, the HTTP client and server must create a temporal unique relationship for the duration of the transaction or communication session.  However, when proxies or load balancers are inserted in the middle of the communication, it is important to retain this affinity between the client and the server. The Load Balancer industry commonly refers to this concept as `Persistence`, or `Sticky`, or `Affinity`, depending on which term the vendor has chosen to use.
+With many legacy applications, the HTTP client and server must create a temporal unique relationship for the duration of the transaction or communication session.  However, when proxies or load balancers are inserted in the middle of the communication, it is important to retain this association between the client and the server. The ADC / Load Balancer industry commonly refers to this concept as `Persistence`, or `Sticky`, or `Affinity`, depending on which term the vendor has chosen to use.
 
-With NGINX, there are several configuration options for this, but in this next lab exercise, you will use the most common option called `ip hash`.  This will allow NGINX to send requests to the same backend based on the client's IP Address.
+With NGINX, there are several configuration options for this, but in this next lab exercise, you will use the Plus feature called `sticky`.  This will allow NGINX to send requests to the same backend based on a Set-Cookie that Nginx sends to the Client, and the client sends back to Nginx.
 
-1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) to include IP Hash persistance, as follows:
+1. Update your `upstreams.conf` file within your mounted folder (`labs/lab4/nginx-plus/etc/nginx/conf.d`) to include `sticky cookie` persistance, as follows:
 
     ```nginx
-    # NGINX Basics, Plus Proxy to three upstream NGINX web servers
-    # Chris Akker, Shouvik Dutta - Feb 2024
+    # NGINX Basics, Plus Proxy to three upstream NGINX containers
+    # Nov 2024 - Chris Akker, Shouvik Dutta, Adam Currier
     #
-    # nginx-cafe servers 
-    upstream nginx_cafe {
+    # nginx_cafe servers
+
+    upstream nginx_cafe {         # Upstream block, the name is "nginx_cafe"
+    
+       # Uncomment the zone directive below to add metrics to the Dashboard
+       zone nginx_cafe 256k;
 
         # Load Balancing Algorithms supported by NGINX
         # - Round Robin (Default if nothing specified)
         # - Least Connections
         # - IP Hash
-        # - Hash (Any generic Hash)     
-        
-        # Uncomment for Least Connections algorithm
-        # least_conn;
+        # - Hash (Any generic Hash)
 
-        # Docker-compose:
+        # Load Balancing Algorithms supported by NGINX Plus
+        # - Least Time Last Byte / Header
+        # - Random Two     
+
+        # Uncomment for Least Time Last Byte algorithm      
+        least_time last_byte;
+
+        # From Docker-Compose:
         server web1:80;
         server web2:80;
         server web3:80;
 
-        #Uncomment for IP Hash persistence
-        ip_hash;
+        #Uncomment for Cookie persistence
+        sticky cookie srv_id expires=1m domain=.example.com path=/;
 
-        # Include keep alive connections to upstreams
+        # Uncomment for keepalive TCP connections to upstreams
         keepalive 16;
 
     }
 
     ```
 
+1. The sticky cookie Directive sets the following:
+
+    - name of the cookie, `srv_id`
+    - the expiration, `1m`, set to 1 minute for testing only
+    - the domain, `.example.com`
+    - the path, `/`
+
 1. Once the content of the file has been updated and saved, Docker Exec into the nginx-plus container.
 
    ```bash
     docker exec -it nginx-plus bin/bash
+
     ```
 
 1. Test and reload your NGINX config by running `nginx -t` and `nginx -s reload` commands respectively from within the container.
 
-1. Test out `ip_hash` persistence with curl and your browser.  You should find that now NGINX will always send your request to the same backend, it will no longer round-robin or least-conn load balance your requests to all three backends.
+1. Test out `sticky cookie` persistence with your browser.  Watching the Plus Dashboard Upstreams, you should now find that NGINX will always send your request to the same backend, it will no longer load balance your requests to all three backends.  If you wait over 1 minute and try again, does it pick a new Upstream?  Why?
+
+    While using Chrome, Open Dev Tools, and Refresh - did you find the `Set-Cookie` Header and Values ?
+
+    If you try curl, what happens ?
 
     ```bash
     # Run curl from outside of container
-    curl -s http://cafe.example.com |grep IP    # try 5 or 6 times
+    curl -s http://cafe.example.com |grep Server    # try 5 or 6 times
 
     ```
 
-1. Try the `wrk` load generation tool again, with the IP Hash enabled, you can only use ONE backend server:
+    Hint:  Are you passing the cookie with curl?  Maybe a Google search will help?
 
-    Looks like web3 is the chosen one:
+    First find the Cookie and Value:
 
-    ![Docker Dashboard](media/lab4_docker-perf-iphash.png)
+    ```bash
+    curl -I http://cafe.example.com
 
-    After testing, you might considering adding `least_conn` and removing `ip_hash` for future exercises.
+    ```
+    ```bash
+    ## Sample Output ##
+    HTTP/1.1 200 OK
+    Server: nginx/1.25.5
+    Date: Thu, 14 Nov 2024 19:37:24 GMT
+    Content-Type: text/html; charset=utf-8
+    Connection: keep-alive
+    Set-Cookie: srv_id=3c04d077c672b3de5197b7c663803ec3; expires=Thu, 14-Nov-24 19:38:24 GMT; max-age=60; domain=.example.com; path=/
+    Expires: Thu, 14 Nov 2024 19:37:23 GMT
+    Cache-Control: no-cache
+
+    ```
+
+    Then try curl with the cookie, like this example:
+    
+    ```bash
+    curl -s --cookie "srv_id=3c04d077c672b3de5197b7c663803ec3" http://cafe.example.com |grep Server   ## Try several times
+
+    ```
+    
+
+1. Now try the `wrk` load generation tool again, with the Sticky Cookie enabled, what happens ?
+
+    Class Discussion - what did you observe while testing Sticky Cookie ?
 
 <br/>
 
@@ -1176,6 +1277,7 @@ If you need to find the `answers` to the lab exercises, you will find the final 
 ```bash
 cd lab4
 docker compose down
+
 ```
 
 ```bash
@@ -1200,7 +1302,8 @@ Network lab4_default         Removed
 - [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
 - [NGINX Variables](https://nginx.org/en/docs/varindex.html)
 - [NGINX Access Logging](https://nginx.org/en/docs/http/ngx_http_log_module.html#access_log)
-- [NGINX Load Balancing Methods](https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/#method)
+- [NGINX Load Balancing Methods](https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/#choosing-a-load-balancing-method)
+- [NGINX Sticky Cookie](https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/#enabling-session-persistence)
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 - [WRK Docker image](https://registry.hub.docker.com/r/williamyeh/wrk)
