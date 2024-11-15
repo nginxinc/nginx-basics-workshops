@@ -20,10 +20,8 @@ RUN printf "deb https://pkgs.nginx.com/plus/ubuntu `lsb_release -cs` nginx-plus\
 # Download the apt configuration to `/etc/apt/apt.conf.d`:
 RUN wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90pkgs-nginx
 
-# <TODO:  modify apt-get install command to pull R32 ( no R33 allowed ):
-# HELP:  https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-docker/#creating-custom-nginx-plus-docker-image
 # Update the repository and install version R32P1 of NGINX Plus:
-RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y nginx-plus=32-2*
+RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y nginx-plus=32-2* nginx-plus-module-njs nginx-plus-module-prometheus
 
 # Remove nginx repository key/cert from docker
 RUN rm -rf /etc/ssl/nginx \
