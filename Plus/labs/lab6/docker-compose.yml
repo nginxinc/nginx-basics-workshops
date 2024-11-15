@@ -1,17 +1,18 @@
 # NGINX Plus Proxy with tools build
 # NGINX webservers with ingress-demo pages
-# NGINX Basics, Jan 2024
-# Chris Akker, Shouvik Dutta
-version: '3.3'
+# NGINX Basics, Nov 2024
+# Chris Akker, Shouvik Dutta, Adam Currier
+#
 services:
   nginx-plus:                  # NGINX Plus Web / Load Balancer
     hostname: nginx-plus
     container_name: nginx-plus
-    build: nginx-plus          # Build new container, using /nginx-plus/Dockerfile
-    volumes:
-        - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d        # Copy these folders to container
-        - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
+    image: nginx-plus:workshop  # From Lab1
+    volumes:                    # Sync these folders to container
         - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+        - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d
+        - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
+        - ./nginx-plus/usr/share/nginx/html:/usr/share/nginx/html
     ports:
         - 80:80       # Open for HTTP
         - 443:443     # Open for HTTPS
