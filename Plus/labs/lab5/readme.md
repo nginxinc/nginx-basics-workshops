@@ -416,7 +416,7 @@ In this section, you will explore how NGINX Plus can be reconfigured without dro
    ```
 
    What did you observe?
-   - You will observe that Nginx created New Workers (this PIDs changed) and `no traffic is dropped`. The statistics are reset to zero. Using the new algorithm, NGINX should now be sending more traffic to faster backends.
+   - You will observe that Nginx created New Workers (the PIDs changed) and `no traffic is dropped`. The statistics are reset to zero. Using the new algorithm, NGINX should now be sending more traffic to faster backends.
 
         (**NOTE:** In lab environment, this is difficult to demonstrate as all the containers are on the same network with same resource allocation)
 

@@ -118,7 +118,7 @@ http {
 
 ### Optional Exercise - Pull the Nginx Plus container from the Nginx Registry
 
-In the next exercise, you will pull the Nginx Plus container from the official Nginx Container Private Registry, using only your JWT Token file.  This is a safe, fast, and convenient way to download and run Nginx Plus, without needing to build your own Docker image.
+In the next exercise, you will pull the Nginx provided Plus container from the official Nginx Container Private Registry, using only your JWT Token file.  This is a safe, fast, and convenient way to download and run Nginx Plus, without needing to build your own Docker image.  There are several different containers available, see the References section.
 
 1. Copy your `nginx-repo.jwt` file to the labs/lab2 folder.  Using the contents of your nginx-repo.jwt file, create an environment variable with the contents of the file:
 
@@ -141,8 +141,6 @@ eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCI
 d41BhtS4fGLzD985rk
 
 ```
-
-<< docker login not working >>
 
 1. Login into the Nginx Private Registry, as shown:
 
@@ -205,7 +203,7 @@ Go ahead and try some of these NGINX commands in your nginx-plus container now, 
 
     ```
 
-1. Test curl access to your NGINX Plus container welcome page and Dashboard:
+1. Test curl and browser access to your NGINX Plus container welcome page and Dashboard:
 
     ```bash
     curl http://localhost
@@ -218,15 +216,24 @@ Go ahead and try some of these NGINX commands in your nginx-plus container now, 
     ![NGINX Welcome](media/lab2_nginx-welcome.png)
 
     ```bash
-    curl http://localhost:9000/dashboard.html
+    curl -I http://localhost:9000/dashboard.html
 
     ```
-    You should see the Nginx Plus Dashboard page.
+    You should see the Nginx Plus Dashboard page with a 200 OK.
 
     Now also test with Chrome or a browser, go to http://localhost:9000/dashboard.html, you should see the same page.
 
     ![NGINX Welcome](media/lab2_dashboard.png)
 
+<br/>
+
+### Introduction to NGINX Commands
+
+<br/>
+
+NGINX runs as several Linux processes, so you must be familiar with the basic commands to control NGINX, and understand what happens when you issue commands to NGINX.  Like most Linux processes, the Host OS is responsible for starting/stopping/enable/disable the initial state of the nginx process when the Linux OS is booted.
+
+Try some Nginx commands:
 
 1. Docker Exec into the nginx-plus container.
 
@@ -234,14 +241,6 @@ Go ahead and try some of these NGINX commands in your nginx-plus container now, 
     docker exec -it nginx-plus /bin/bash
 
     ```
-
-1. In a second Terminal, watch the nginx-plus container's log file, and watch as you send various NGINX commands.
-
-    ```bash
-    docker logs nginx-plus --follow
-    ```
-
-    It should look similar to this:
 
     ```bash
     ##Sample output##
@@ -271,29 +270,23 @@ Go ahead and try some of these NGINX commands in your nginx-plus container now, 
 
     ```
 
-### Introduction to NGINX Commands
+    Here is a quick review of the NGINX commands you should be familiar with.  Depending on your Linux system, you may need to prefix these commands with `sudo`.
 
-<br/>
+    ```bash
 
-NGINX runs as several Linux processes, so you must be familiar with the basic commands to control NGINX, and understand what happens when you issue commands to NGINX.  Like most Linux processes, the Host OS is responsible for starting/stopping/enable/disable the initial state of the nginx process when the Linux OS is booted.
+    nginx -v                  #displays NGINX version details
 
-Here is a quick review of the NGINX commands you should be familiar with.  Depending on your Linux system, you may need to prefix these commands with `sudo`.
+    nginx -s quit             #graceful shutdown (Note: This will exit the container)
 
-```bash
+    nginx -s stop             #terminates all NGINX processes (Note: This will exit the container)
 
-nginx -v                  #displays NGINX version details
+    nginx -t                  #test configuration syntax and files
 
-nginx -s quit             #graceful shutdown (Note: This will exit the container)
+    nginx -T                  #dumps the current running configurations
 
-nginx -s stop             #terminates all NGINX processes (Note: This will exit the container)
+    nginx -s reload           #reloads NGINX with new configuration
 
-nginx -t                  #test configuration syntax and files
-
-nginx -T                  #dumps the current running configurations
-
-nginx -s reload           #reloads NGINX with new configuration
-
-```
+    ```
 
 <br/>
 
@@ -319,6 +312,7 @@ It is important to understand the details about what NGINX does, when you change
   ```bash
    nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
    nginx: configuration file /etc/nginx/nginx.conf test is successful
+   
    ```
 
 - Once the master process configuration validation is successful, then NGINX will do the following:
@@ -614,6 +608,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
     ```bash
      # Run curl from outside of container
     curl 127.0.0.1
+
     ```
 
     You should see something like:
@@ -621,6 +616,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
     ```bash
      ##Sample output##
      You have reached www.example.com, location /
+
     ```
 
 1. Within the same folder (`labs/lab2/nginx-plus/etc/nginx/conf.d`), create a new file called `www2.example.com.conf`, and type in below commands.  Copy/paste using the example provided:
@@ -660,6 +656,7 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
     ```bash
      # Run curl from outside of container
      curl 127.0.0.1
+
     ```
 
 >BUT WAIT!  Curl is still going to the FIRST website - why ??
@@ -671,6 +668,7 @@ Try adding the Host Header:
 ```bash
     # Run curl from outside of container
     curl 127.0.0.1 -H "Host: www2.example.com"
+
 ```
 
 ```bash
@@ -838,6 +836,7 @@ server {
 
     ```bash
     curl 127.0.0.1/debug -H "Host: cafe.example.com"
+
     ```
 
     You should see a response from the `/debug location block`, with the NGINX `$variables` filled in with data for each request to <http://cafe.example.com/debug> :
@@ -978,6 +977,8 @@ Now that you have some hot cars in your garage to show off, you might want to le
         }
 
     ```
+
+1. Because the `index.html` file *does* exist, you need to rename it to allow Nginx to autoindex the folder.  Go the `/nginx-plus/usr/share/nginx/html` folder, and rename the index.html file to `index.html.bak`.
 
 1. Save your file, and test your NGINX config by running `nginx -t` command from within the container.
 
@@ -1127,7 +1128,7 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 
     ```
 
-    You see the GET request for the coffee page, with metadata from the Nginx $varibles.
+    You see the GET request for the coffee page, with metadata from the Nginx $variables.
 
 <br/>
 

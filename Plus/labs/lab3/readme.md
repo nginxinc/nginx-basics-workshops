@@ -335,9 +335,11 @@ Now that you have a working TLS configuration, you decide everyone should use it
 
 ### NGINX TLS Settings
 
-<TLS icon here>
+NGINX  | Openssl | TLS
+:----:|:----:|:----:
+![nginx icon](media/nginx-icon.png) | ![openssl icon](media/openssl-logo.png) | ![padlock icon](media/padlock-icon.png)
 
-![TLS icon](media/lab3_tls-icon.png)
+<br/>
 
 In this exercise, you will add some additional NGINX TLS settings to control the TLS protocol.  This will show you the flexibility in supporting both Modern and Legacy TLS / SSL protocols for a variety of HTTP clients.  It is considered a Best Practice to always use the Highest version of Protocol and Highest strength encryption Ciphers at all times.  However, given the vast variety of HTTP clients, you may have to "downgrade" your NGINX web server TLS configurations to accomodate less secure environments.  Always consult security experts with TLS experience for advice, as older protocols and ciphers can expose your webserver to Common Vulnerabilities and Exploits (CVEs).
 
