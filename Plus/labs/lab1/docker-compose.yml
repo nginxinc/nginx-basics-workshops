@@ -5,9 +5,16 @@
 services:
   nginx-plus:                  # NGINX Plus Web / Load Balancer
     hostname: nginx-plus
-    container_name: nginx-plus
-    build: ./nginx-plus          # Build new container, using /nginx-plus/Dockerfile
+    container_name: nginx-plus         
+    build:                          # Build new container, using /nginx-plus/Dockerfile
+        context: ./nginx-plus
+        dockerfile: Dockerfile_debian
     image: nginx-plus:workshop
+    environment:
+        - NGINX_AGENT_SERVER_GRPCPORT=443
+        - NGINX_AGENT_SERVER_HOST=agent.connect.nginx.com
+        - NGINX_AGENT_SERVER_TOKEN="LeelBvILwe5MYGbUAr8KSryw8f5r3lf2ab4oWvmOA0w="
+        - NGINX_AGENT_TLS_ENABLE=true
     volumes:
         - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d        # Copy these folders to container
         - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
@@ -17,4 +24,5 @@ services:
         - 80:80       # Open for HTTP
         - 443:443     # Open for HTTPS
         - 9000:9000   # Open for Plus Dashboard page / API
-    restart: always     
+    restart: always
+    runtime: runc     

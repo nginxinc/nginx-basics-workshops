@@ -17,11 +17,14 @@ RUN wget https://nginx.org/keys/nginx_signing.key && apt-key add nginx_signing.k
 # Add NGINX Plus repository:
 RUN printf "deb https://pkgs.nginx.com/plus/ubuntu `lsb_release -cs` nginx-plus\n" | tee /etc/apt/sources.list.d/nginx-plus.list
 
+# Add NGINX Agent repository:
+RUN printf "deb https://pkgs.nginx.com/nginx-agent/ubuntu/ `lsb_release -cs` agent\n" | tee /etc/apt/sources.list.d/nginx-agent.list
+
 # Download the apt configuration to `/etc/apt/apt.conf.d`:
 RUN wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90pkgs-nginx
 
 # Update the repository and install version R32P1 of NGINX Plus:
-RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y nginx-plus=32-2* nginx-plus-module-njs nginx-plus-module-prometheus
+RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y nginx-plus=32-2* nginx-plus-module-njs=32* nginx-plus-module-prometheus=32* nginx-agent
 
 # Remove nginx repository key/cert from docker
 RUN rm -rf /etc/ssl/nginx \
