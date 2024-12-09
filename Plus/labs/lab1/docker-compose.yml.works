@@ -8,9 +8,8 @@ services:
     container_name: nginx-plus
     build: ./nginx-plus          # Build new container, using /nginx-plus/Dockerfile
     image: nginx-plus:workshop
-    volumes:                     # Copy these files/folders to container
-        - ./nginx-plus/etc/nginx/license.jwt:/etc/nginx/license.jwt
-        - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d        
+    volumes:
+        - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d        # Copy these folders to container
         - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
         - ./nginx-plus/usr/share/nginx/html:/usr/share/nginx/html
         - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
