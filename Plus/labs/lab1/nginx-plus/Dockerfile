@@ -24,10 +24,10 @@
     RUN wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90pkgs-nginx
     
     # Update the repository and install version R32P1 of NGINX Plus:
-    RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y nginx-agent  nginx-plus-module-njs nginx-plus-module-prometheus
+    # RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y nginx-agent  nginx-plus-module-njs nginx-plus-module-prometheus
     
     # Update the repository and install version R32 of NGINX Plus with Agent:
-    # RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y nginx-plus=32* nginx-agent
+    RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y nginx-plus=32* nginx-agent
     
     # Remove nginx repository key/cert from docker
     RUN rm -rf /etc/ssl/nginx \

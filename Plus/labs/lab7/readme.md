@@ -31,19 +31,15 @@ By the end of the lab you will be able to:
 - You must have Docker-compose installed
 - See `Lab0` for instructions on setting up your system for this Workshop
 - Familiarity with basic Linux commands and commandline tools
-- Familiarity with basic Docker concepts and commands
-- Familiarity with basic HTTP protocol
-- Familiarity with Prometheus
-- Familiartiy with Grafana
+- Familiarity with Docker concepts and commands
+- Familiarity with the HTTP protocol
 
 <br/>
 
 ## How it Works
 
-The `**Nginx One Console**`, is part of the F5 Networks Distributed Cloud Software as a Service (SaaS) product. This Service provides a Web Console, inventory and storage, and features needed by Nginx administrators.  The Nginx One Service is under constant development and service delivery, as new features are added, enhanced, updated and explanded.  Nginx admins can use the One Console for many kinds of routine opertional and administrative tasks.  This lab exercise is offered as a Test Drive of most of these features.
+The **`Nginx One Console`**, is part of the F5 Networks Distributed Cloud Software as a Service (SaaS) product. This Service provides a Web Console, inventory and storage, and features needed by Nginx administrators.  The Nginx One Service is under constant development and service delivery, as new features are added, enhanced, updated and explanded.  Nginx admins can use the One Console for many kinds of routine opertional and administrative tasks.  This lab exercise is offered as a Test Drive of most of these features.
 
-NGINX Agent
-:-------------------------:|
 ![NGINX Agent](media/nginx-agent-icon.png) 
 
 The Nginx One Console requires `nginx-agent`, an open source software module written by Nginx that connects and communicates with Nginx One.  This nginx-agent must be installed and running on every Nginx instance that you wish to manage with Nginx One.  You will use the publicly avialable Nginx with Agent images from Docker Hub for your Nginx OSS containers.  In addition, as part of your Dockerfile, your NGINX Plus containers already have the required `NGINX Agent` installed during the build process for you.  Refer to the /lab7 Dockerfiles if you want to check it out, use them as templates for adding Nginx Agent to your own fleet of Nginx containers.  Nginx-agent can also be installed using regular Linux package manager like `apt` and `yum`.  Refer to the References Section for links to the Nginx Agent installation guides.
@@ -147,7 +143,7 @@ Nginx OSS Instances
 
 ## Add Nginx Plus Containers to Nginx One
 
-1. Inspect the lab7/docker-compse.yml file.  You will see several Nginx OSS and Plus containers being started for you, and added to your Nginx One inventory.
+1. Inspect the lab7/docker-compse.yml file.  You will see several Nginx Plus containers being started for you, and added to your Nginx One inventory.
 
 1. Ensure you are in the `lab7` folder.  Using a Terminal, run Docker Compose to build and run all the containers.
 
@@ -156,6 +152,18 @@ Nginx OSS Instances
      docker compose up --force-recreate -d
 
     ```
+1. Verify the NginxPlus containers started.
+
+```bash
+docker ps
+
+```
+
+```bash
+## Sample output ##
+
+
+```
 
 
 
@@ -195,9 +203,13 @@ Don't forget to stop all of the OSS Nginx containers if you are finished with th
 
 ## References:
 
+- [Nginx One Console](https://docs.nginx.com/nginx-one/)
+- [Nginx Agent](https://docs.nginx.com/nginx-agent/overview/)
 - [NGINX Plus](https://www.nginx.com/products/nginx/)
 - [NGINX Admin Guide](https://docs.nginx.com/nginx/admin-guide/)
 - [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
+
+
 
 <br/>
 
