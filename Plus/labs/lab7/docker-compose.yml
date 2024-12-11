@@ -1,18 +1,19 @@
-# NGINX Plus Proxy with tools build
+# NGINX Plus / OSS with NGINX Agent
 # NGINX webservers with ingress-demo pages
-# NGINX Basics, Nov 2024
+# NGINX One Console Instance Registration
+# NGINX Basics, Dec 2024
 # Chris Akker, Shouvik Dutta, Adam Currier
 #
 services:
-  workshop11:                  # NGINX Plus Web / Load Balancer
+  basics-plus1:                  # Debian NGINX Plus Web / Load Balancer
     environment:
       NGINX_AGENT_SERVER_HOST: "agent.connect.nginx.com"
       NGINX_AGENT_SERVER_GRPCPORT: "443"
       NGINX_AGENT_TLS_ENABLE: "true"
-      NGINX_AGENT_SERVER_TOKEN: "iStZKfCF398qYoVxv1I6XTScS9c9lhSQZvbJymXF2k8="  
-    hostname: workshop11
-    container_name: workshop11
-    image: nginx-plus:workshop  # From Lab1
+      NGINX_AGENT_SERVER_TOKEN: "vJ+ADwlFXKf58bX0Qk/TEH6N38Al4fdxXDefT6J2iiM="  # Datakey Fron basics- One Console
+    hostname: basics-plus1
+    container_name: basics-plus1
+    image: private-registry.nginx.com/nginx-plus/agent:nginx-plus-r32-debian  # From Nginx Private Registry
     volumes:                    # Sync these folders to container
         - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
         - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d
@@ -25,22 +26,111 @@ services:
         - "9113"    # Open for Prometheus Scraper page
     restart: always
   #
-  workshop12:                  # NGINX Plus Web / Load Balancer
-    hostname: workshop12
-    container_name: workshop12
-    image: nginx-plus:workshop  # From Lab1
+  basics-plus2:                  # Alpine NGINX Plus Web / Load Balancer
+    environment:
+      NGINX_AGENT_SERVER_HOST: "agent.connect.nginx.com"
+      NGINX_AGENT_SERVER_GRPCPORT: "443"
+      NGINX_AGENT_TLS_ENABLE: "true"
+      NGINX_AGENT_SERVER_TOKEN: "vJ+ADwlFXKf58bX0Qk/TEH6N38Al4fdxXDefT6J2iiM="  # Datakey Fron Nginx One Console
+    hostname: basics-plus2
+    container_name: basics-plus2
+    image: private-registry.nginx.com/nginx-plus/agent:nginx-plus-r31-alpine    # From Nginx Private Registry
     volumes:                    # Sync these folders to container
         - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
         - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d
         - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
         - ./nginx-plus/usr/share/nginx/html:/usr/share/nginx/html
     ports:
-        - "80"       # Open for HTTP
-        - "443"      # Open for HTTPS
-        - "9000"     # Open for API / Dashboard page
-        - "9113"     # Open for Prometheus Scraper page
-    restart: always      
+        - "80"      # Open for HTTP
+        - "443"     # Open for HTTPS
+        - "9000"    # Open for API / Dashboard page
+        - "9113"    # Open for Prometheus Scraper page
+    restart: always
   #
+  basics-plus3:                  # RHEL UBI NGINX Plus Web / Load Balancer
+    environment:
+      NGINX_AGENT_SERVER_HOST: "agent.connect.nginx.com"
+      NGINX_AGENT_SERVER_GRPCPORT: "443"
+      NGINX_AGENT_TLS_ENABLE: "true"
+      NGINX_AGENT_SERVER_TOKEN: "vJ+ADwlFXKf58bX0Qk/TEH6N38Al4fdxXDefT6J2iiM="  # Datakey Fron Nginx One Console
+    hostname: basics-plus3
+    container_name: basics-plus3
+    image: private-registry.nginx.com/nginx-plus/agent:nginx-plus-r31-ubi    # From Nginx Private Registry
+    volumes:                    # Sync these folders to container
+        - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+        - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d
+        - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
+        - ./nginx-plus/usr/share/nginx/html:/usr/share/nginx/html
+    ports:
+        - "80"      # Open for HTTP
+        - "443"     # Open for HTTPS
+        - "9000"    # Open for API / Dashboard page
+        - "9113"    # Open for Prometheus Scraper page
+    restart: always
+  #
+  basics-oss1:                  # Debian NGINX OSS Web / Load Balancer
+    environment:
+      NGINX_AGENT_SERVER_HOST: "agent.connect.nginx.com"
+      NGINX_AGENT_SERVER_GRPCPORT: "443"
+      NGINX_AGENT_TLS_ENABLE: "true"
+      NGINX_AGENT_SERVER_TOKEN: "vJ+ADwlFXKf58bX0Qk/TEH6N38Al4fdxXDefT6J2iiM="  # Datakey Fron Nginx One Console
+    hostname: basics-oss1
+    container_name: basics-oss1
+    image: docker-registry.nginx.com/nginx/agent:mainline  # From Docker Public Registry
+    volumes:                    # Sync these folders to container
+        - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+        - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d
+        - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
+        - ./nginx-oss/usr/share/nginx/html:/usr/share/nginx/html
+    ports:
+        - "80"      # Open for HTTP
+        - "443"     # Open for HTTPS
+        - "9000"    # Open for stub status page
+        - "9113"    # Open for Prometheus Scraper page
+    restart: always
+  #
+  basics-oss2:                  # Alpine NGINX OSS Web / Load Balancer
+    environment:
+      NGINX_AGENT_SERVER_HOST: "agent.connect.nginx.com"
+      NGINX_AGENT_SERVER_GRPCPORT: "443"
+      NGINX_AGENT_TLS_ENABLE: "true"
+      NGINX_AGENT_SERVER_TOKEN: "vJ+ADwlFXKf58bX0Qk/TEH6N38Al4fdxXDefT6J2iiM="  # Datakey Fron Nginx One Console
+    hostname: basics-oss2
+    container_name: basics-oss2
+    image: docker-registry.nginx.com/nginx/agent:alpine  # From Docker Public Registry
+    volumes:                    # Sync these folders to container
+        - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+        - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d
+        - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
+        - ./nginx-oss/usr/share/nginx/html:/usr/share/nginx/html
+    ports:
+        - "80"      # Open for HTTP
+        - "443"     # Open for HTTPS
+        - "9000"    # Open for stub status page
+        - "9113"    # Open for Prometheus Scraper page
+    restart: always
+    #
+  basics-oss3:                  # Older Alpine NGINX OSS Web / Load Balancer
+    environment:
+      NGINX_AGENT_SERVER_HOST: "agent.connect.nginx.com"
+      NGINX_AGENT_SERVER_GRPCPORT: "443"
+      NGINX_AGENT_TLS_ENABLE: "true"
+      NGINX_AGENT_SERVER_TOKEN: "vJ+ADwlFXKf58bX0Qk/TEH6N38Al4fdxXDefT6J2iiM="  # Datakey Fron Nginx One Console
+    hostname: basics-oss3
+    container_name: basics-oss3
+    image: docker-registry.nginx.com/nginx/agent:1.26-alpine  # From Docker Public Registry
+    volumes:                    # Sync these folders to container
+        - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+        - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d
+        - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
+        - ./nginx-oss/usr/share/nginx/html:/usr/share/nginx/html
+    ports:
+        - "80"      # Open for HTTP
+        - "443"     # Open for HTTPS
+        - "9000"    # Open for stub status page
+        - "9113"    # Open for Prometheus Scraper page
+    restart: always
+  #     
   web1:
       hostname: web1
       container_name: web1
