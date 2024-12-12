@@ -25,7 +25,7 @@ By the end of the lab you will be able to:
 
 ## Pre-Requisites
 
-- You must an F5 Distributed Cloud account, with access to the Nginx One Service.
+- You must have an F5 Distributed Cloud account, with access to the Nginx One Service.
 - You must have the NginxPlus image from Lab1
 - You must have Docker installed and running
 - You must have Docker-compose installed
@@ -42,7 +42,7 @@ The **`Nginx One Console`**, is part of the F5 Networks Distributed Cloud Softwa
 
 ![NGINX Agent](media/nginx-agent-icon.png) 
 
-The Nginx One Console requires `nginx-agent`, an open source software module written by Nginx that connects and communicates with Nginx One.  This nginx-agent must be installed and running on every Nginx instance that you wish to manage with Nginx One.  You will use the publicly avialable Nginx with Agent images from Docker Hub for your Nginx OSS containers.  In addition, as part of your Dockerfile, your NGINX Plus containers already have the required `NGINX Agent` installed during the build process for you.  Refer to the /lab7 Dockerfiles if you want to check it out, use them as templates for adding Nginx Agent to your own fleet of Nginx containers.  Nginx-agent can also be installed using regular Linux package manager like `apt` and `yum`.  Refer to the References Section for links to the Nginx Agent installation guides.
+The Nginx One Console requires `nginx-agent`, an open source software module written by Nginx that connects and communicates with Nginx One.  This nginx-agent must be installed and running on every Nginx instance that you wish to manage with Nginx One.  You will use the publicly available Nginx with Agent images from Docker Hub for your Nginx OSS containers.  In addition, as part of your Docker Compose file, your NGINX Plus containers already have the required `NGINX Agent` installed for you.  Nginx-agent can also be installed using regular Linux package managers like `apt` and `yum`.  Refer to the References Section for links to the Nginx Agent installation guides.
 
 <br/>
 
@@ -54,7 +54,7 @@ F5 Distributed Cloud Login
 :-------------------------:|
 ![XC Login](media/lab7_xc-login.png) 
 
-1. Click on on the `Nginx One` tile, which will bring you to the Nginx One Console Service description page.  
+1. Click on on the `Nginx One` tile, which will bring you to the Nginx One Console Service Description page.  
 
 Nginx One Console Service
 :-------------------------:|
@@ -68,17 +68,17 @@ Nginx One Overview Dashboard
 :-------------------------:|
 ![NOne Service](media/lab7_none-dashboard-overview.png) 
 
-If this is your first time logging in or using the Nginx One Console, your Nginx Inventory will be empty.  Follow the instructions below to fire up several Nginx containers, which will be added to the Inventory for you:
+If this is your first time logging in or using the Nginx One Console, your Nginx Inventory will be empty.  Have no fear - follow the instructions below to fire up several Nginx containers, which will be added to the Inventory for you:
 
 <br/>
 
-## Create a new Datakey for these lab exercises.
+## Create a new Dataplane Key for these lab exercises.
 
 1. Using the Nginx One Console, click on Manage > Instances, then ` + Add instance`.
 
-1. Click on `Generate Dataplane Key`, then copy the value of this key to the clipboard using the `Copy` icon on this right side.  NOTE:  This Dataplane Key is only show here, one time.  Save it locally if you plan to use it again.  You can Register as many Nginx Instances are you like with the same Dataplane Key.
+1. Click on `Generate Dataplane Key`, then copy the value of this key to the clipboard using the `Copy` icon on the right side.  NOTE:  This Dataplane Key is only show here, one time.  Save it locally if you plan to use it again.  You can Register as many Nginx Instances are you like with the same Dataplane Key.  If you lose the Key, just create a new one.
 
-1. Scroll down, then click the `Done` button on the bottom right.
+1. After Saving your Key somewhere, scroll down, then click the `Done` button on the bottom right.
 
 ## Run Nginx Containers with Docker
 
@@ -90,12 +90,12 @@ Now that you have a Dataplane Key, you can run some Docker containers, using the
 
 1. Inspect the `lab7/docker-compose.yml` file.  You will see the details of each container being pulled and run.
 
-Before you can pull and run these containers, you must set several Environment variables correctly, `before running docker compose`.
+>Before you can pull and run these containers, you must set several Environment variables correctly, `before running docker compose`.
 
 1. Using the Visual Studio Terminal, set the `TOKEN` environment variable with the Dataplane Key from the One Console, as follows:
 
 ```bash
-export TOKEN=paste-your-token-from-clipboard-here
+export TOKEN=paste-your-dataplane-key-from-clipboard-here
 
 ```
 
@@ -104,6 +104,12 @@ And verify it was set:
 ```bash
 #check it
 echo $TOKEN
+
+```
+
+```bash
+## Sample output ##
+vJ+ADwlFXKf58bX0Qk/...6N38Al4fdxXDefT6J2iiM=
 
 ```
 
@@ -121,7 +127,7 @@ echo $JWT
 
 ```
 
-1. Login to to the Nginx Private Registry, use the $JWT ENV variable, as follows.  (Your system may require sudo):
+1. Using Docker, Login to to the Nginx Private Registry, using the $JWT ENV variable for the username, as follows.  (Your system may require sudo):
 
 ```bash
 docker login private-registry.nginx.com --username=$JWT --password=none
@@ -149,7 +155,7 @@ docker compose up --force-recreate -d
 
 You will see Docker pulling the images, and then starting the containers.
 
-<pulling images here>
+![Docker Pulling](media/lab7_none-docker-pulling.png) 
 
 ```bash
 ## Sample output ##
@@ -194,7 +200,7 @@ dba569e76e36   nginxinc/ingress-demo                                            
 
 ```
 
-Go back to your One Console Instance page, and click `Refresh`.  You should see all 6 of your `basics-`  instances appear in the list, and the Online icon should be `green`.  If they did not Register with the One Console, it is likely you have an issue with the $TOKEN used, try a new Dataplane Key.  It should look similar to this:
+Go back to your One Console Instance page, and click `Refresh`.  You should see all 6 of your `basics-`  instances appear in the list, and the Online icon should be `green`.  If they did not Register with the One Console, it is likely you have an issue with the $TOKEN used, create a new Dataplane Key and try again.  It should look similar to this:
 
 Nginx Instances
 :-------------------------:|
