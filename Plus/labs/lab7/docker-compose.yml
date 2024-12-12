@@ -5,15 +5,15 @@
 # Chris Akker, Shouvik Dutta, Adam Currier
 #
 services:
-  basics-plus1:                  # Debian NGINX Plus Web / Load Balancer
+  basics-plus1:                  # Alpine NGINX Plus Web / Load Balancer
     environment:
       NGINX_AGENT_SERVER_HOST: "agent.connect.nginx.com"
       NGINX_AGENT_SERVER_GRPCPORT: "443"
       NGINX_AGENT_TLS_ENABLE: "true"
-      NGINX_AGENT_SERVER_TOKEN: "vJ+ADwlFXKf58bX0Qk/TEH6N38Al4fdxXDefT6J2iiM="  # Datakey Fron basics- One Console
+      NGINX_AGENT_SERVER_TOKEN: $TOKEN  # Datakey Fron basics- One Console
     hostname: basics-plus1
     container_name: basics-plus1
-    image: private-registry.nginx.com/nginx-plus/agent:nginx-plus-r32-debian  # From Nginx Private Registry
+    image: private-registry.nginx.com/nginx-plus/agent:nginx-plus-r32-alpine-3.20-20240613  # CVE - From Nginx Private Registry
     volumes:                    # Sync these folders to container
         - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
         - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d
@@ -31,10 +31,10 @@ services:
       NGINX_AGENT_SERVER_HOST: "agent.connect.nginx.com"
       NGINX_AGENT_SERVER_GRPCPORT: "443"
       NGINX_AGENT_TLS_ENABLE: "true"
-      NGINX_AGENT_SERVER_TOKEN: "vJ+ADwlFXKf58bX0Qk/TEH6N38Al4fdxXDefT6J2iiM="  # Datakey Fron Nginx One Console
+      NGINX_AGENT_SERVER_TOKEN: $TOKEN  # Datakey Fron Nginx One Console
     hostname: basics-plus2
     container_name: basics-plus2
-    image: private-registry.nginx.com/nginx-plus/agent:nginx-plus-r31-alpine    # From Nginx Private Registry
+    image: private-registry.nginx.com/nginx-plus/agent:nginx-plus-r31-alpine-3.19-20240522 # CVE - From Nginx Private Registry
     volumes:                    # Sync these folders to container
         - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
         - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d
@@ -52,10 +52,10 @@ services:
       NGINX_AGENT_SERVER_HOST: "agent.connect.nginx.com"
       NGINX_AGENT_SERVER_GRPCPORT: "443"
       NGINX_AGENT_TLS_ENABLE: "true"
-      NGINX_AGENT_SERVER_TOKEN: "vJ+ADwlFXKf58bX0Qk/TEH6N38Al4fdxXDefT6J2iiM="  # Datakey Fron Nginx One Console
+      NGINX_AGENT_SERVER_TOKEN: $TOKEN  # Datakey Fron Nginx One Console
     hostname: basics-plus3
     container_name: basics-plus3
-    image: private-registry.nginx.com/nginx-plus/agent:nginx-plus-r31-ubi    # From Nginx Private Registry
+    image: private-registry.nginx.com/nginx-plus/agent:nginx-plus-r31-ubi-9-20240522    # From Nginx Private Registry
     volumes:                    # Sync these folders to container
         - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
         - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d
@@ -73,7 +73,7 @@ services:
       NGINX_AGENT_SERVER_HOST: "agent.connect.nginx.com"
       NGINX_AGENT_SERVER_GRPCPORT: "443"
       NGINX_AGENT_TLS_ENABLE: "true"
-      NGINX_AGENT_SERVER_TOKEN: "vJ+ADwlFXKf58bX0Qk/TEH6N38Al4fdxXDefT6J2iiM="  # Datakey Fron Nginx One Console
+      NGINX_AGENT_SERVER_TOKEN: $TOKEN  # Datakey Fron Nginx One Console
     hostname: basics-oss1
     container_name: basics-oss1
     image: docker-registry.nginx.com/nginx/agent:mainline  # From Docker Public Registry
@@ -81,6 +81,7 @@ services:
         - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
         - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d
         - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
+        - ./nginx-oss/etc/ssl/nginx:/etc/ssl/nginx
         - ./nginx-oss/usr/share/nginx/html:/usr/share/nginx/html
     ports:
         - "80"      # Open for HTTP
@@ -94,7 +95,7 @@ services:
       NGINX_AGENT_SERVER_HOST: "agent.connect.nginx.com"
       NGINX_AGENT_SERVER_GRPCPORT: "443"
       NGINX_AGENT_TLS_ENABLE: "true"
-      NGINX_AGENT_SERVER_TOKEN: "vJ+ADwlFXKf58bX0Qk/TEH6N38Al4fdxXDefT6J2iiM="  # Datakey Fron Nginx One Console
+      NGINX_AGENT_SERVER_TOKEN: $TOKEN  # Datakey Fron Nginx One Console
     hostname: basics-oss2
     container_name: basics-oss2
     image: docker-registry.nginx.com/nginx/agent:alpine  # From Docker Public Registry
@@ -102,6 +103,7 @@ services:
         - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
         - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d
         - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
+        - ./nginx-oss/etc/ssl/nginx:/etc/ssl/nginx
         - ./nginx-oss/usr/share/nginx/html:/usr/share/nginx/html
     ports:
         - "80"      # Open for HTTP
@@ -115,7 +117,7 @@ services:
       NGINX_AGENT_SERVER_HOST: "agent.connect.nginx.com"
       NGINX_AGENT_SERVER_GRPCPORT: "443"
       NGINX_AGENT_TLS_ENABLE: "true"
-      NGINX_AGENT_SERVER_TOKEN: "vJ+ADwlFXKf58bX0Qk/TEH6N38Al4fdxXDefT6J2iiM="  # Datakey Fron Nginx One Console
+      NGINX_AGENT_SERVER_TOKEN: $TOKEN  # Datakey Fron Nginx One Console
     hostname: basics-oss3
     container_name: basics-oss3
     image: docker-registry.nginx.com/nginx/agent:1.26-alpine  # From Docker Public Registry
@@ -123,6 +125,7 @@ services:
         - ./nginx-oss/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
         - ./nginx-oss/etc/nginx/conf.d:/etc/nginx/conf.d
         - ./nginx-oss/etc/nginx/includes:/etc/nginx/includes
+        - ./nginx-oss/etc/ssl/nginx:/etc/ssl/nginx
         - ./nginx-oss/usr/share/nginx/html:/usr/share/nginx/html
     ports:
         - "80"      # Open for HTTP
@@ -152,3 +155,4 @@ services:
       ports:
         - "80"
         - "443"
+
