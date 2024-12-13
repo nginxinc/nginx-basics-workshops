@@ -7,8 +7,8 @@ In this lab, you will be exploring the Nginx One Console, part of the F5 Network
 This Overview will show the different features of the Console, and allow you to explore adding, removing, configuring, updating, and monitoring various instances of Nginx OSS and Nginx Plus Docker containers.
 
 NGINX Plus | NGINX One| NGINX OSS
-:-------------------------:|:-------------------------:|:-----:
-![NGINX Plus](media/nginx-plus-icon.png)  |![Prom](media/nginx-one-icon.png) |![Grafana](media/nginx-icon.png)
+:-------------------------:|:-------------------------:|:---------------:
+![NGINX Plus](media/nginx-plus-icon.png)  |![Nginx One](media/nginx-one-icon.png) |![Nginx OSS](media/nginx-icon.png)
   
 ## Learning Objectives
 
@@ -23,10 +23,10 @@ By the end of the lab you will be able to:
 - Explore the Nginx One Metrics
 - Optional - Explore the Nginx One Console API
 
-## Pre-Requisites
+## Prerequisites
 
 - You must have an F5 Distributed Cloud account, with access to the Nginx One Service.
-- You must have the NginxPlus image from Lab1
+- You must have your Nginx Plus license files from Lab1
 - You must have Docker installed and running
 - You must have Docker-compose installed
 - See `Lab0` for instructions on setting up your system for this Workshop
@@ -56,17 +56,21 @@ F5 Distributed Cloud Login
 
 1. Click on on the `Nginx One` tile, which will bring you to the Nginx One Console Service Description page.  
 
+Nginx One Tile
+:-------------------------:|
+![NOne Service](media/lab7_none-tile.png) 
+
+Make sure the Nginx One Console status shows `green - Enabled`.  Click on `Visit Service`.  If it is not enabled, you must request access from your Distributed Cloud admin.
+
 Nginx One Console Service
 :-------------------------:|
 ![NOne Service](media/lab7_none-service.png) 
-
-Make sure the Nginx One Console status shows `green - Enabled`.  Click on `Visit Service`.  If it is not enabled, you must request access from your Distributed Cloud admin.
  
 This will bring you to the Nginx Console `Overview Dashboard` page - it will show you a collection of Nginx instances, and some Details and Summary panels.
 
 Nginx One Overview Dashboard
 :-------------------------:|
-![NOne Service](media/lab7_none-dashboard-overview.png) 
+![NOne Service](media/lab7_none-overview-dashboard.png) 
 
 If this is your first time logging in or using the Nginx One Console, your Nginx Inventory will be empty.  Have no fear - follow the instructions below to fire up several Nginx containers, which will be added to the Inventory for you:
 
@@ -155,7 +159,7 @@ docker compose up --force-recreate -d
 
 You will see Docker pulling the images, and then starting the containers.
 
-![Docker Pulling](media/lab7_none-docker-pulling.png) 
+![Docker Pulling](media/lab7_docker-pulling.png) 
 
 ```bash
 ## Sample output ##
@@ -228,11 +232,11 @@ Click on the Overview Dashboard, to see the Summary Panels of your Nginx fleet:
 
 This Panel is pretty self explanatory, which of your Nginx Instances is online and communicating with the Console.  Click on the `Online, Offline, or Unavailable` links for more details.  You can add a `Filter` to assist with sorting/displaying your Instances.  Notice there is a `Last Reported Time` column, so you know when the instance last did a handshake with the Console.  Under `Actions`, you can go directly to the Configuration tool, or Delete the Instance.
 
-![Nginx Avail](media/lab7_none-availability.png) 
+![Nginx Availability](media/lab7_none-availability.png) 
 
 ### Nginx Versions
 
-This Panel shows a Summary of which Nginx Versions are in use and by how many instances.  Sure, you could write a bash script to SSH into every Instance, and query `nginx -v` and collect this data yourself ... but why not use the Console instead?  Do you even *have* `root privleges` to SSH in the first place?  This makes it easy to know which Instances need a patch or an upgrade to Nginx.
+This Panel shows a Summary of which Nginx Versions are in use and by how many instances.  Sure, you could write a `bash script to SSH into every Instance`, and query `nginx -v` and collect this data yourself ... but why not use the Console instead?  Do you even *have* `root privleges` to SSH in the first place?  This makes it easy to know what versions of Nginx are running on your Instances - do they need a patch or an upgrade??
 
 ![Nginx versions](media/lab7_none-nginx-versions.png) 
 
@@ -260,9 +264,15 @@ This Panel is a great tool to show you the CVEs that you might have in your Ngin
 
 ![CVEs](media/lab7_none-cves.png) 
 
+Click on the `basics-plus2` Instance, you should see a list of all the CVEs identified by Ngine One CVE scanner.  NOTE:  *This list may not include ALL CVEs*, rather just the list that Nginx One knows about at the time of the last scan.
+
+Basics Plus1 | Basics Plus2
+:-------------------------:|:-------------------------:
+![Container CVEs](media/lab7_basics-plus1-cves.png) | ![Container CVEs](media/lab7_basics-plus2-cves.png)
+
 ### CPU, RAM, Disk Utilization
 
-This Panel shows basic Host level information from the Linux OS about the consumption of hardware resources that the Nginx Agent reports to the One Console.  There is a `time selector` to show these metrics over different periods of time, with a history graph plotted for you.  Click the `See All` button for a columnar list, which you can Filter and Sort.
+This Panel shows basic Host level information from the Linux OS about the consumption of hardware resources that the Nginx Agent reports to the One Console.  There is a `time selector` to show these metrics over different periods of time, with a history graph plotted for you.  Click the `See All` button for a columnar list, which you can Filter and Sort.  NOTE:  Docker containers do not report Disk usage.
 
 ![Cpu](media/lab7_none-cpu.png) 
 ![Ram](media/lab7_none-ram.png) 
@@ -314,7 +324,7 @@ If you would like to just run a few containers without Docker Compose, here are 
 
     ```
 
-#### Nginx Instances with Nginx Agent for Nginx One Console use
+#### Nginx Instances with Nginx Agent installed for Nginx One Console
 
 For Reference:  Find all the currently available Nginx OSS containers with Agent installed.  Curl the `Docker Registry`:
 
@@ -323,28 +333,79 @@ curl https://docker-registry.nginx.com/v2/nginx/agent/tags/list  | jq
 
 ```
 
-For Reference:  Find all the currently available NginxPlus containers with Agent installed.  Curl the `Nginx Private Registry`, you will need your `nginx-repo Cert and Key` files for this command:
+For Reference:  Find all the currently available NginxPlus containers with Agent installed.  Curl the `Nginx Private Registry`, you will need your `nginx-repo Certificate and Key` files for this command:
 
 ```bash
 curl https://private-registry.nginx.com/v2/nginx-plus/agent/tags/list --key nginx-repo.key --cert nginx-repo.crt | jq
 
 ```
+
 <br/>
 
 ## Nginx One Certificates Overview
 
-< tls icon here >
+![Certs](media/lab7_none-certs.png) 
 
-Another nice feature of the Nginx One Console is the ability to quickly see the `Expiration Dates of the TLS Certificates` being used by your Nginx Instances.  When the nginx-agent reads the Nginx configuration, it looks for the TLS certificate path/name, and uses openssl to collect the Certificate Expiration date, and sends this information to the One Console.  It provides both a Summary of all the certificates, and the details on each one.  Sure, you can write an bash script to login with root privleges to every Nginx Server, and collect this information yourself.  But using the Nginx One Console makes this easy to see and help plan appropriate actions.  There is one caveat to this feature, it only scans the TLS certificates that are part of the running Nginx configuration of the Instance, it does not check additional TLS certificates, even if they are in the same location on disk.
+Another nice feature of the Nginx One Console is the ability to quickly see the `Expiration Dates of the TLS Certificates` being used by your Nginx Instances.  When the nginx-agent reads the Nginx configuration, it looks for the TLS certificate path/name, and uses openssl to collect the Certificate Expiration date and Subject Name, and sends this information to the One Console.  It provides both a Summary of all the certificates, and the details on each one.  Sure, you can write an bash script to login with root privleges to every Nginx Server, and collect this information yourself.  But using the Nginx One Console makes this easy to see and help plan appropriate actions.  
+
+>There is one small caveat to this feature, it only scans the TLS certificates that are part of the running Nginx configuration of the Instance, *it does not check additional TLS certificates*, even if they are in the same location on disk.
+
+- **Expired** means the current date is past the certificate's Expiration Date.
+- **Expiring** means the current data is within 31 days of the certificate's Expiration Date.
+
+1. Using the Overview Dashboard Certificates Panel, Click on the `Expiring` link.  This will provide a List View of the Instances affected, with metadata about the Instances using the Certificate.
+
+1. Click on the `basics-oss1` Instance.  This will provide the Instance level Details, you will see a `Certificates` Section, this time with the Name, Status, `Expiration Date`, and Subject Name for each certificate file.
+
+![Certs](media/lab7_basics-oss1-certs.png) 
+
+1. If you Click on the actual certifcate file, for example `30-day.crt`, it will give you a List of all the Instances that are using that same certificate.
+
+![Cert Details](media/lab7_30-day-cert-details.png) 
+
+**Optional Lab Exercise:**
+
+Fix the Expired Certificate!  If you want to create a new certificate, say with a 90-day expiration, follow these instructions to use `openssl` to create a Self-Signed certificate/key pair, and update your Nginx config files to use the new Certficate.
 
 1. Create a new 91-day SSL certificate/key, and apply it to your configuration:
 
-```bash
-openssl req -x509 -nodes -days 91 -newkey rsa:2048 -keyout 91-day.key -out 91-day.crt -subj "/CN=NginxPlusBasics"
+    ```bash
+    openssl req -x509 -nodes -days 91 -newkey rsa:2048 -keyout 91-day.key -out 91-day.crt -subj "/CN=NginxPlusBasics"
 
-```
+    ```
+
+1. Copy the 91.* files to the appriopriate directory, in the workshop, that would be lab7/nginx-oss/etc/ssl/nginx.
+
+1. Edit the `tls-cars.example.com.conf` file, changing the names of the crt/key from `1-day.crt and 1-day.key` to `90-day.crt and 90-day.key`; Lines #13-14.
+
+    ```nginx
+    ...
+    # Update the following 2 lines for NGINX cert and key directives and file locations
+
+        ssl_certificate /etc/ssl/nginx/1-day.crt;
+        ssl_certificate_key /etc/ssl/nginx/1-day.key;
+
+    ...
+
+    ```
+
+
+1. You will have to `docker exec login` to each container, and reload Nginx ( nginx -s reload ) for Nginx to pick up the configuration changes.
+
+<br/>
 
 ## Nginx One Config Recommendations Overview
+
+One of the Best Features of the Nginx ONE Console is the Configuration analysis and recommendations that it can provides.  The Nginx Product Management and Development teams are experts at Nginx, and they have collaborated to create these valuable insights.  There are three types of Recommendations:
+- Security:  Nginx configurations to provide the best levels of security.
+- Optimization: Nginx configurations known to provide optimal performance.
+- Best Practices: Common configurations that follow standards and conform to ideal configs.
+
+1. Click on the `Security` and then Click on the `basics-oss1` Instance, then on Configuration to see the details.  The Recommendations are at the bottom of the screen, and if you look at the config file list, you see small numbers next to each config file that is affected.  These are `color-coded`: the Orange numbers are for Security, Blue numbers are for Optimizations, and the Green numbers for for Optimizations.
+
+1. In the Configuration Panel for `basics-oss1`, click on `stub_status.conf`.  The details at the bottom are highlighting *Security - Error: stub_status should have access control list defined on Line 11*.  This lets you that you should consider adding an ACL to the stub_status module, which provides metrics about your Nginx instance.  With no access list defined, anyone can see it.
+
+
 
 
 ## Nginx One CVEs Overview

@@ -20,10 +20,10 @@ services:
         - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
         - ./nginx-plus/usr/share/nginx/html:/usr/share/nginx/html
     ports:
-        - "80"      # Open for HTTP
-        - "443"     # Open for HTTPS
-        - "9000"    # Open for API / Dashboard page
-        - "9113"    # Open for Prometheus Scraper page
+        - 80:80       # Open for HTTP
+        - 443:443     # Open for HTTPS
+        - 9000:9000   # Open for stub status page
+        - 9113:9113   # Open for Prometheus Scraper page
     restart: always
   #
   basics-plus2:                  # Alpine NGINX Plus Web / Load Balancer
