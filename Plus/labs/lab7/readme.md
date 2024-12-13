@@ -410,7 +410,7 @@ One of the Best Features of the Nginx ONE Console is the Configuration analysis 
 
 1. Now Click on the `nginx.conf` file, it will show you Recommendations about the `worker_processes` Directive.
 
-![Nginx Conf Best Practice](media/lab7_stub-status-best-practice.png) 
+![Nginx Conf Best Practice](media/lab7_nginx-conf-best-practice.png) 
 
 Ok, so now what??  You can fix all these.  Just Click the `Edit Configuration` Pencil icon at the top, and now you can edit the Nginx config files directly.
 
