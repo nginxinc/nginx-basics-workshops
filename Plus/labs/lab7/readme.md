@@ -2,13 +2,13 @@
 
 ## Introduction
 
-In this lab, you will be exploring the Nginx One Console, part of the F5 Networks Distributed Cloud ecosystem.
+In this lab, you will be exploring the **Nginx One Console**, part of the F5 Networks Distributed Cloud ecosystem.
 
 This Overview will show the different features of the Console, and allow you to explore adding, removing, configuring, updating, and monitoring various instances of Nginx OSS and Nginx Plus Docker containers.
 
-NGINX Plus | NGINX One| NGINX OSS
+NGINX One | NGINX OSS| NGINX Plus
 :-------------------------:|:-------------------------:|:---------------:
-![NGINX Plus](media/nginx-plus-icon.png)  |![Nginx One](media/nginx-one-icon.png) |![Nginx OSS](media/nginx-icon.png)
+![NGINX Plus](media/nginx-one-icon.png) |![Nginx One](media/nginx-icon.png) |![Nginx OSS](media/nginx-plus-icon.png)
   
 ## Learning Objectives
 
@@ -17,10 +17,11 @@ By the end of the lab you will be able to:
 - Login into the Nginx One Console
 - Add Nginx OSS and Nginx Plus containers to your inventory
 - Explore and review the Nginx and OS Versions
+- Explore and review the Linux OS Versions
 - Explore and review the TLS Certificates
-- Explore and follow the Nginx One Recommendations to update your Nginx configurations
-- Explore and review the CVEs
+- Explore and review the Security CVEs
 - Explore the Nginx One Metrics
+- Explore and follow the Nginx One Recommendations
 - Optional - Explore the Nginx One Console API
 
 ## Prerequisites
@@ -38,7 +39,7 @@ By the end of the lab you will be able to:
 
 ## How it Works
 
-The **`Nginx One Console`**, is part of the F5 Networks Distributed Cloud Software as a Service (SaaS) product. This Service provides a Web Console, inventory and storage, and features needed by Nginx administrators.  The Nginx One Service is under constant development and service delivery, as new features are added, enhanced, updated and explanded.  Nginx admins can use the One Console for many kinds of routine opertional and administrative tasks.  This lab exercise is offered as a Test Drive of most of these features.
+The **`Nginx One Console`**, is part of the F5 Networks Distributed Cloud Software as a Service (SaaS) product. This Service provides a Web Console, inventory and storage, and features needed by Nginx administrators.  The Nginx One Service is under constant development and service delivery, as new features are added, enhanced, updated and explanded.  Nginx admins can use the One Console for many kinds of routine opertional and administrative tasks.  This lab exercise is provided as an Overview and Test Drive of most of these features.
 
 ![NGINX Agent](media/nginx-agent-icon.png) 
 
@@ -48,31 +49,26 @@ The Nginx One Console requires `nginx-agent`, an open source software module wri
 
 ## Login to F5 Distributed Cloud, Nginx One Service
 
-1. Login into your Nginx One Service, using your F5 Distributed Cloud credentials.  The login page can be found at: https://console.ves.volterra.io/login/start
+1. Login into the Nginx One Service, using your F5 Distributed Cloud credentials.  The login page can be found at: https://console.ves.volterra.io/login/start
 
-F5 Distributed Cloud Login
-:-------------------------:|
 ![XC Login](media/lab7_xc-login.png) 
 
 1. Click on on the `Nginx One` tile, which will bring you to the Nginx One Console Service Description page.  
 
-Nginx One Tile
-:-------------------------:|
-![NOne Service](media/lab7_none-tile.png) 
+
+![None Tile](media/lab7_none-tile.png) 
 
 Make sure the Nginx One Console status shows `green - Enabled`.  Click on `Visit Service`.  If it is not enabled, you must request access from your Distributed Cloud admin.
 
-Nginx One Console Service
-:-------------------------:|
-![NOne Service](media/lab7_none-service.png) 
+
+![None Service](media/lab7_none-service.png) 
  
 This will bring you to the Nginx Console `Overview Dashboard` page - it will show you a collection of Nginx instances, and some Details and Summary panels.
 
-Nginx One Overview Dashboard
-:-------------------------:|
-![NOne Service](media/lab7_none-overview-dashboard.png) 
 
-If this is your first time logging in or using the Nginx One Console, your Nginx Inventory will be empty.  Have no fear - follow the instructions below to fire up several Nginx containers, which will be added to the Inventory for you:
+![None Overview](media/lab7_one-overview-dashboard.png) 
+
+>If this is your first time logging in or using the Nginx One Console, your Nginx Inventory will be empty.  *Have no fear - follow the instructions below to fire up several Nginx containers, which will be added to the Inventory for you:*
 
 <br/>
 
@@ -80,7 +76,7 @@ If this is your first time logging in or using the Nginx One Console, your Nginx
 
 1. Using the Nginx One Console, click on Manage > Instances, then ` + Add instance`.
 
-1. Click on `Generate Dataplane Key`, then copy the value of this key to the clipboard using the `Copy` icon on the right side.  NOTE:  This Dataplane Key is only show here, one time.  Save it locally if you plan to use it again.  You can Register as many Nginx Instances are you like with the same Dataplane Key.  If you lose the Key, just create a new one.
+1. Click on `Generate Dataplane Key`, then copy the value of this key to the clipboard using the `Copy` icon on the right side.  NOTE:  This Dataplane Key is only show here, one time!  Save it locally if you plan to use it again.  You can Register as many Nginx Instances are you like with the same Dataplane Key.  If you lose the Key, just create a new one.
 
 1. After Saving your Key somewhere, scroll down, then click the `Done` button on the bottom right.
 
@@ -94,7 +90,7 @@ Now that you have a Dataplane Key, you can run some Docker containers, using the
 
 1. Inspect the `lab7/docker-compose.yml` file.  You will see the details of each container being pulled and run.
 
->Before you can pull and run these containers, you must set several Environment variables correctly, `before running docker compose`.
+>Before you can pull and run these containers, you must set several Environment variables correctly, *before running docker compose*.
 
 1. Using the Visual Studio Terminal, set the `TOKEN` environment variable with the Dataplane Key from the One Console, as follows:
 
@@ -206,8 +202,7 @@ dba569e76e36   nginxinc/ingress-demo                                            
 
 Go back to your One Console Instance page, and click `Refresh`.  You should see all 6 of your `basics-`  instances appear in the list, and the Online icon should be `green`.  If they did not Register with the One Console, it is likely you have an issue with the $TOKEN used, create a new Dataplane Key and try again.  It should look similar to this:
 
-Nginx Instances
-:-------------------------:|
+
 ![Nginx Instances](media/lab7_none-instances.png) 
 
 >Now that the Nginx OSS and Plus containers are running and Registered with the One Console, you can explore the various features of the One Console, and manage your Nginx Instances!
@@ -324,7 +319,7 @@ If you would like to just run a few containers without Docker Compose, here are 
 
     ```
 
-#### Nginx Instances with Nginx Agent installed for Nginx One Console
+### Nginx Container Images with Nginx Agent installed for Nginx One Console
 
 For Reference:  Find all the currently available Nginx OSS containers with Agent installed.  Curl the `Docker Registry`:
 
@@ -365,7 +360,7 @@ Another nice feature of the Nginx One Console is the ability to quickly see the 
 
 **Optional Lab Exercise:**
 
-Fix the Expired Certificate!  If you want to create a new certificate, say with a 90-day expiration, follow these instructions to use `openssl` to create a Self-Signed certificate/key pair, and update your Nginx config files to use the new Certficate.
+Fix the Expired Certificate!  If you want to create a new certificate, say with a 91-day expiration, follow these instructions to use `openssl` to create a Self-Signed certificate/key pair, and update your Nginx config files to use the new Certficate.
 
 1. Create a new 91-day SSL certificate/key, and apply it to your configuration:
 
@@ -374,7 +369,7 @@ Fix the Expired Certificate!  If you want to create a new certificate, say with 
 
     ```
 
-1. Copy the 91.* files to the appriopriate directory, in the workshop, that would be lab7/nginx-oss/etc/ssl/nginx.
+1. Copy the 91.* files to the appropriate directory, in this workshop, that would be `lab7/nginx-oss/etc/ssl/nginx`.
 
 1. Edit the `tls-cars.example.com.conf` file, changing the names of the crt/key from `1-day.crt and 1-day.key` to `90-day.crt and 90-day.key`; Lines #13-14.
 
@@ -394,19 +389,56 @@ Fix the Expired Certificate!  If you want to create a new certificate, say with 
 
 <br/>
 
-## Nginx One Config Recommendations Overview
+## Nginx One Configuration Recommendations
 
-One of the Best Features of the Nginx ONE Console is the Configuration analysis and recommendations that it can provides.  The Nginx Product Management and Development teams are experts at Nginx, and they have collaborated to create these valuable insights.  There are three types of Recommendations:
+One of the Best Features of the Nginx ONE Console is the Configuration analysis and recommendations that it provides.  The Nginx Product Management and Development teams are experts at Nginx, and they have collaborated to create these valuable insights.  There are three types of Recommendations:
 - Security:  Nginx configurations to provide the best levels of security.
 - Optimization: Nginx configurations known to provide optimal performance.
 - Best Practices: Common configurations that follow standards and conform to ideal configs.
 
 1. Click on the `Security` and then Click on the `basics-oss1` Instance, then on Configuration to see the details.  The Recommendations are at the bottom of the screen, and if you look at the config file list, you see small numbers next to each config file that is affected.  These are `color-coded`: the Orange numbers are for Security, Blue numbers are for Optimizations, and the Green numbers for for Optimizations.
 
-1. In the Configuration Panel for `basics-oss1`, click on `stub_status.conf`.  The details at the bottom are highlighting *Security - Error: stub_status should have access control list defined on Line 11*.  This lets you that you should consider adding an ACL to the stub_status module, which provides metrics about your Nginx instance.  With no access list defined, anyone can see it.
+![Config Recs](media/lab7_basics-oss1-config-colors.png) 
+
+1. If you click on the `cafe.example.com.conf` file, the Recommendations will be shown on the bottom, with details and Line Numbers, so you know which ones are being highlighted.
+
+![Cafe Best Practice](media/lab7_cafe-best-practice.png) 
+
+1. Now Click on `stub_status.conf`.  The details at the bottom are highlighting *Security - Error: stub_status should have access control list defined on Line 11*.  This advises that you should consider adding an ACL to the stub_status module, which provides metrics about your Nginx instance.  With no access list defined, anyone can see it.
+
+![Stub Status Best Practice](media/lab7_stub-status-best-practice.png) 
+
+1. Now Click on the `nginx.conf` file, it will show you Recommendations about the `worker_processes` Directive.
+
+![Nginx Conf Best Practice](media/lab7_stub-status-best-practice.png) 
+
+Ok, so now what??  You can fix all these.  Just Click the `Edit Configuration` Pencil icon at the top, and now you can edit the Nginx config files directly.
+
+1. Try this on the `cafe.example.com.conf` file.  At the bottom, Click the link for `line 4`.  It will take you directly to the file's config line, and also display an explanation with details about the parameter.  ADD the `default_server` directive to Line4, so it reads `listen 80 default_server;`.  
+
+>And another Great Feature of the One Console, **Nginx Mice!!**  If you `mouse-over` any of the `colored words` in your config, you will see a pop-up with details about the Directive, Variable, or Parameter.  No more Googling to try and find details about Nginx configurations, it's at your finger/mouse tips!
+
+![Cafe Edit Line4](media/lab7_cafe-edit-line4.png) 
+
+1. Now do the same for Line #16, the `proxy_buffering off` Directive, change it to `on`.
+
+![Cafe Edit Line16](media/lab7_cafe-edit-line16.png) 
+
+1. When finished with your Edits, Click the Green `Next` button.  This will show you a side-by-side `DIFF` of the before/after configuration changes that you made.
+
+![Cafe Edit Line16](media/lab7_cafe-config-diff.png) 
+
+1. Now you can click the Green `Publish` button to commit your changes to the Nginx Instance.  The Nginx-agent on the Instance will re-test and then apply your configuration changes.  You will see two pop-ups for Publishing Status and `Success`.
 
 
+![Cafe Publish](media/lab7_cafe-publish.png) 
+![Cafe Publish completed](media/lab7_cafe-publish-success.png) 
 
+1. You can follow this same procedure for your other Nginx config files, making the edits and Publish your changes.
+
+>You can even add `new` files to your Nginx configurations, and Publish those as well!  Just click on `Add file` while you are in Edit mode.
+
+<br/>
 
 ## Nginx One CVEs Overview
 
