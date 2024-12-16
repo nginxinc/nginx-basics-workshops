@@ -442,6 +442,24 @@ Ok, so now what??  You can fix all these.  Just Click the `Edit Configuration` P
 
 ## Nginx One CVEs Overview
 
+![CVE](media/lab7_none-cves.png)
+
+One of the nice security feature of the NGINX One Console is the ability to provide a CVE summary with `High-Medium-Low Severity` classes. Clicking those classes reveals which Instances fall under them.
+
+1. Using the Overview Dashboard CVEs Panel, Click on the `High` Severity link. This will provide a List View of the Instances that have CVEs that are classified under `High` Severity.
+
+    ![High CVEs](media/lab7_none-cves-high.png)
+
+1. Click on the `basics-plus1` Instance. This will provide the Instance level Details, you will see a `CVEs` Section, this time with the Name, Severity and Description for each CVEs applicable to the instance.
+
+    ![Basics-plus1 CVE](media/lab7_basics-plus1-cves.png)
+
+1. If you click on one of the CVEs name hyperlink, for example `CVE-2024-39792`, it will directly open the CVE website on a new tab with detailed information and possible remediations.
+
+    ![High CVE redirect](media/lab7_basics-plus1-cves-redirect.png)
+
+1. In similar fashion explore, click on the `Medium` Severity link within the Overview Dashboard and explore all the other CVEs that are classified under `Medium` Severity.
+
 
 
 <br/>
