@@ -6,9 +6,9 @@ In this lab, you will be exploring the **Nginx One Console**, part of the F5 Net
 
 This Overview will show the different features of the Console, and allow you to explore adding, removing, configuring, updating, and monitoring various instances of Nginx OSS and Nginx Plus Docker containers.
 
-NGINX One | NGINX OSS| NGINX Plus
+NGINX Plus | NGINX One| NGINX OSS
 :-------------------------:|:-------------------------:|:---------------:
-![NGINX Plus](media/nginx-one-icon.png) |![Nginx One](media/nginx-icon.png) |![Nginx OSS](media/nginx-plus-icon.png)
+![NGINX Plus](media/nginx-plus-icon.png) |![Nginx One](media/nginx-one-icon.png) |![Nginx OSS](media/nginx-icon.png)
   
 ## Learning Objectives
 
@@ -16,7 +16,7 @@ By the end of the lab you will be able to:
 
 - Login into the Nginx One Console
 - Add Nginx OSS and Nginx Plus containers to your inventory
-- Explore and review the Nginx and OS Versions
+- Explore and review the Nginx Versions
 - Explore and review the Linux OS Versions
 - Explore and review the TLS Certificates
 - Explore and review the Security CVEs
@@ -81,6 +81,10 @@ This will bring you to the Nginx Console `Overview Dashboard` page - it will sho
 1. After Saving your Key somewhere, scroll down, then click the `Done` button on the bottom right.
 
 ## Run Nginx Containers with Docker
+
+NGINX Plus | Docker| NGINX OSS
+:-------------------------:|:-------------------------:|:---------------:
+![NGINX Plus](media/nginx-plus-icon.png) |![Docker](media/docker-icon.png) |![Nginx OSS](media/nginx-icon.png)
 
 Now that you have a Dataplane Key, you can run some Docker containers, using the provided `docker-compose.yml` file.  This Docker Compose will pull and run 9 different Docker Containers, as follows:
 
@@ -211,6 +215,8 @@ Go back to your One Console Instance page, and click `Refresh`.  You should see 
 
 ## Explore the Nginx One Console Overview Dashboard
 
+![Nginx ONE](media/nginx-one-icon.png) 
+
 Click on the Overview Dashboard, to see the Summary Panels of your Nginx fleet:  
 
 - Availability of your Instances to the Console
@@ -231,29 +237,29 @@ This Panel is pretty self explanatory, which of your Nginx Instances is online a
 
 ### Nginx Versions
 
-This Panel shows a Summary of which Nginx Versions are in use and by how many instances.  Sure, you could write a `bash script to SSH into every Instance`, and query `nginx -v` and collect this data yourself ... but why not use the Console instead?  Do you even *have* `root privleges` to SSH in the first place?  This makes it easy to know what versions of Nginx are running on your Instances - do they need a patch or an upgrade??
+This Panel shows a Summary of which Nginx Versions are in use and by how many instances.  Sure, you could write a `bash script to SSH into every Instance`, and query `nginx -v` and collect this data yourself ... but why not use the Console instead?  Do you even *have* `root privileges` to SSH in the first place?  This makes it easy to know what versions of Nginx are running on your Instances - do they need a patch or an upgrade??
 
 ![Nginx versions](media/lab7_none-nginx-versions.png) 
 
 ### Operating Systems
 
-This Panel shows a Summary of which Linux Distros are in use and by how many instances.  Sure, you could write YABS - yet another bash script - to SSH into every Instance, and query `uname` and collect the versions yourself ... but why not use the Console Easy Button instead ?  As the number of people, teams, and projects grow using Nginx, the Version sprawl can become an issue.  The Console lets you see this level of detail quite easily.  And it makes it easy to find Linux versions that may not be approved by Security for Production, or need a patch applied.
+This Panel shows a Summary of which Linux Distros are in use and by how many instances.  Sure, you could write YABS - yet another bash script - to SSH into every Instance, and query `uname` and collect the versions yourself ... but why not use the Console's Easy Button instead ?  As the number of people, teams, and projects grow using Nginx, the Version sprawl can become an issue.  The Console lets you see this level of detail quite easily.  And it makes it easy to find Linux versions that may not be approved by Security for Production, or need a patch applied.
 
 ![Linux versions](media/lab7_none-linux-versions.png) 
 
-### Certificates
+### Certificates Overview
 
 This Panel shows a Summary of the TLS Certificate expiration Status, using each certificate's expiry date as reported with openssl on each Instance.  Nginx Agent scans the Nginx config files, then uses openssl to query each Certificate file, and reports this information up to the Nginx Console.  If you click on the `Expired, Expiring, Valid, or Not Ready` links, you get additional details on the name of the certificate and on which Instance it can be found.  Once again, this saves you writing another bash script, you can see this TLS metadata at your fingertips.  You will update an expired certificate in the next Exercise.
 
 ![Certs](media/lab7_none-certs.png) 
 
-### Configuration Recommendations
+### Configuration Recommendations Overview
 
 This Panel shows some possible improvements that could be made to your current running Nginx configs.  Some are Security related, or an Optimization, or a Best Practice from the experts that built Nginx.  Clicking on each of these will give you additional details and provide an easy way to edit / update your Nginx configs.  You will do this in the next Exercise.
 
 ![Config recommendations](media/lab7_none-config-recommendations.png) 
 
-### CVEs
+### CVEs Overview
 
 This Panel is a great tool to show you the CVEs that you might have in your Nginx fleet, with `High-Medium-Low Severity` classes, and which Instances are affected.  Even better, click on the CVE hyperlink takes you directly to the CVE website for detailed information, and possible remediations.
 
@@ -267,11 +273,12 @@ Basics Plus1 | Basics Plus2
 
 ### CPU, RAM, Disk Utilization
 
-This Panel shows basic Host level information from the Linux OS about the consumption of hardware resources that the Nginx Agent reports to the One Console.  There is a `time selector` to show these metrics over different periods of time, with a history graph plotted for you.  Click the `See All` button for a columnar list, which you can Filter and Sort.  NOTE:  Docker containers do not report Disk usage.
+These Panels show Host level information from the Linux OS about the consumption of hardware resources that the Nginx Agent reports to the One Console.  There is a `time selector` to show these metrics over different periods of time, with a history graph plotted for you.  Click the `See All` button for a columnar list, which you can Filter and Sort.  
+*NOTE:  Docker containers do not report Disk usage.*
 
-![Cpu](media/lab7_none-cpu.png) 
-![Ram](media/lab7_none-ram.png) 
-![Disk](media/lab7_none-disk.png) 
+CPU | RAM | Disk
+:-------------------------:|:-------------------------:|:---------------:
+![Cpu](media/lab7_none-cpu.png) | ![Ram](media/lab7_none-ram.png) | ![Disk](media/lab7_none-disk.png) 
 
 ### Unsuccessful Response Codes
 
@@ -292,16 +299,7 @@ If you would like to just run a few containers without Docker Compose, here are 
 1. Run an OSS container, with Debian Linux, called `workshop1` using the $TOKEN variable, as follows.
 
     ```bash
-    sudo docker run \
-    --name=workshop1
-    --hostname=workshop1
-    --env=NGINX_AGENT_SERVER_GRPCPORT=443 \
-    --env=NGINX_AGENT_SERVER_HOST=agent.connect.nginx.com \
-    --env=NGINX_AGENT_SERVER_TOKEN=$TOKEN \
-    --env=NGINX_AGENT_TLS_ENABLE=true \
-    --restart=always \
-    --runtime=runc \
-    -d docker-registry.nginx.com/nginx/agent:mainline
+    sudo docker run --name=workshop1 --hostname=workshop1 --env=NGINX_AGENT_SERVER_GRPCPORT=443 --env=NGINX_AGENT_SERVER_HOST=agent.connect.nginx.com --env=NGINX_AGENT_SERVER_TOKEN=$TOKEN --env=NGINX_AGENT_TLS_ENABLE=true --restart=always --runtime=runc -d docker-registry.nginx.com/nginx/agent:mainline
 
     ```
 
@@ -321,14 +319,14 @@ If you would like to just run a few containers without Docker Compose, here are 
 
 ### Nginx Container Images with Nginx Agent installed for Nginx One Console
 
-For Reference:  Find all the currently available Nginx OSS containers with Agent installed.  Curl the `Docker Registry`:
+For Reference:  Find all the currently available `Nginx OSS` containers with Agent installed.  Curl the `Docker Registry`:
 
 ```bash
 curl https://docker-registry.nginx.com/v2/nginx/agent/tags/list  | jq
 
 ```
 
-For Reference:  Find all the currently available NginxPlus containers with Agent installed.  Curl the `Nginx Private Registry`, you will need your `nginx-repo Certificate and Key` files for this command:
+For Reference:  Find all the currently available `NginxPlus` containers with Agent installed.  Curl the `Nginx Private Registry`, you will need your `nginx-repo Certificate and Key` files for this command:
 
 ```bash
 curl https://private-registry.nginx.com/v2/nginx-plus/agent/tags/list --key nginx-repo.key --cert nginx-repo.crt | jq
@@ -337,11 +335,11 @@ curl https://private-registry.nginx.com/v2/nginx-plus/agent/tags/list --key ngin
 
 <br/>
 
-## Nginx One Certificates Overview
+## Nginx One Certificates Deep Dive
 
 ![Certs](media/lab7_none-certs.png) 
 
-Another nice feature of the Nginx One Console is the ability to quickly see the `Expiration Dates of the TLS Certificates` being used by your Nginx Instances.  When the nginx-agent reads the Nginx configuration, it looks for the TLS certificate path/name, and uses openssl to collect the Certificate Expiration date and Subject Name, and sends this information to the One Console.  It provides both a Summary of all the certificates, and the details on each one.  Sure, you can write an bash script to login with root privleges to every Nginx Server, and collect this information yourself.  But using the Nginx One Console makes this easy to see and help plan appropriate actions.  
+Another nice feature of the Nginx One Console is the ability to quickly see the `Expiration Dates of the TLS Certificates` being used by your Nginx Instances.  When the nginx-agent reads the Nginx configuration, it looks for the TLS certificate path/name, and uses openssl to collect the Certificate Expiration date and Subject Name, and sends this information to the One Console.  It provides both a Summary of all the certificates, and the details on each one.  Sure, you can write an bash script to login with root privileges to every Nginx Server, and collect this information yourself.  But using the Nginx One Console makes this easy to see and help plan appropriate actions.  
 
 >There is one small caveat to this feature, it only scans the TLS certificates that are part of the running Nginx configuration of the Instance, *it does not check additional TLS certificates*, even if they are in the same location on disk.
 
@@ -389,7 +387,7 @@ Fix the Expired Certificate!  If you want to create a new certificate, say with 
 
 <br/>
 
-## Nginx One Configuration Recommendations
+## Nginx One Configuration Recommendations Deep Dive
 
 One of the Best Features of the Nginx ONE Console is the Configuration analysis and recommendations that it provides.  The Nginx Product Management and Development teams are experts at Nginx, and they have collaborated to create these valuable insights.  There are three types of Recommendations:
 - Security:  Nginx configurations to provide the best levels of security.
@@ -440,7 +438,7 @@ Ok, so now what??  You can fix all these.  Just Click the `Edit Configuration` P
 
 <br/>
 
-## Nginx One CVEs Overview
+## Nginx One CVEs Deep Dive
 
 ![CVE](media/lab7_none-cves.png)
 
@@ -459,8 +457,6 @@ One of the nice security feature of the NGINX One Console is the ability to prov
     ![High CVE redirect](media/lab7_basics-plus1-cves-redirect.png)
 
 1. In similar fashion explore, click on the `Medium` Severity link within the Overview Dashboard and explore all the other CVEs that are classified under `Medium` Severity.
-
-
 
 <br/>
 
@@ -506,7 +502,6 @@ Don't forget to stop all of the Nginx containers if you are finished with them, 
 - [NGINX Technical Specs](https://docs.nginx.com/nginx/technical-specs/)
 
 
-
 <br/>
 
 ### Authors
@@ -517,4 +512,4 @@ Don't forget to stop all of the Nginx containers if you are finished with them, 
 
 -------------
 
-Navigate to ([Main Menu](../readme.md))
+Navigate to ([Lab7](../lab7/readme.md) | [Main Menu](../readme.md))
