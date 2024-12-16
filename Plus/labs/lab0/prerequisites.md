@@ -15,6 +15,9 @@ By the end of this Prerequisite instructions, you will be ready to do the Worksh
 3. If you do not have a current license, you can request a 30-Day Trial License for free, here: https://www.f5.com/trials/free-trial-nginx-plus-and-nginx-app-protect . It takes several minutes for the F5 Licensing system to send you an email, with a `one-time download link` to the License files.  `Save the nginx-repo.* files to your local storage`, you will need them before you start the Workshop.  (NOTE: the nginx-repo.jwt file is not needed for this workshop, but download it for the Nginx Plus Ingress Workshop if you are interested in learning about Nginx Plus Ingress Controller for Kubernetes - your next NGINXperts Workshop!).
 4. If you do not have access to Nginx Plus, you can still take the NGINX OSS Basics Workshop, and get familiar with NGINX Open Source.
 
+## F5 Distributed Cloud Accout
+
+You will need an F5 Distributed Cloud account to complete the Nginx ONE Console lab exercises.  If you do not have an Account, please contact your F5 Sales Representative for more information.
 
 ## Hardware Requirments
 

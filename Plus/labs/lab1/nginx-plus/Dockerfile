@@ -42,7 +42,7 @@ RUN chown -R nginx:nginx /etc/nginx \
 # # Forward request logs to Docker log collector:
 # && ln -sf /dev/stdout /var/log/nginx/access.log \
 # && ln -sf /dev/stderr /var/log/nginx/error.log \
- # Remove the cert/keys from the image
+    # Remove the cert/keys from the image
 && rm /etc/ssl/nginx/nginx-repo.crt /etc/ssl/nginx/nginx-repo.key
 
 # COPY /usr/share/nginx/html (Nginx files) directory
