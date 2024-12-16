@@ -460,11 +460,11 @@ One of the nice security feature of the NGINX One Console is the ability to prov
 
 <br/>
 
-# Nginx One Config Sync Groups
+## Nginx One Config Sync Groups
 
-You can create and manage config sync groups in the NGINX One Console. Config sync groups synchronize NGINX configurations across multiple NGINX instances, ensuring consistency and ease of management. If you’ve used instance groups in NGINX Instance Manager, you’ll find config sync groups in NGINX One similar. Let's go ahead and create one then add some instances to it.
+You can create and manage `Config Sync Groups` in the NGINX One Console. Config sync groups synchronize NGINX configurations across multiple NGINX instances, ensuring consistency and ease of management. If you’ve used instance groups in NGINX Instance Manager, you’ll find config sync groups in NGINX One similar. Let's go ahead and create one then add some instances to it.
 
-## Create a Config Sync Group
+### Create a Config Sync Group
 
 - Under the `Manage` heading in the left hand column, click on `Config Sync Groups`.<br/>
   ![Config Sync Groups](media/lab7_csg.png)<br/><br/>
@@ -476,20 +476,40 @@ You can create and manage config sync groups in the NGINX One Console. Config sy
   `basics-workshop-plus`<br/>
   ![Config Sync Group Name](media/lab7_csg_name.png)<br/><br/>
 
-## Create and add an instance to the group
+### Create and add an instance to the group
 
-On this page is a button that says `Add Instance to Config Sync Group`<br/>
-![Add Instance](media/lab7_csg_add_instance.png)<br/>
+On this page is a button that says `Add Instance to Config Sync Group`
 
-This will pop up another modal window on the right. We will choose the second option that says: `Register a new instance with NGINX One and then add it to the config sync group`. Then proceed to click on the `Next` button.<br/>
+<br/>
+
+![Add Instance](media/lab7_csg_add_instance.png)
+
+<br/>
+
+This will pop up another modal window on the right. We will choose the second option that says: `Register a new instance with NGINX One and then add it to the config sync group`. Then proceed to click on the `Next` button.
+
+<br/>
+
 ![Register New](media/lab7_csg_register_new.png)
+
 <br/>
-The next option is to generate a dataplane key or use an existing one. We will choose `Use existing Key` and enter `$TOKEN` so that we can use the variable that we created earlier (you can also paste the value of the key itself should you choose).<br/>
+
+The next option is to generate a dataplane key or use an existing one. We will choose `Use existing Key` and enter `$TOKEN` so that we can use the variable that we created earlier (you can also paste the value of the key itself should you choose).
+
+<br/>
+
 ![Use Existing Key](media/lab7_csg_use_existing_key.png)
+
 <br/>
-If you are testing on bare metal, there is a curl command listed to register things. We are going to choose the `Docker Container` option which will list the steps we need to perform. There are three of them as shown in the image below. We are going to modify them a bit (you may need sudo in your environment):<br/>
+
+If you are testing on bare metal, there is a curl command listed to register things. We are going to choose the `Docker Container` option which will list the steps we need to perform. There are three of them as shown in the image below. We are going to modify them a bit (you may need sudo in your environment):
+
+<br/>
+
 ![Docker instructions](media/lab7_csg_docker_instructions.png)
+
 <br/>
+
 Now that we saw the process as outlined in the NGINX One console, let's go over this again and run the provided commands in the terminal (with some modifications):
 
 ### Step 1
@@ -528,11 +548,13 @@ docker run \
 ```
 
 You can see that the container starts up. With a refresh on the Config Sync Groups page, you will see that the basics-workshop-plus Config Sync Group now has 1 instance in it.
+
 <br/>
 
 ![1 Manual Instance](media/lab7_csg_one_manual_instance.png)
 
 <br/>
+
 Hey, didn't we use docker compose to start our containers before? We can add instances to this `Config Sync Group` even easier than what we did above - automatically!
 
 Let's stop our running containers by running:
@@ -554,6 +576,7 @@ docker compose up
 ```
 
 Use the refresh button and you should see the three original instances added to our config group. These will only be the Plus instances as they were the instances to which we added the variable line.
+
 <br/>
 
 ![3 Auto Instances](media/lab7_csg_three_auto_instances.png)
@@ -561,6 +584,7 @@ Use the refresh button and you should see the three original instances added to 
 <br/>
 
 Upon being added to the Config Instance group, NGINX One will attempt to apply the configuration of the group to the instances in it. Here we can see the config was immediately applied to **basics-plus-2**:
+
 <br/>
 
 ![In Sync](media/lab7_csg_basics-plus-2.png)
@@ -575,6 +599,7 @@ Before this finishes, let's show we can push a change to the whole group! Click 
 <br/>
 
 On line 76, Let's simply add a comment, a trivial change. Then click the `Next` button.
+
 <br/>
 
 ![Config Change](media/lab7_csg_config_change.png)
@@ -582,6 +607,7 @@ On line 76, Let's simply add a comment, a trivial change. Then click the `Next` 
 <br/>
 
 The next screen allows you to see a diff between the two configs. After reviewing you can click `Save and Publish`.
+
 <br>
 
 ![Save and Publish](media/lab7_csg_save_publish.png)
@@ -589,6 +615,7 @@ The next screen allows you to see a diff between the two configs. After reviewin
 <br>
 
 NGINX One will indicate the change was a success and push it to all of our instances. Click on the `Details` button of the group to see the status of the instances.
+
 <br>
 
 ![Edit Success](media/lab7_csg_edit_success.png)
@@ -596,6 +623,7 @@ NGINX One will indicate the change was a success and push it to all of our insta
 <br>
 
 We can now see all the instances are in sync!
+
 <br>
 
 ![In Sync](media/lab7_csg_in_sync.png)
@@ -606,7 +634,7 @@ We can now see all the instances are in sync!
 
 **NOTE**
 
-A final note... you can mix OSS and Plus instances in the same group! The important caveat is that the config features must be available to all instances. If you are going to be working with NGINX Plus specific configurations, you are better off putting those into their own Config Sync Group.
+A final note... you can `mix OSS and Plus instances` in the same group! The important caveat is that the config features must be available to all instances. If you are going to be working with NGINX Plus specific configurations, you are better off putting those into their own Config Sync Group.
 
 ---
 
