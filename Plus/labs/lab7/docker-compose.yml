@@ -11,6 +11,7 @@ services:
       NGINX_AGENT_SERVER_GRPCPORT: "443"
       NGINX_AGENT_TLS_ENABLE: "true"
       NGINX_AGENT_SERVER_TOKEN: $TOKEN  # Datakey Fron basics- One Console
+#      NGINX_AGENT_INSTANCE_GROUP: basics-workshop-plus
     hostname: basics-plus1
     container_name: basics-plus1
     image: private-registry.nginx.com/nginx-plus/agent:nginx-plus-r32-alpine-3.20-20240613  # CVE - From Nginx Private Registry
@@ -32,6 +33,7 @@ services:
       NGINX_AGENT_SERVER_GRPCPORT: "443"
       NGINX_AGENT_TLS_ENABLE: "true"
       NGINX_AGENT_SERVER_TOKEN: $TOKEN  # Datakey Fron Nginx One Console
+#      NGINX_AGENT_INSTANCE_GROUP: basics-workshop-plus
     hostname: basics-plus2
     container_name: basics-plus2
     image: private-registry.nginx.com/nginx-plus/agent:nginx-plus-r31-alpine-3.19-20240522 # CVE - From Nginx Private Registry
@@ -53,6 +55,7 @@ services:
       NGINX_AGENT_SERVER_GRPCPORT: "443"
       NGINX_AGENT_TLS_ENABLE: "true"
       NGINX_AGENT_SERVER_TOKEN: $TOKEN  # Datakey Fron Nginx One Console
+#      NGINX_AGENT_INSTANCE_GROUP: basics-workshop-plus
     hostname: basics-plus3
     container_name: basics-plus3
     image: private-registry.nginx.com/nginx-plus/agent:nginx-plus-r31-ubi-9-20240522    # From Nginx Private Registry
@@ -133,7 +136,7 @@ services:
         - "9000"    # Open for stub status page
         - "9113"    # Open for Prometheus Scraper page
     restart: always
-  #     
+  #
   web1:
       hostname: web1
       container_name: web1
