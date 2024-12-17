@@ -663,6 +663,22 @@ docker compose down
 
 ```
 
+To clean up the manual container we added:
+```bash
+docker ps | grep manual
+f8a5fb797615   private-registry.nginx.com/nginx-plus/agent:nginx-plus-r31-alpine-3.19-20240522   "/usr/bin/supervisor…"   About an hour ago   Up About an hour   80/tcp                                                                                                                                                                         basics-manual
+```
+
+```bash
+docker stop f8a
+f8a
+```
+
+```bash
+docker rm f8a
+f8a
+```
+
 Don't forget to stop all of the Nginx containers if you are finished with them, and Delete them from the Nginx One Instance inventory.
 
 <br/>
