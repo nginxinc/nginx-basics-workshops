@@ -93,7 +93,7 @@ Visual Studio Code | Docker
 
     >After submitting the Trial Request form, you will receive an Email in a few minutes with links to download your three license files.  The links are only good for a one-time download.  *Notice - you will also likely receive F5 sales and marketing emails.*
 
-1. Copy your Plus TLS nginx-repo.* license files to the `lab1/nginx-plus/etc/ssl/nginx` folder within your workshop folder.  The nginx-repo.* files must be located in this exact folder for Docker compose to build the container properly.
+1. Copy your Plus TLS `nginx-repo.*` license files to the `lab1/nginx-plus/etc/ssl/nginx` folder within your workshop folder.  The nginx-repo.* files must be located in this exact folder for Docker compose to build the container properly.
 
     ```bash
     # Example
@@ -124,10 +124,11 @@ Visual Studio Code | Docker
 1. Ensure you are in the `lab1` folder.  Using the Visual Studio Terminal, run Docker Compose to build and run the above container.
 
    ```bash
-    cd lab1
+    cd labs/lab1
     docker compose up --force-recreate -d
 
    ```
+
    >If you encounter any errors during the Nginx Plus build process, or starting the containers, you must fix them before proceeding.  The most common errors are related to the nginx-repo files missing or expired or invalid.
 
 1. Verify your `lab1-nginx-plus` container is up and running:
@@ -140,7 +141,7 @@ Visual Studio Code | Docker
     ```bash
     ###Sample output###
     CONTAINER ID   IMAGE                   COMMAND                  CREATED          STATUS          PORTS                                                                        NAMES
-    701272e031e2   lab1-nginx-plus   "nginx -g 'daemon of…"   34 seconds ago   Up 33 seconds   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 8080/tcp, 0.0.0.0:9000->9000/tcp, 9113/tcp   nginx-plus
+    701272e031e2   nginx-plus:workshop   "nginx -g 'daemon of…"   34 seconds ago   Up 33 seconds   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 8080/tcp, 0.0.0.0:9000->9000/tcp, 9113/tcp   nginx-plus
 
     ```
 
@@ -150,6 +151,7 @@ Visual Studio Code | Docker
     curl http://localhost
 
     ```
+
     You should see the Nginx Welcome page.
 
     Now also test with Chrome or a browser, go to http://localhost, you should see the same page.
@@ -179,7 +181,7 @@ In this section, you explore and learn about various Nginx and Linux commands us
 
     ```bash
     ##Sample Output##
-    nginx version: nginx/1.25.3 (nginx-plus-r31)
+    nginx version: nginx/1.25.5 (nginx-plus-r32-p1)
     Usage: nginx [-?hvVtTq] [-s signal] [-p prefix]
              [-e filename] [-c filename] [-g directives]
 
@@ -219,7 +221,7 @@ In this section, you explore and learn about various Nginx and Linux commands us
 
     ```bash
     ##Sample Output##
-    nginx version: nginx/1.25.3 (nginx-plus-r31)
+    nginx version: nginx/1.25.5 (nginx-plus-r32-p1)
     built by gcc 9.4.0 (Ubuntu 9.4.0-1ubuntu1~20.04.2) 
     built with OpenSSL 1.1.1f  31 Mar 2020            # notice the OpenSSL version
     TLS SNI support enabled
@@ -232,29 +234,37 @@ In this section, you explore and learn about various Nginx and Linux commands us
 
     dpkg-query -l | grep nginx
     
-    dpkg -s nginx-plus
-
     ```
 
     ```bash
     ##Sample Output##
-    ii  nginx-plus                 31-1~focal                   amd64        NGINX Plus, provided by Nginx, Inc.
+    ii  nginx-plus                   32-2~focal                        amd64        NGINX Plus, provided by Nginx, Inc.
+    ii  nginx-plus-module-njs        32+0.8.5-1~focal                  amd64        NGINX Plus njs dynamic modules
+    ii  nginx-plus-module-prometheus 32+1.3.6-1~focal                  amd64        NGINX Plus Prometheus exporter NJS module
+    ```
 
+    ```bash
+     dpkg -s nginx-plus
+    
+    ```
+
+    ```
+    ##Sample Output##
     Package: nginx-plus
     Status: install ok installed
     Priority: optional
     Section: httpd
-    Installed-Size: 7062
+    Installed-Size: 7125
     Maintainer: NGINX Packaging <nginx-packaging@f5.com>
     Architecture: amd64
-    Version: 31-1~focal
+    Version: 32-2~focal
     Replaces: nginx, nginx-core, nginx-plus-debug
-    Provides: httpd, nginx, nginx-plus-r31
+    Provides: httpd, nginx, nginx-plus-r32
     Depends: libc6 (>= 2.28), libcrypt1 (>= 1:4.1.0), libpcre2-8-0 (>= 10.22), libssl1.1 (>= 1.1.1), zlib1g (>= 1:1.1.4), lsb-base (>= 3.0-6)
     Recommends: logrotate
     Conflicts: nginx, nginx-common, nginx-core
     Conffiles:
-     /etc/init.d/nginx 0b8cb35c30e187ff9bdfd5d9e7d79631
+    /etc/init.d/nginx 0b8cb35c30e187ff9bdfd5d9e7d79631
     /etc/init.d/nginx-debug ed610161bfa49f021f5afa483a10eac5
     /etc/logrotate.d/nginx a4da44b03e39926b999329061770362b
     /etc/nginx/conf.d/default.conf 5e054c6c3b2901f98e0d720276c3b20c
@@ -263,10 +273,13 @@ In this section, you explore and learn about various Nginx and Linux commands us
     /etc/nginx/nginx.conf 563e30e020178f0db80bd2a87d6232a6
     /etc/nginx/scgi_params df8c71e25e0356ffc539742f08fddfff
     /etc/nginx/uwsgi_params 88ac833ee8ea60904a8b3063fde791de
-    Description: NGINX Plus, provided by Nginx, Inc.    # Not from Marketing, but Dev
-     NGINX Plus extends NGINX open source to create an enterprise-grade Application Delivery Controller, Accelerator and Web Server. Enhanced features include: Layer 4 and Layer 7 load balancing with health checks,session persistence and on-the-fly configuration; Improved content caching;Enhanced status and monitoring information; Streaming media delivery.
+    Description: NGINX Plus, provided by Nginx, Inc.
+    NGINX Plus extends NGINX open source to create an enterprise-grade
+    Application Delivery Controller, Accelerator and Web Server. Enhanced
+    features include: Layer 4 and Layer 7 load balancing with health checks,
+    session persistence and on-the-fly configuration; Improved content caching;
+    Enhanced status and monitoring information; Streaming media delivery.
     Homepage: https://www.nginx.com/
-
     ```
 
     ```bash
@@ -359,7 +372,7 @@ In this section, you explore and learn about various Nginx and Linux commands us
 
 ## NGINX Plus Live Monitoring Dashboard
 
-![NGINX Plus](media/nginx-plus-icon.png) 
+![NGINX Plus](media/nginx-plus-icon.png)
 
 In this section, you will enable the NGINX Plus status Dashboard and watch it for status changes and metrics while you add new configerations and run various tests on NGINX.
 
@@ -418,6 +431,7 @@ All of these metrics are available via NGINX Plus API as a JSON object making it
 1. Test your Nginx configuration and reload Nginx, using the Terminal logged into the Nginx Plus container:
 
    ```bash
+   docker exec -it nginx-plus /bin/bash
    nginx -t
    nginx -s reload
 
@@ -467,7 +481,6 @@ All of these metrics are available via NGINX Plus API as a JSON object making it
 >If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab1` folder:
 
     ```bash
-    cd lab1
     docker compose down
     
     ```
