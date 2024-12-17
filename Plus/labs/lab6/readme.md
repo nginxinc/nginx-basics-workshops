@@ -275,4 +275,4 @@ Network lab6_default         Removed
 
 -------------
 
-Navigate to ([Main Menu](../readme.md))
+Navigate to ([Lab7](../lab7/readme.md) | [Main Menu](../readme.md))

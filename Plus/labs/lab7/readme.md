@@ -705,4 +705,4 @@ Don't forget to stop all of the Nginx containers if you are finished with them, 
 
 -------------
 
-Navigate to ([Lab7](../lab7/readme.md) | [Main Menu](../readme.md))
+Navigate to ([Main Menu](../readme.md))
