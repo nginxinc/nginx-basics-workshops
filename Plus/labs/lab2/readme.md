@@ -116,64 +116,6 @@ http {
 
 <br/>
 
-### Optional Exercise - Pull the Nginx Plus container from the Nginx Registry
-
-In the next exercise, you will pull the Nginx provided Plus container from the official Nginx Container Private Registry, using only your JWT Token file.  This is a safe, fast, and convenient way to download and run Nginx Plus, without needing to build your own Docker image.  There are several different containers available, see the References section.
-
-1. Copy your `nginx-repo.jwt` file to the labs/lab2 folder.  Using the contents of your nginx-repo.jwt file, create an environment variable with the contents of the file:
-
-```bash
-cd lab2
-export JWT=$(cat nginx-repo.jwt)
-
-```
-
-Verify the $JWT is populated:
-
-```bash
-echo $JWT
-
-```
-```
-## Sample output
-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCI
-...snip
-d41BhtS4fGLzD985rk
-
-```
-
-1. Login into the Nginx Private Registry, as shown:
-
-```bash
-docker login private-registry.nginx.com --username=$JWT --password=none
-
-```
-
-1. Pull the Nginx Plus image, as shown:
-
-```bash
-docker pull private-registry.nginx.com/nginx-plus/base:nginx-plus-r32-debian-bookworm
-
-```
-
-1. Verify the image was pulled, as shown:
-
-```bash
-docker image list
-
-```
-
-```bash
-## Sample output
-REPOSITORY                                               TAG                 IMAGE ID       CREATED             SIZE
-private-registry.nginx.com/nginx-plus/nginx-plus/base nginx-plus-r32-debian-bookworm  a947bb41179b   18 hours ago       239MB
-
-```
-
-Now you can tag it and push it to a private Registry if needed.
-
-<br/>
-
 ### Run Nginx Plus
 
 Go ahead and try some of these NGINX commands in your nginx-plus container now, so you are familiar with them.  Open a second Terminal, so you can Watch the docker logs while you try these different commands.  It is recommended that you use 2 Terminals, one for issuing commands, and one for watching logs.
@@ -815,180 +757,6 @@ server {
 
 <br/>
 
-### Optional Lab Exercise - Create an Nginx DEBUG page
-
-1. Update the file `cafe.example.com.conf` to add a new `location` block called `/debug`, open the file and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
-
-    ```nginx
-
-        location /debug {      # Used for testing, returns IP, HTTP, NGINX info 
-            
-            return 200 "NGINX Debug/Testing URL from cafe.example.com\n\nIP Parameters: ClientIP=$remote_addr, NginxIP=$server_addr, UpstreamIP=$upstream_addr, Connection=$connection\n\nHTTP Parameters: Scheme=$scheme, Host=$host, URI=$request, Args=$args, Method=$request_method, UserAgent=$http_user_agent, RequestID=$request_id\n\nSystem Parameters: Time=$time_local, NGINX version=$nginx_version, NGINX PID=$pid\n\n";
-        }
-        
-    ```
-
-1. Save your file, and test your NGINX config by running `nginx -t` command from within the container.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
-
-1. Reload NGINX with `nginx -s reload` command.
-
-1. Test your new /debug path with curl, did you remember your Host Header?
-
-    ```bash
-    curl 127.0.0.1/debug -H "Host: cafe.example.com"
-
-    ```
-
-    You should see a response from the `/debug location block`, with the NGINX `$variables` filled in with data for each request to <http://cafe.example.com/debug> :
-
-    ```bash
-    #Sample output
-    NGINX Debug/Testing URL from cafe.example.com
-
-    IP Parameters: ClientIP=172.18.0.2, NginxIP=172.18.0.2, UpstreamIP=, Connection=8
-
-    HTTP Parameters: Scheme=http, Host=cafe.example.com, URI=GET /debug HTTP/1.1, Args=, Method=GET, UserAgent=curl/8.5.0, RequestID=7a29149e6a687bb52c6901dfc19079f8
-
-    System Parameters: Time=31/Jan/2024:18:53:11 +0000, NGINX version=1.25.3, NGINX PID=89
-
-    ```
-
-If you like this debug page, feel free to explore and ADD additional Request and Response variables, to make the page display the data that is interesting to you.
-
-<br/>
-
-### Optional Lab Exercise - NGINX Static HTML pages
-
-<br/>
-
-Let try some HTML files and images.  You will create another new website, `cars.example.com`, that will have 3 new HTML files and some images of the cars, which will represent 3 high performance autos: the `Lexus RCF, Nissan GTR, and Acura NSX`.  Each car will have it's own URL and location block, and matching .html and .jpg files on disk.
-
-The default directory for serving HTML content with NGINX is `/usr/share/nginx/html`, so you will use that as the root of your new website.
-
-1. First, using vi or a text editor, update your local DNS resolver hosts file, usually `etc/hosts` on MacOS/Linux, to add these FQDN Hostnames used for these lab exercises. `cars.example.com`
-
-    ```bash
-     vi /etc/hosts
-
-     # NGINX Basics hostnames for labs
-     127.0.0.1 localhost www.example.com www2.example.com cafe.example.com cars.example.com
-
-    ```
-
-1. Within the mounted folder (`labs/lab2/nginx-plus/etc/nginx/conf.d`),  create a new file called `cars.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
-
-    ```nginx
-
-    server {
-        
-        listen 80;      # Listening on port 80 on all IP addresses on this machine
-
-        server_name cars.example.com;   # Set hostname to match in request
-
-        access_log  /var/log/nginx/cars.example.com.log main; 
-        error_log   /var/log/nginx/cars.example.com_error.log info;
-
-        root /usr/share/nginx/html;      # Set the root folder for the HTML and JPG files
-
-        location / {           
-            default_type text/html;
-            return 200 "Let's go fast, you have reached cars.example.com, path $uri\n";
-        }
-
-        location /gtr {
-            try_files $uri $uri.html;     # Look for a filename that matches the URI requested
-        }
-        
-        location /nsx {
-            try_files $uri $uri.html;
-        }
-        
-        location /rcf {
-            try_files $uri $uri.html;
-        }
-
-    } 
-
-    ```
-
-1. Save your file, and test your NGINX config by running `nginx -t` command from within the container.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
-
-1. Reload NGINX with `nginx -s reload` command.
-
-1. Test all three URLs, one for each car with curl. Because you have updated local `/etc/hosts` file you can now use your FQDN with curl:
-
-    ```bash
-    curl cars.example.com/gtr
-    curl cars.example.com/nsx
-    curl cars.example.com/rcf
-
-    ```
-
-    ```bash
-    ##Sample output##
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <title>Welcome to nginx GTR !</title>
-    <style>
-        body {
-            width: 35em;
-            margin: 0 auto;
-            font-family: Tahoma, Verdana, Arial, sans-serif;
-        }
-    </style>
-    </head>
-    <body>
-    <h1>Welcome to nginx GTR !</h1>
-    <p>If you see this page, the nginx web server is successfully installed and
-    working.</p>
-
-    <img src="gtr.jpg" alt="GTR" height="480" width="640"></img>
-
-    <p><em>Thank you for using nginx.</em></p>
-    </body>
-    </html>
-
-    ```
-
-    Try all three in a browser, like <http://cars.example.com/gtr>, <http://cars.example.com/nsx>, <http://cars.example.com/rcf> :
-
-    ![NGINX Welcome RCF](media/lab2_welcome-rcf.png)
-
-    You will notice, this page has just a few simple modification to NGINX's default Welcome page.  Feel free to try adding some of your favorite images, and create a new hostname, and location blocks to serve up your new content ... now that you have a couple examples to work with - it's easy with NGINX!
-
-<br/>
-
-### Optional Lab Exercise - NGINX Directory Browsing
-
-<br/>
-
-Now that you have some hot cars in your garage to show off, you might want to let users browse images without knowing all the names or links.  Or, you might want to know what files are in different folders on your webserver, either for yourself or for your visitors, so a File Manager type of user interface would be nice.  NGINX can provide this for you with a module called `http_auto_index`, that can provide this feature.  You will now create a new `location` block called `/browse` that will perform `Directory Browsing` using this feature module:
-
-1. Update the `cars.example.com.conf` file, and add this new Location Block, change the URL path if you like:
-
-    ```nginx
-
-        location /browse {                   # new URL path
-        
-            alias /usr/share/nginx/html;     # Browse this folder
-            index index.html;                # Use this file, but if it does *not* exist
-            autoindex on;                    # Perform directory/file browsing
-        }
-
-    ```
-
-1. Because the `index.html` file *does* exist, you need to rename it to allow Nginx to autoindex the folder.  Go the `/nginx-plus/usr/share/nginx/html` folder, and rename the index.html file to `index.html.bak`.
-
-1. Save your file, and test your NGINX config by running `nginx -t` command from within the container.
-
-1. Reload NGINX with `nginx -s reload` command.
-
-1. To see this in action, open your browser to <http://cars.example.com/browse/> , you should see something similar to this.  If you click on one of the .jpg files, you will see the image; or the webpage if you click on the .html files.  This is a handy feature for presenting images, downloading files from directories, PDFs for documents, etc.
-
-    ![NGINX Directory Browse](media/lab2_directory-browse.png)
-
-<br/>
 
 ### NGINX Logging
 
@@ -1147,6 +915,239 @@ Container nginx-plus          Removed
 Network lab2_default         Removed
 
 ```
+
+### Optional Lab Exercise 1 - Create an Nginx DEBUG page
+
+1. Update the file `cafe.example.com.conf` to add a new `location` block called `/debug`, open the file and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
+
+    ```nginx
+
+        location /debug {      # Used for testing, returns IP, HTTP, NGINX info 
+            
+            return 200 "NGINX Debug/Testing URL from cafe.example.com\n\nIP Parameters: ClientIP=$remote_addr, NginxIP=$server_addr, UpstreamIP=$upstream_addr, Connection=$connection\n\nHTTP Parameters: Scheme=$scheme, Host=$host, URI=$request, Args=$args, Method=$request_method, UserAgent=$http_user_agent, RequestID=$request_id\n\nSystem Parameters: Time=$time_local, NGINX version=$nginx_version, NGINX PID=$pid\n\n";
+        }
+        
+    ```
+
+1. Save your file, and test your NGINX config by running `nginx -t` command from within the container.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
+
+1. Reload NGINX with `nginx -s reload` command.
+
+1. Test your new /debug path with curl, did you remember your Host Header?
+
+    ```bash
+    curl 127.0.0.1/debug -H "Host: cafe.example.com"
+
+    ```
+
+    You should see a response from the `/debug location block`, with the NGINX `$variables` filled in with data for each request to <http://cafe.example.com/debug> :
+
+    ```bash
+    #Sample output
+    NGINX Debug/Testing URL from cafe.example.com
+
+    IP Parameters: ClientIP=172.18.0.2, NginxIP=172.18.0.2, UpstreamIP=, Connection=8
+
+    HTTP Parameters: Scheme=http, Host=cafe.example.com, URI=GET /debug HTTP/1.1, Args=, Method=GET, UserAgent=curl/8.5.0, RequestID=7a29149e6a687bb52c6901dfc19079f8
+
+    System Parameters: Time=31/Jan/2024:18:53:11 +0000, NGINX version=1.25.3, NGINX PID=89
+
+    ```
+
+If you like this debug page, feel free to explore and ADD additional Request and Response variables, to make the page display the data that is interesting to you.
+
+<br/>
+
+### Optional Lab Exercise 2 - NGINX Static HTML pages
+
+<br/>
+
+Let try some HTML files and images.  You will create another new website, `cars.example.com`, that will have 3 new HTML files and some images of the cars, which will represent 3 high performance autos: the `Lexus RCF, Nissan GTR, and Acura NSX`.  Each car will have it's own URL and location block, and matching .html and .jpg files on disk.
+
+The default directory for serving HTML content with NGINX is `/usr/share/nginx/html`, so you will use that as the root of your new website.
+
+1. First, using vi or a text editor, update your local DNS resolver hosts file, usually `etc/hosts` on MacOS/Linux, to add these FQDN Hostnames used for these lab exercises. `cars.example.com`
+
+    ```bash
+     vi /etc/hosts
+
+     # NGINX Basics hostnames for labs
+     127.0.0.1 localhost www.example.com www2.example.com cafe.example.com cars.example.com
+
+    ```
+
+1. Within the mounted folder (`labs/lab2/nginx-plus/etc/nginx/conf.d`),  create a new file called `cars.example.com.conf`, and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
+
+    ```nginx
+
+    server {
+        
+        listen 80;      # Listening on port 80 on all IP addresses on this machine
+
+        server_name cars.example.com;   # Set hostname to match in request
+
+        access_log  /var/log/nginx/cars.example.com.log main; 
+        error_log   /var/log/nginx/cars.example.com_error.log info;
+
+        root /usr/share/nginx/html;      # Set the root folder for the HTML and JPG files
+
+        location / {           
+            default_type text/html;
+            return 200 "Let's go fast, you have reached cars.example.com, path $uri\n";
+        }
+
+        location /gtr {
+            try_files $uri $uri.html;     # Look for a filename that matches the URI requested
+        }
+        
+        location /nsx {
+            try_files $uri $uri.html;
+        }
+        
+        location /rcf {
+            try_files $uri $uri.html;
+        }
+
+    } 
+
+    ```
+
+1. Save your file, and test your NGINX config by running `nginx -t` command from within the container.  If the configuration is valid, it will tell you so.  If you have any errors, it will tell you which file and line number needs to be fixed.
+
+1. Reload NGINX with `nginx -s reload` command.
+
+1. Test all three URLs, one for each car with curl. Because you have updated local `/etc/hosts` file you can now use your FQDN with curl:
+
+    ```bash
+    curl cars.example.com/gtr
+    curl cars.example.com/nsx
+    curl cars.example.com/rcf
+
+    ```
+
+    ```bash
+    ##Sample output##
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>Welcome to nginx GTR !</title>
+    <style>
+        body {
+            width: 35em;
+            margin: 0 auto;
+            font-family: Tahoma, Verdana, Arial, sans-serif;
+        }
+    </style>
+    </head>
+    <body>
+    <h1>Welcome to nginx GTR !</h1>
+    <p>If you see this page, the nginx web server is successfully installed and
+    working.</p>
+
+    <img src="gtr.jpg" alt="GTR" height="480" width="640"></img>
+
+    <p><em>Thank you for using nginx.</em></p>
+    </body>
+    </html>
+
+    ```
+
+    Try all three in a browser, like <http://cars.example.com/gtr>, <http://cars.example.com/nsx>, <http://cars.example.com/rcf> :
+
+    ![NGINX Welcome RCF](media/lab2_welcome-rcf.png)
+
+    You will notice, this page has just a few simple modification to NGINX's default Welcome page.  Feel free to try adding some of your favorite images, and create a new hostname, and location blocks to serve up your new content ... now that you have a couple examples to work with - it's easy with NGINX!
+
+<br/>
+
+### Optional Lab Exercise 3 - NGINX Directory Browsing
+
+<br/>
+
+Now that you have some hot cars in your garage to show off, you might want to let users browse images without knowing all the names or links.  Or, you might want to know what files are in different folders on your webserver, either for yourself or for your visitors, so a File Manager type of user interface would be nice.  NGINX can provide this for you with a module called `http_auto_index`, that can provide this feature.  You will now create a new `location` block called `/browse` that will perform `Directory Browsing` using this feature module:
+
+1. Update the `cars.example.com.conf` file, and add this new Location Block, change the URL path if you like:
+
+    ```nginx
+
+        location /browse {                   # new URL path
+        
+            alias /usr/share/nginx/html;     # Browse this folder
+            index index.html;                # Use this file, but if it does *not* exist
+            autoindex on;                    # Perform directory/file browsing
+        }
+
+    ```
+
+1. Because the `index.html` file *does* exist, you need to rename it to allow Nginx to autoindex the folder.  Go the `/nginx-plus/usr/share/nginx/html` folder, and rename the index.html file to `index.html.bak`.
+
+1. Save your file, and test your NGINX config by running `nginx -t` command from within the container.
+
+1. Reload NGINX with `nginx -s reload` command.
+
+1. To see this in action, open your browser to <http://cars.example.com/browse/> , you should see something similar to this.  If you click on one of the .jpg files, you will see the image; or the webpage if you click on the .html files.  This is a handy feature for presenting images, downloading files from directories, PDFs for documents, etc.
+
+    ![NGINX Directory Browse](media/lab2_directory-browse.png)
+
+<br/>
+
+### Optional Lab Exercise 4 - Pull the Nginx Plus container from the Nginx Registry
+
+In the next exercise, you will pull the Nginx provided Plus container from the official Nginx Container Private Registry, using only your JWT Token file.  This is a safe, fast, and convenient way to download and run Nginx Plus, without needing to build your own Docker image.  There are several different containers available, see the References section.
+
+1. Copy your `nginx-repo.jwt` file to the labs/lab2 folder.  Using the contents of your nginx-repo.jwt file, create an environment variable with the contents of the file:
+
+```bash
+cd lab2
+export JWT=$(cat nginx-repo.jwt)
+
+```
+
+Verify the $JWT is populated:
+
+```bash
+echo $JWT
+
+```
+```
+## Sample output
+eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCI
+...snip
+d41BhtS4fGLzD985rk
+
+```
+
+1. Login into the Nginx Private Registry, as shown:
+
+```bash
+docker login private-registry.nginx.com --username=$JWT --password=none
+
+```
+
+1. Pull the Nginx Plus image, as shown:
+
+```bash
+docker pull private-registry.nginx.com/nginx-plus/base:nginx-plus-r32-debian-bookworm
+
+```
+
+1. Verify the image was pulled, as shown:
+
+```bash
+docker image list
+
+```
+
+```bash
+## Sample output
+REPOSITORY                                               TAG                 IMAGE ID       CREATED             SIZE
+private-registry.nginx.com/nginx-plus/nginx-plus/base nginx-plus-r32-debian-bookworm  a947bb41179b   18 hours ago       239MB
+
+```
+
+Now you can tag it and push it to a private Registry if needed.
+
+<br/>
 
 **This completes Lab2.**
 
