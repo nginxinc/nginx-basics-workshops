@@ -53,9 +53,9 @@ Look for an email from **`courses@notify.udf.f5.com`**. This will have instructi
 
 ## Step 3: RDP to the Jumphost
 
-- Wait for the Jumphost to finish booting. . .
+- Wait for the Jumphost to finish booting...
 
-    ![Non F5](media/waitforboot.png "loading. . .")
+    ![Non F5](media/waitforboot.png "loading...")
 
 - There are two ways to RDP to the Jumphost
 
@@ -76,7 +76,6 @@ Look for an email from **`courses@notify.udf.f5.com`**. This will have instructi
   - In the next window click on "OK" and then enter the login password (`Nginx123`) to log into the Jumphost.
 
       ![Non F5](media/useruser.png)
-
 
   ### OPTION 2: Using **xRDP**
 
