@@ -494,11 +494,10 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 1. First, using vi or a text editor, update your local DNS resolver hosts file, usually `etc/hosts` on MacOS/Linux, to add these FQDN Hostnames used for these lab exercises. `www.example.com www2.example.com`
 
     ```bash
-     vi /etc/hosts
+     sudo vi /etc/hosts
 
      # NGINX Basics hostnames for labs
      127.0.0.1 localhost www.example.com www2.example.com 
-
     ```
 
 1. Navigate to the `labs/lab2/nginx-plus/etc/nginx/conf.d` folder.  Remember, this is the default folder for NGINX HTTP configuration files that is volume mounted to the container.
@@ -531,7 +530,6 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
     ```bash
     docker exec -it nginx-plus /bin/bash
-
     ```
 
 1. As the `labs/lab2/nginx-plus/etc/nginx/conf.d` folder is volume mounted to the `nginx-plus` container, the new file that you created should appear within the container under `/etc/nginx/conf.d` folder.
@@ -542,7 +540,6 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
 
    ```bash
    nginx -s reload
-
    ```
 
 1. Test access to your new website, using terminal, curl to 127.0.0.1:
@@ -550,7 +547,6 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
     ```bash
      # Run curl from outside of container
     curl 127.0.0.1
-
     ```
 
     You should see something like:
@@ -598,7 +594,6 @@ In this exercise, you will create 2 new HTTP configurations, for 2 different web
     ```bash
      # Run curl from outside of container
      curl 127.0.0.1
-
     ```
 
 >BUT WAIT!  Curl is still going to the FIRST website - why ??
@@ -610,7 +605,6 @@ Try adding the Host Header:
 ```bash
     # Run curl from outside of container
     curl 127.0.0.1 -H "Host: www2.example.com"
-
 ```
 
 ```bash
@@ -639,7 +633,7 @@ In this exercise, you will continue to learn how NGINX routes requests, by looki
 1. First, using vi or a text editor, update your local DNS resolver hosts file, usually `etc/hosts` on MacOS/Linux, to add these FQDN Hostnames used for these lab exercises. `cafe.example.com`
 
     ```bash
-     vi /etc/hosts
+     sudo vi /etc/hosts
 
      # NGINX Basics hostnames for labs
      127.0.0.1 localhost www.example.com www2.example.com cafe.example.com
@@ -699,34 +693,28 @@ server {
 
    ```bash
    nginx -s reload
-
    ```
 
 1. Test your new /paths with curl, do you need the Host Header?:
 
     ```bash
     curl cafe.example.com
-
     ```
 
     ```bash
     curl cafe.example.com/coffee
-
     ```
 
     ```bash
     curl cafe.example.com/tea
-
     ```
 
     ```bash
     curl cafe.example.com/hours
-
     ```
 
     ```bash
     curl cafe.example.com/hours/closed
-
     ```
 
     ```bash
@@ -885,7 +873,6 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
     docker exec -it nginx-plus /bin/bash
 
     tail -f /var/log/nginx/cafe.example.com.log
-
     ```
 
     Use curl or your browser to `http://cafe.example.com/coffee`.  The access log should look similar to this:
@@ -905,7 +892,6 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
 ```bash
 cd lab2
 docker compose down
-
 ```
 
 ```bash
@@ -937,7 +923,6 @@ Network lab2_default         Removed
 
     ```bash
     curl 127.0.0.1/debug -H "Host: cafe.example.com"
-
     ```
 
     You should see a response from the `/debug location block`, with the NGINX `$variables` filled in with data for each request to <http://cafe.example.com/debug> :
@@ -969,7 +954,7 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 1. First, using vi or a text editor, update your local DNS resolver hosts file, usually `etc/hosts` on MacOS/Linux, to add these FQDN Hostnames used for these lab exercises. `cars.example.com`
 
     ```bash
-     vi /etc/hosts
+     sudo vi /etc/hosts
 
      # NGINX Basics hostnames for labs
      127.0.0.1 localhost www.example.com www2.example.com cafe.example.com cars.example.com
@@ -1022,7 +1007,6 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
     curl cars.example.com/gtr
     curl cars.example.com/nsx
     curl cars.example.com/rcf
-
     ```
 
     ```bash
@@ -1100,16 +1084,15 @@ In the next exercise, you will pull the Nginx provided Plus container from the o
 ```bash
 cd lab2
 export JWT=$(cat nginx-repo.jwt)
-
 ```
 
 Verify the $JWT is populated:
 
 ```bash
 echo $JWT
+```
 
-```
-```
+```bash
 ## Sample output
 eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCI
 ...snip
@@ -1121,21 +1104,18 @@ d41BhtS4fGLzD985rk
 
 ```bash
 docker login private-registry.nginx.com --username=$JWT --password=none
-
 ```
 
 1. Pull the Nginx Plus image, as shown:
 
 ```bash
 docker pull private-registry.nginx.com/nginx-plus/base:nginx-plus-r32-debian-bookworm
-
 ```
 
 1. Verify the image was pulled, as shown:
 
 ```bash
 docker image list
-
 ```
 
 ```bash
