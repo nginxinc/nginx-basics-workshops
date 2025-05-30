@@ -393,7 +393,15 @@ The NGINX Plus Dashboard and statistics API provide over 240 metrics about the r
 
 All of these metrics are available via NGINX Plus API as a JSON object making it easy to import these stats/metrics into your choice of Monitoring tools.  You will do this in a lab exercise.
 
-1. Using Visual Studio, create a new file called `/etc/nginx/conf.d/dashboard.conf`.  Copy/paste the Nginx config provided here:
+1. Using Visual Studio, create a new file called `dashboard.conf` within `lab1/nginx-plus/etc/nginx/conf.d` folder as shown in below screenshots.  
+
+    ![vscode newfile](media/lab1_vscode_newfile.png)
+
+    <br/>
+
+    ![newfile name](media/lab1_vscode_newfile_name.png)
+
+1. Copy/paste the Nginx config provided below within this new `dashboard.conf` config file:
 
     ```nginx
 
@@ -422,6 +430,7 @@ All of these metrics are available via NGINX Plus API as a JSON object making it
     }
 
     ```
+
     Notice the following configuration parameters:
     - The Dashboard is listening on port 9000, not port 80.
     - The URL is /dashboard.html, using the local folder /usr/share/nginx/html
@@ -478,20 +487,23 @@ All of these metrics are available via NGINX Plus API as a JSON object making it
 
     The current version of the Plus API is `9`, and you can see there is data and metrics available for nginx, processes, connections, http, etc.  You will explore these in upcoming labs.
 
->If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab1` folder:
+## Wrap Up
 
-    ```bash
-    docker compose down
-    
-    ```
+>If you are finished with this lab, you can use Docker Compose to shut down your test environment.
 
-    ```bash
-    ##Sample output##
-    Running 2/2
-    Container nginx-plus         Removed                            
-    Network lab1_default         Removed
+(**NOTE:** Make sure you have exited out of the container by typing `exit` and pressing enter in the container prompt. Also make sure in your terminal, you are back within `labs/lab1` folder before running the command)
 
-    ```
+```bash
+docker compose down
+```
+
+```bash
+##Sample output##
+Running 2/2
+Container nginx-plus         Removed                            
+Network lab1_default         Removed
+
+```
 
 **This completes Lab 1.**
 

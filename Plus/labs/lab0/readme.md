@@ -51,42 +51,63 @@ Look for an email from **`courses@notify.udf.f5.com`**. This will have instructi
 - Click the `DEPLOYMENT` tab at the top
 ![Non F5](media/almostthere.png "I'm up here")
 
-## Step 3: RDP to the Ubuntu Jumpbox
+## Step 3: RDP to the Jumphost
 
-- username: `ubuntu`
-- password: `Nginx123`
+- Wait for the Jumphost to finish booting...
 
-THIS REQUIRES AN RDP CLIENT! If you have a Mac *and* haven't downloaded an RDP client before, here is the first-party version:
+    ![Non F5](media/waitforboot.png "loading...")
 
-[Microsoft's RDP client on the Apple Apps Store](https://apps.apple.com/us/app/microsoft-remote-desktop/id1295203466?mt=12)
+- There are two ways to RDP to the Jumphost
 
-- Now you just have to wait for the Ubuntu Desktop to finish booting. . .
+    ![Non F5](media/launchrdp.png "almost there")
 
-![Non F5](media/waitforboot.png "loading. . .")
+  ### OPTION 1: Using **Apache Guacamole**
 
-- Make sure to select a small enough resolution to see the whole screen.
-
-![Non F5](media/launchrdp.png "almost there")
-
-- Once you select the resolution, your browser will download an rdp file. Open this file to connect to Ubuntu Desktop.
-
-- Accept the self-signed cert, the Ubuntu Desktop username and password will be `ubuntu` and `Nginx123`.
+  ![Apache Guacamole](media/apache_guacamole.png)
   
-  (**NOTE:** This is *not* your UDF login username & password.)
+  This workshop is enabled with Apache Guacamole, which is a clientless remote desktop gateway.
 
-  ![Non F5](media/useruser.png)
+  - To use Apache Guacamole, select `Guacamole` from the ACCESS drop down for the Jumphost.
 
--------------
-> **If you can't connect to the Ubuntu Desktop, *remember to shut off your VPN*, or join a non-proxied network (sometimes a guest network in the office will work)**
--------------
+  - Click on "Allow" for the popup and then enter below credentials.
 
-**For machines running Windows and attached to a domain, Windows will helpfully attempt to use your domain creds to log in, and you'll see:**
+      ![Guacamole Login](media/guacamole_login.png)
+  
+  - In the next window click on "OK" and then enter the login password (`Nginx123`) to log into the Jumphost.
 
-![Non F5](media/domaincreds.png "everyone has credentials.com email accounts right?")
+      ![Non F5](media/useruser.png)
 
-### Click "More choices" to enter both a username and a password
+  ### OPTION 2: Using **xRDP**
 
-![Non F5](media/domaincredsannotated.png "green arrows")
+  ![RDP](media/rdp.png)
+
+  THIS OPTION REQUIRES AN RDP CLIENT! If you have a Mac *and* haven't downloaded an RDP client before, here is the first-party version:
+
+  [Microsoft's RDP client on the Apple Apps Store](https://apps.apple.com/us/app/microsoft-remote-desktop/id1295203466?mt=12)
+
+  - To use your RDP client, select `xRDP` from the ACCESS drop down for the Jumphost. Make sure to select a small enough resolution to see the whole screen.
+
+  - Once you select the resolution, your browser will download an rdp file. Open this file to connect to the Jumphost.
+
+  - Accept the self-signed cert and then enter the login password (`Nginx123`) to log into the Jumphost.
+  
+    (**NOTE:** This is *not* your UDF login password.)
+
+    ![Non F5](media/useruser.png)
+
+    > **If you can't connect to the Jumphost, *remember to shut off your VPN*, or join a non-proxied network (sometimes a guest network in the office will work)**
+
+    **For machines running Windows and attached to a domain, Windows will helpfully attempt to use your domain creds to log in, and you'll see:**
+
+    ![Non F5](media/domaincreds.png "everyone has credentials.com email accounts right?")
+
+    **Click "More choices" to enter both a username and a password**
+
+    ![Non F5](media/domaincredsannotated.png "green arrows")
+
+- Irrespective of which Option you choose to RDP to Jumphost, once logged in you should see an ubuntu desktop as below screenshot.
+
+  ![rdp desktop](media/rdp_desktop.png)
 
 That wraps the pre-requisites.
 
