@@ -2,7 +2,7 @@
 
 ## Introduction
 
-You will build a Docker container running the Plus version of NGINX, which requires a subscription/license.  You will need a subscription license, using the TLS `nginx-repo.crt and nginx-repo.key` files.  These files provide access to the `NGINX Plus Repository` where the Plus binary files are located.  These are not publicly accessible, you must have a valid Certificate and Key for access.  This new NGINX Plus container will be used for the rest of the Lab exercises, while you explore and add Plus features and options to your environment.
+You will build a Docker container running the Plus version of NGINX, which requires a subscription/license.  You will need a subscription license, using the TLS `nginx-repo.crt, nginx-repo.key and license.jwt` files.  These files provide access to the `NGINX Plus Repository` where the Plus binary files are located.  These are not publicly accessible, you must have a valid Certificate and Key for access. You also need the JWT license file to validate your subscription and automatically send usage reports to F5 licensing endpoint to be complaint with subscription agreement.  This new NGINX Plus container will be used for the rest of the Lab exercises, while you explore and add Plus features and options to your environment.
 
 ## Learning Objectives
 
@@ -64,7 +64,9 @@ NGINX Plus is the `Commercial version of NGINX`, with additional Enterprise feat
 
 ## Pre-Requisites
 
-- You must have a license for NGINX Plus, see Lab0 Prerequisites for details
+> **NOTE:** If you are attending an F5 hosted workshop then you can ignore the pre-requisites section as the F5 workshop environment should have all the tooling pre installed.
+
+- You must have a license for NGINX Plus, see Lab0 Prerequisites for details 
 - You must have Docker installed and running
 - You must have Docker-compose installed
 - (Optional) You should have Visual Studio Code installed to work through the NGINX configuration files.
