@@ -26,7 +26,7 @@ RUN wget -qO - https://cs.nginx.com/static/keys/nginx_signing.key \
     | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
 
 RUN printf "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
-https://pkgs.nginx.com/plus/debian `lsb_release -cs` nginx-plus\n" \
+https://pkgs.nginx.com/plus/R33/debian `lsb_release -cs` nginx-plus\n" \
 | tee /etc/apt/sources.list.d/nginx-plus.list
 
 RUN wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90pkgs-nginx
