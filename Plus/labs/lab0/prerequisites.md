@@ -17,7 +17,7 @@ By the end of this Prerequisite instructions, you will be ready to do the Worksh
 
 ## F5 Distributed Cloud Accout
 
-You will need an F5 Distributed Cloud account to complete the Nginx ONE Console lab exercises.  If you do not have an Account, please contact your F5 Sales Representative for more information.
+You will need an F5 Distributed Cloud account to complete the Nginx ONE Console lab exercise (lab 7).  If you do not have an Account, please contact your F5 Sales Representative for more information.
 
 ## Hardware Requirments
 

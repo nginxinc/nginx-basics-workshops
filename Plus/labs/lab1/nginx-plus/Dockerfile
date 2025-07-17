@@ -10,4 +10,4 @@ FROM private-registry.nginx.com/nginx-plus/base:r34-debian-bookworm
 # COPY --from=otel-base / /
 
 # Use this section to  install additional tools/packages
-RUN apt-get update && apt-get install -y curl wget net-tools vim tree openssl jq
+RUN apt-get update && apt-get install -y curl wget procps net-tools vim tree openssl jq

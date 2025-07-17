@@ -83,43 +83,57 @@ Visual Studio Code | Docker
 
 1. Open the Workshop folder with Visual Studio Code, or an IDE / text editor of your choice, so you can read and edit the files provided.
 
+    >**NOTE:** If you are using F5 provided UDF environment then jump to Step 5 and skip Step 2 - 4 as those steps cover downloading NGINX Plus license file which is already provided in the F5 UDF environment.
+
 1. Download and copy your NGINX Plus license files to your computer.  There are 3 files provided, you will need all three files `.crt and .key and .jwt` files for this Workshop:
 
     - `nginx-repo.crt`, TLS certificate for Plus Repo access
     - `nginx-repo.key`, TLS key for Plus Repo access
-    - `nginx-repo.jwt`, a JWT Token for the F5 container registry
+    - `nginx-repo.jwt`, a JWT Token to validate your subscription. This JWT Token is also used to access private F5 container registry
 
     If you need an NGINX Plus Trial license, you can request one here:
 
-    [NGINX Plus Trial](https://www.f5.com/trials/free-trial-nginx-plus-and-nginx-app-protect)
+    [NGINX Plus Trial](https://www.f5.com/trials/nginx-one)
 
     >After submitting the Trial Request form, you will receive an Email in a few minutes with links to download your three license files.  The links are only good for a one-time download.  *Notice - you will also likely receive F5 sales and marketing emails.*
 
-1. Copy your Plus TLS `nginx-repo.*` license files to the `lab1/nginx-plus/etc/ssl/nginx` folder within your workshop folder.  The nginx-repo.* files must be located in this exact folder for Docker compose to build the container properly.
+1. Copy your Plus `nginx-repo.crt` and `nginx-repo.key` license files to the `lab1/nginx-plus/etc/ssl/nginx` folder within your workshop folder.  The `nginx-repo.crt` and `nginx-repo.key` files must be located in this exact folder for Docker compose to build the container properly.
 
     ```bash
     # Example
-    cp /user/home/nginx-repo.* /user/home/nginx-basics-workshop/Plus/labs/lab1/nginx-plus/etc/ssl/nginx
+    cp /user/home/nginx-repo.crt /user/home/nginx-basics-workshop/Plus/labs/lab1/nginx-plus/etc/ssl/nginx
+    
+    cp /user/home/nginx-repo.key /user/home/nginx-basics-workshop/Plus/labs/lab1/nginx-plus/etc/ssl/nginx
+
+    ```
+
+1. Rename `nginx-repo.jwt` JWT token file to `license.jwt` and copy to the `lab1/nginx-plus/etc/nginx` folder within your workshop folder. The `license.jwt` file must be located in this exact folder for Docker compose to build the container properly.
+
+    ```bash
+    # Example
+    cp /user/home/nginx-repo.jwt /user/home/nginx-basics-workshop/Plus/labs/lab1/nginx-plus/etc/nginx/license.jwt
 
     ```
 
 1. Inspect the `docker-compose.yml` file, located in the /lab1 folder. Notice you start with building the NGINX-Plus container.  There are several folders that are mounted, and several TCP ports opened.
 
    ```bash
-    nginx-plus:              # NGINX Plus Web / Load Balancer
-        hostname: nginx-plus
-        container_name: nginx-plus
-        build: nginx-plus    # Build new container, using /nginx-plus/Dockerfile
-        volumes:
-            - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d        # Copy these folders to container
-            - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
-            - ./nginx-plus/usr/share/nginx/html:/usr/share/nginx/html
-            - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
-        ports:
-            - 80:80       # Open for HTTP
-            - 443:443     # Open for HTTPS
-            - 9000:9000   # Open for dashboard & api
-        restart: always
+    nginx-plus:                  # NGINX Plus Web / Load Balancer
+    hostname: nginx-plus
+    container_name: nginx-plus
+    build: ./nginx-plus          # Build new container, using /nginx-plus/Dockerfile
+    image: nginx-plus:workshop
+    volumes:                     # Copy these files/folders to container
+        - ./nginx-plus/etc/nginx/license.jwt:/etc/nginx/license.jwt
+        - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d        
+        - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
+        - ./nginx-plus/usr/share/nginx/html:/usr/share/nginx/html
+        - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+        - 80:80       # Open for HTTP
+        - 443:443     # Open for HTTPS
+        - 9000:9000   # Open for Plus Dashboard page / API
+    restart: always 
 
    ```
 
@@ -151,7 +165,6 @@ Visual Studio Code | Docker
 
     ```bash
     curl http://localhost
-
     ```
 
     You should see the Nginx Welcome page.
@@ -170,7 +183,6 @@ In this section, you explore and learn about various Nginx and Linux commands us
 
     ```bash
     docker exec -it nginx-plus /bin/bash
-
     ```
 
 1. Run some commands inside the NGINX Plus Container:
@@ -178,12 +190,11 @@ In this section, you explore and learn about various Nginx and Linux commands us
     ```bash
     # Check NGINX help page
     nginx -h
-
     ```
 
     ```bash
     ##Sample Output##
-    nginx version: nginx/1.25.5 (nginx-plus-r32-p1)
+    nginx version: nginx/1.27.4 (nginx-plus-r34-p1)
     Usage: nginx [-?hvVtTq] [-s signal] [-p prefix]
              [-e filename] [-c filename] [-g directives]
 
@@ -206,63 +217,57 @@ In this section, you explore and learn about various Nginx and Linux commands us
     ```bash
     # What version of Nginx is running:
     nginx -v
-
     ```
 
     ```bash
     ##Sample Output##
-    nginx version: nginx/1.25.5 (nginx-plus-r32-p1)  # Notice the "-plus-rXX" label
+    nginx version: nginx/1.27.4 (nginx-plus-r34-p1)  # Notice the "-plus-rXX" label
 
     ```
 
     ```bash
     # List all modules and config settings of NGINX Plus:
     nginx -V
-
     ```
 
     ```bash
     ##Sample Output##
-    nginx version: nginx/1.25.5 (nginx-plus-r32-p1)
-    built by gcc 9.4.0 (Ubuntu 9.4.0-1ubuntu1~20.04.2) 
-    built with OpenSSL 1.1.1f  31 Mar 2020            # notice the OpenSSL version
+    nginx version: nginx/1.27.4 (nginx-plus-r34-p1)
+    built by gcc 12.2.0 (Debian 12.2.0-14+deb12u1) 
+    built with OpenSSL 3.0.16 11 Feb 2025           # notice the OpenSSL version
     TLS SNI support enabled
-    configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-http_v3_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --build=nginx-plus-r31 --mgmt-id-path=/var/lib/nginx/nginx.id --with-http_auth_jwt_module --with-http_f4f_module --with-http_hls_module --with-http_proxy_protocol_vendor_module --with-http_session_log_module --with-mgmt --with-stream_mqtt_filter_module --with-stream_mqtt_preread_module --with-stream_proxy_protocol_vendor_module --with-cc-opt='-g -O2 -fdebug-prefix-map=/data/builder/debuild/nginx-plus-1.25.3/debian/debuild-base/nginx-plus-1.25.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
+    configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-http_v3_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --build=nginx-plus-r34-p1 --state-path=/var/lib/nginx/state --with-http_auth_jwt_module --with-http_f4f_module --with-http_hls_module --with-http_oidc_module --with-http_proxy_protocol_vendor_module --with-http_session_log_module --with-mgmt --with-stream_mqtt_filter_module --with-stream_mqtt_preread_module --with-stream_proxy_protocol_vendor_module --system-ca-bundle=/etc/ssl/certs/ca-certificates.crt --with-cc-opt='-g -O2 -ffile-prefix-map=/home/builder/debuild/nginx-plus-1.27.4/debian/debuild-base/nginx-plus-1.27.4=. -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
 
     ```
 
     ```bash
     # List nginx packages installed
-
     dpkg-query -l | grep nginx
-    
     ```
 
     ```bash
     ##Sample Output##
-    ii  nginx-plus                   32-2~focal                        amd64        NGINX Plus, provided by Nginx, Inc.
-    ii  nginx-plus-module-njs        32+0.8.5-1~focal                  amd64        NGINX Plus njs dynamic modules
-    ii  nginx-plus-module-prometheus 32+1.3.6-1~focal                  amd64        NGINX Plus Prometheus exporter NJS module
+    ii  nginx-plus                  34-2~bookworm                  arm64        NGINX Plus, provided by Nginx, Inc.
+    ii  nginx-plus-module-njs       34+0.8.9-1~bookworm            arm64        NGINX Plus njs dynamic modules
     ```
 
     ```bash
      dpkg -s nginx-plus
-    
     ```
 
-    ```
+    ```bash
     ##Sample Output##
     Package: nginx-plus
     Status: install ok installed
     Priority: optional
     Section: httpd
-    Installed-Size: 7125
+    Installed-Size: 5173
     Maintainer: NGINX Packaging <nginx-packaging@f5.com>
-    Architecture: amd64
-    Version: 32-2~focal
+    Architecture: arm64
+    Version: 34-2~bookworm
     Replaces: nginx, nginx-core, nginx-plus-debug
-    Provides: httpd, nginx, nginx-plus-r32
-    Depends: libc6 (>= 2.28), libcrypt1 (>= 1:4.1.0), libpcre2-8-0 (>= 10.22), libssl1.1 (>= 1.1.1), zlib1g (>= 1:1.1.4), lsb-base (>= 3.0-6)
+    Provides: httpd, nginx, nginx-plus-r34
+    Depends: libc6 (>= 2.34), libcrypt1 (>= 1:4.1.0), libpcre2-8-0 (>= 10.22), libssl3 (>= 3.0.0), zlib1g (>= 1:1.1.4), lsb-base (>= 3.0-6), ca-certificates
     Recommends: logrotate
     Conflicts: nginx, nginx-common, nginx-core
     Conffiles:
@@ -272,7 +277,7 @@ In this section, you explore and learn about various Nginx and Linux commands us
     /etc/nginx/conf.d/default.conf 5e054c6c3b2901f98e0d720276c3b20c
     /etc/nginx/fastcgi_params 4729c30112ca3071f4650479707993ad
     /etc/nginx/mime.types 754582375e90b09edaa6d3dbd657b3cf
-    /etc/nginx/nginx.conf 563e30e020178f0db80bd2a87d6232a6
+    /etc/nginx/nginx.conf e7b0272ab0408de48c8440432787ba7b
     /etc/nginx/scgi_params df8c71e25e0356ffc539742f08fddfff
     /etc/nginx/uwsgi_params 88ac833ee8ea60904a8b3063fde791de
     Description: NGINX Plus, provided by Nginx, Inc.
@@ -282,40 +287,39 @@ In this section, you explore and learn about various Nginx and Linux commands us
     session persistence and on-the-fly configuration; Improved content caching;
     Enhanced status and monitoring information; Streaming media delivery.
     Homepage: https://www.nginx.com/
+
     ```
 
     ```bash
     # What nginx processes are running?
     ps aux |grep nginx
-
     ```
 
     ```bash
     ##Sample Output##
-    root         1  0.0  0.0  10544  7040 ?        Ss   18:27   0:00 nginx: master process nginx -g daemon off;
-    nginx        7  0.0  0.0  92924  4312 ?        S    18:27   0:00 nginx: worker process
-    root        50  0.0  0.0   3312  1792 pts/0    S+   19:00   0:00 grep --color=auto nginx
+   root        31  0.1  0.1  12608  9108 ?        S    22:24   0:00 nginx: master process /usr/sbin/nginx -g daemon off;
+    nginx       32  0.0  0.1  86996  8296 ?        S    22:24   0:00 nginx: worker process
+    root        41  0.0  0.0   3080  1356 pts/0    S+   22:25   0:00 grep nginx
 
     ```
 
     ```bash
     # Which TCP Ports are being used by NGINX ?
     netstat -alpn
-
     ```
 
     ```bash
     ##Sample output##
     Active Internet connections (servers and established)
-    Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
-    tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      1/nginx: master pro
-    tcp        0      0 127.0.0.11:33521        0.0.0.0:*               LISTEN      -
-    tcp        0      0 0.0.0.0:9000            0.0.0.0:*               LISTEN      1/nginx: master pro
-    udp        0      0 127.0.0.11:58307        0.0.0.0:*                           -
+    Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+    tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      31/nginx: master pr 
+    tcp        0      0 127.0.0.11:46387        0.0.0.0:*               LISTEN      -                   
+    udp        0      0 127.0.0.11:47095        0.0.0.0:*                           -                   
     Active UNIX domain sockets (servers and established)
     Proto RefCnt Flags       Type       State         I-Node   PID/Program name     Path
-    unix  3      [ ]         STREAM     CONNECTED     634      1/nginx: master pro
-    unix  3      [ ]         STREAM     CONNECTED     635      1/nginx: master pro
+    unix  3      [ ]         STREAM     CONNECTED     27341    31/nginx: master pr  
+    unix  3      [ ]         STREAM     CONNECTED     27342    31/nginx: master pr  
+    unix  2      [ ACC ]     STREAM     LISTENING     35714    1/python3            /var/run/supervisor.sock.1
 
     ```
 
@@ -324,13 +328,11 @@ In this section, you explore and learn about various Nginx and Linux commands us
     ls -l /etc/nginx
 
     ls -l /etc/nginx/conf.d
-
     ```
 
     ```bash
     # Test the current NGINX configuration
     nginx -t
-
     ```
 
     ```bash
@@ -343,13 +345,11 @@ In this section, you explore and learn about various Nginx and Linux commands us
     ```bash
     # Reload Nginx - checks your new config and reloads Nginx
     nginx -s reload
-
     ```
 
     ```bash
     # Display the entire NGINX configuration, includes all files
     nginx -T
-
     ```
 
     ```bash
