@@ -68,10 +68,6 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
             - ./nginx-plus/usr/share/nginx/html:/usr/share/nginx/html
             - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
             - ../nginx-repo.jwt:/etc/nginx/license.jwt      # Copy JWT Token to fulfill licensing requirement
-        links:
-            - web1:web1
-            - web2:web2
-            - web3:web3
         ports:
             - 80:80       # Open for HTTP
             - 443:443     # Open for HTTPS
