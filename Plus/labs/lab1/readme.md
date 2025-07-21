@@ -107,15 +107,33 @@ Visual Studio Code | Docker
 
     ```
 
-1. Rename `nginx-repo.jwt` JWT token file to `license.jwt` and copy to the `lab1/nginx-plus/etc/nginx` folder within your workshop folder. The `license.jwt` file must be located in this exact folder for Docker compose to build the container properly.
+1. Copy `nginx-repo.jwt` JWT token file to the `labs` folder within your workshop folder. The `nginx-repo.jwt` file must be located in this exact folder for Docker compose to build the container properly.
 
     ```bash
     # Example
-    cp /user/home/nginx-repo.jwt /user/home/nginx-basics-workshop/Plus/labs/lab1/nginx-plus/etc/nginx/license.jwt
+    cp /user/home/nginx-repo.jwt /user/home/nginx-basics-workshop/Plus/labs
 
     ```
 
-1. Inspect the `docker-compose.yml` file, located in the /lab1 folder. Notice you start with building the NGINX-Plus container.  There are several folders that are mounted, and several TCP ports opened.
+1. Using the Visual Studio Terminal, set the `JWT` environment variable with your nginx-repo.jwt license file. This is required to pull the NGINX Plus container images from the NGINX Private Registry referenced in the dockerfile.
+
+    ```bash
+    export JWT=$(cat nginx-repo.jwt)
+    ```
+
+    And verify it was set:
+
+    ```bash
+    echo $JWT
+    ```
+
+1. Using Docker, Login to to the NGINX Private Registry, using the $JWT ENV variable for the username, as follows. (Your system may require sudo):
+
+    ```bash
+    docker login private-registry.nginx.com --username=$JWT --password=none
+    ```
+
+1. Inspect the `docker-compose.yml` file, located in the `labs/lab1` folder. Notice you start with building the NGINX-Plus container.  There are several folders that are mounted, and several TCP ports opened.
 
    ```bash
     nginx-plus:                  # NGINX Plus Web / Load Balancer
@@ -124,11 +142,11 @@ Visual Studio Code | Docker
     build: ./nginx-plus          # Build new container, using /nginx-plus/Dockerfile
     image: nginx-plus:workshop
     volumes:                     # Copy these files/folders to container
-        - ./nginx-plus/etc/nginx/license.jwt:/etc/nginx/license.jwt
         - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d        
         - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
         - ./nginx-plus/usr/share/nginx/html:/usr/share/nginx/html
         - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+        - ../nginx-repo.jwt:/etc/nginx/license.jwt      # Copy JWT Token to fulfill licensing requirement
     ports:
         - 80:80       # Open for HTTP
         - 443:443     # Open for HTTPS
@@ -140,7 +158,7 @@ Visual Studio Code | Docker
 1. Ensure you are in the `lab1` folder.  Using the Visual Studio Terminal, run Docker Compose to build and run the above container.
 
    ```bash
-    cd labs/lab1
+    cd lab1
     docker compose up --force-recreate -d
 
    ```
@@ -151,7 +169,6 @@ Visual Studio Code | Docker
 
     ```bash
     docker ps
-
     ```
 
     ```bash
