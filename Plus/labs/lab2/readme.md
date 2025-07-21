@@ -1079,10 +1079,10 @@ Now that you have some hot cars in your garage to show off, you might want to le
 
 In the next exercise, you will pull the Nginx provided Plus container from the official Nginx Container Private Registry, using only your JWT Token file.  This is a safe, fast, and convenient way to download and run Nginx Plus, without needing to build your own Docker image.  There are several different containers available, see the References section.
 
-1. Copy your `nginx-repo.jwt` file to the labs/lab2 folder.  Using the contents of your nginx-repo.jwt file, create an environment variable with the contents of the file:
+1. Make sure your `JWT` environment variable is still set, if not set using below command:
 
 ```bash
-cd lab2
+cd labs
 export JWT=$(cat nginx-repo.jwt)
 ```
 
