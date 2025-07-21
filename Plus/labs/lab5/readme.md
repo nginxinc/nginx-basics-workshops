@@ -52,22 +52,22 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
 
 1. Inspect the `docker-compose.yml` file, located in the /lab5 folder. Notice you are running the NGINX-Plus container that you built in Lab1.
 
-   ```bash
-    # NGINX Plus Proxy with tools build
-    # NGINX webservers with ingress-demo pages
-    # NGINX Basics, Nov 2024
-    # Chris Akker, Shouvik Dutta, Adam Currier
-    #
+    ```bash
+
+    ...
+
     services:
     nginx-plus:                  # NGINX Plus Web / Load Balancer
         hostname: nginx-plus
         container_name: nginx-plus
-        image: nginx-plus:workshop  # From Lab1
-        volumes:                    # Sync these folders to container
-            - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+        #build: ./nginx-plus          # Build new container, using /nginx-plus/Dockerfile
+        image: nginx-plus:workshop          # Run nginx-plus container
+        volumes:                      # Copy these files/folders to container 
             - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d
             - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
             - ./nginx-plus/usr/share/nginx/html:/usr/share/nginx/html
+            - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+            - ../nginx-repo.jwt:/etc/nginx/license.jwt      # Copy JWT Token to fulfill licensing requirement
         links:
             - web1:web1
             - web2:web2
@@ -75,37 +75,37 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
         ports:
             - 80:80       # Open for HTTP
             - 443:443     # Open for HTTPS
-            - 9000:9000   # Open for API / dashboard page
-        restart: always 
+            - 9000:9000   # Open for Plus Dashboard page / API
+        restart: always
 
-   ```
+    ```
 
 1. Also in the `docker-compose.yml` file you will run three other Docker NGINX webserver containers. These will be your upstream backend webservers for this lab.
 
-```bash
-    web1:
-        hostname: web1
-        container_name: web1
-        image: nginxinc/ingress-demo            # Image from Docker Hub
-        ports:
-            - "80"                                # Open for HTTP
-            - "443"                               # Open for HTTPS
-    web2:
-        hostname: web2
-        container_name: web2
-        image: nginxinc/ingress-demo
-        ports:
-            - "80"
-            - "433"
-    web3:
-        hostname: web3
-        container_name: web3
-        image: nginxinc/ingress-demo
-        ports:
-            - "80"
-            - "443" 
+    ```bash
+        web1:
+            hostname: web1
+            container_name: web1
+            image: nginxinc/ingress-demo            # Image from Docker Hub
+            ports:
+                - "80"                                # Open for HTTP
+                - "443"                               # Open for HTTPS
+        web2:
+            hostname: web2
+            container_name: web2
+            image: nginxinc/ingress-demo
+            ports:
+                - "80"
+                - "433"
+        web3:
+            hostname: web3
+            container_name: web3
+            image: nginxinc/ingress-demo
+            ports:
+                - "80"
+                - "443" 
 
-```
+    ```
 
 1. Ensure you are in the `lab5` folder.  Using a Terminal, run Docker Compose to build and run all the above containers.  *Make sure you stop all the containers from Lab4 before running Lab5.*
 
@@ -199,7 +199,7 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
 
     ```bash
     ##Sample Output##
-    nginx version: nginx/1.25.3 (nginx-plus-r31)
+    nginx version: nginx/1.27.4 (nginx-plus-r34-p1)
     Usage: nginx [-?hvVtTq] [-s signal] [-p prefix]
              [-e filename] [-c filename] [-g directives]
 
@@ -374,7 +374,7 @@ In this section, you will explore how NGINX Plus can be reconfigured without dro
 1. Start the `wrk` load generation tool by downloading and running the following docker container.
 
    ```bash
-    docker run --network=lab5_default --rm williamyeh/wrk -t4 -c200 -d5m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
+    docker run --network=lab5_default --rm elswork/wrk -t4 -c200 -d5m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
 
    ```
 
@@ -437,7 +437,7 @@ In this section, you will manage your backend servers dynamically using the NGIN
 1. Start the `wrk` load generation tool by downloading and running the following docker container.
 
    ```bash
-    docker run --network=lab5_default --rm williamyeh/wrk -t4 -c200 -d20m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
+    docker run --network=lab5_default --rm elswork/wrk -t4 -c200 -d20m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
 
    ```
 
