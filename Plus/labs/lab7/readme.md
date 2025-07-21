@@ -115,10 +115,10 @@ Now that you have a Dataplane Key, you can run some Docker containers, using the
 
     ```
 
-1. Using the same Terminal, set the `JWT` environment variable from your `nginx-repo.jwt` license file.  This is required to pull the Nginx Plus container images from the Nginx Private Registry.   If you do not have an Nginx Plus license, you can request a free 30-Day Trial license from here:  https://www.f5.com/trials/nginx-one 
+1. Using the same Terminal, set the `JWT` environment variable from your `labs/nginx-repo.jwt` license file.  This is required to pull the Nginx Plus container images from the Nginx Private Registry.   If you do not have an Nginx Plus license, you can request a free 30-Day Trial license from here:  https://www.f5.com/trials/nginx-one 
 
     ```bash
-    export JWT=$(cat lab7/nginx-repo.jwt)
+    export JWT=$(cat nginx-repo.jwt)
     ```
 
     And verify it was set:
