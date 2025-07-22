@@ -64,6 +64,6 @@ Click [Lab1: Build and Run NGINX Plus on Docker](lab1/readme.md) to get started!
 
 ### Authors
 
-- Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
-- Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
-- Adam Currier - Solutions Architect - Community and Alliances @ F5, Inc.
+- Chris Akker - Solutions Architect - Modern Apps Team @ F5, Inc.
+- Shouvik Dutta - Solutions Architect - Modern Apps Team @ F5, Inc.
+- Adam Currier - Solutions Architect - Modern Apps Team @ F5, Inc.

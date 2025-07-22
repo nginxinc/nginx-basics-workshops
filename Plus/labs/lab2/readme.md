@@ -187,34 +187,6 @@ Try some Nginx commands:
 
     ```
 
-    ```bash
-    ##Sample output##
-
-    /etc/nginx # nginx -v
-    nginx version: nginx/1.25.4
-
-    /etc/nginx # nginx -t
-    nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
-    nginx: configuration file /etc/nginx/nginx.conf test is successful
-
-    /etc/nginx # nginx -T
-    nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
-    nginx: configuration file /etc/nginx/nginx.conf test is successful
-    # configuration file /etc/nginx/nginx.conf:
-    ...
-    # displays all .conf file contents
-    ...
-
-    /etc/nginx # nginx -s reload
-    2024/02/02 20:10:04 [notice] 44#44: signal process started
-
-    2024/02/02 20:10:04 [notice] 1#1: signal 1 (SIGHUP) received from 44, reconfiguring
-    2024/02/02 20:10:04 [notice] 1#1: reconfiguring
-    2024/02/02 20:10:04 [notice] 1#1: using the "epoll" event method
-    ...
-
-    ```
-
     Here is a quick review of the NGINX commands you should be familiar with.  Depending on your Linux system, you may need to prefix these commands with `sudo`.
 
     ```bash
@@ -235,7 +207,10 @@ Try some Nginx commands:
 
 <br/>
 
-### NGINX Reloads
+<details>
+   <summary><b>Deep Dive: NGINX Reloads</b></summary>
+
+#### NGINX Reloads
 
 <br/>
 
@@ -323,7 +298,14 @@ Or use can use another Linux command `ps aux|grep nginx` to see the nginx proces
 
 <br/>
 
-### NGINX Configuration Overview
+</details>
+
+<br/>
+
+<details>
+   <summary><b>Deep Dive: NGINX Configuration Overview</b></summary>
+
+#### NGINX Configuration Overview
 
 <br/>
 
@@ -443,6 +425,8 @@ maps to:
 **schema://hostname:port/uri/object.type**
 
 >NOTE:  The lab exercises will focus on the HTTP, Server, and Location contexts and blocks.  The Stream context is for Layer4 TCP/UDP traffic, which is not covered in these labs.
+
+</details>
 
 <br/>
 
@@ -905,7 +889,12 @@ Network lab2_default         Removed
 
 ```
 
-### Optional Lab Exercise 1 - Create an Nginx DEBUG page
+<br/>
+
+<details>
+   <summary><b>Optional Lab Exercise 1 - Create an Nginx DEBUG page</b></summary>
+
+#### Optional Lab Exercise 1 - Create an Nginx DEBUG page
 
 1. Update the file `cafe.example.com.conf` to add a new `location` block called `/debug`, open the file and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
@@ -944,9 +933,14 @@ Network lab2_default         Removed
 
 If you like this debug page, feel free to explore and ADD additional Request and Response variables, to make the page display the data that is interesting to you.
 
+</details>
+
 <br/>
 
-### Optional Lab Exercise 2 - NGINX Static HTML pages
+<details>
+   <summary><b>Optional Lab Exercise 2 - NGINX Static HTML pages</b></summary>
+
+#### Optional Lab Exercise 2 - NGINX Static HTML pages
 
 <br/>
 
@@ -1045,9 +1039,14 @@ The default directory for serving HTML content with NGINX is `/usr/share/nginx/h
 
     You will notice, this page has just a few simple modification to NGINX's default Welcome page.  Feel free to try adding some of your favorite images, and create a new hostname, and location blocks to serve up your new content ... now that you have a couple examples to work with - it's easy with NGINX!
 
+</details>
+
 <br/>
 
-### Optional Lab Exercise 3 - NGINX Directory Browsing
+<details>
+   <summary><b>Optional Lab Exercise 3 - NGINX Directory Browsing</b></summary>
+
+#### Optional Lab Exercise 3 - NGINX Directory Browsing
 
 <br/>
 
@@ -1076,59 +1075,66 @@ Now that you have some hot cars in your garage to show off, you might want to le
 
     ![NGINX Directory Browse](media/lab2_directory-browse.png)
 
+</details>
+
 <br/>
 
-### Optional Lab Exercise 4 - Pull the Nginx Plus container from the Nginx Registry
+<details>
+   <summary><b>Optional Lab Exercise 4 - Pull the Nginx Plus container from the Nginx Registry</b></summary>
+
+#### Optional Lab Exercise 4 - Pull the Nginx Plus container from the Nginx Registry
 
 In the next exercise, you will pull the Nginx provided Plus container from the official Nginx Container Private Registry, using only your JWT Token file.  This is a safe, fast, and convenient way to download and run Nginx Plus, without needing to build your own Docker image.  There are several different containers available, see the References section.
 
 1. Make sure your `JWT` environment variable is still set, if not, then set using below command:
 
-```bash
-cd labs
-export JWT=$(cat nginx-repo.jwt)
-```
+    ```bash
+    cd labs
+    export JWT=$(cat nginx-repo.jwt)
+    ```
 
-Verify the $JWT is populated:
+    Verify the $JWT is populated:
 
-```bash
-echo $JWT
-```
+    ```bash
+    echo $JWT
+    ```
 
-```bash
-## Sample output
-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCI
-...snip
-d41BhtS4fGLzD985rk
+    ```bash
+    ## Sample output
+    eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCI
+    ...snip
+    d41BhtS4fGLzD985rk
 
-```
+    ```
 
 1. Login into the Nginx Private Registry, as shown:
 
-```bash
-docker login private-registry.nginx.com --username=$JWT --password=none
-```
+    ```bash
+    docker login private-registry.nginx.com --username=$JWT --password=none
+    ```
 
 1. Pull the Nginx Plus image, as shown:
 
-```bash
-docker pull private-registry.nginx.com/nginx-plus/base:nginx-plus-r32-debian-bookworm
-```
+    ```bash
+    docker pull private-registry.nginx.com/nginx-plus/base:nginx-plus-r32-debian-bookworm
+    ```
 
 1. Verify the image was pulled, as shown:
 
-```bash
-docker image list
-```
+    ```bash
+    docker image list
+    ```
 
-```bash
-## Sample output
-REPOSITORY                                               TAG                 IMAGE ID       CREATED             SIZE
-private-registry.nginx.com/nginx-plus/nginx-plus/base nginx-plus-r32-debian-bookworm  a947bb41179b   18 hours ago       239MB
+    ```bash
+    ## Sample output
+    REPOSITORY                                               TAG                 IMAGE ID       CREATED             SIZE
+    private-registry.nginx.com/nginx-plus/nginx-plus/base nginx-plus-r32-debian-bookworm  a947bb41179b   18 hours ago       239MB
 
-```
+    ```
 
 Now you can tag it and push it to a private Registry if needed.
+
+</details>
 
 <br/>
 
@@ -1153,9 +1159,9 @@ Now you can tag it and push it to a private Registry if needed.
 
 ### Authors
 
-- Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
-- Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
-- Adam Currier - Solutions Architect - Community and Alliances @ F5, Inc.
+- Chris Akker - Solutions Architect - Modern Apps Team @ F5, Inc.
+- Shouvik Dutta - Solutions Architect - Modern Apps Team @ F5, Inc.
+- Adam Currier - Solutions Architect - Modern Apps Team @ F5, Inc.
 
 -------------
 
