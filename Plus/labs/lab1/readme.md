@@ -258,17 +258,6 @@ In this section, you explore and learn about various Nginx and Linux commands us
     ```
 
     ```bash
-    # List nginx packages installed
-    dpkg-query -l | grep nginx
-    ```
-
-    ```bash
-    ##Sample Output##
-    ii  nginx-plus                  34-2~bookworm                  arm64        NGINX Plus, provided by Nginx, Inc.
-    ii  nginx-plus-module-njs       34+0.8.9-1~bookworm            arm64        NGINX Plus njs dynamic modules
-    ```
-
-    ```bash
      dpkg -s nginx-plus
     ```
 
