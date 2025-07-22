@@ -129,6 +129,7 @@ Go ahead and try some of these NGINX commands in your nginx-plus container now, 
     docker compose up --force-recreate -d
 
    ```
+
    >If you encounter any errors during the Nginx Plus build process, or starting the containers, you must fix them before proceeding.  The most common errors are related to the nginx-repo files missing or expired or invalid.
 
 1. Verify your `nginx-plus:workshop` container is up and running:
@@ -151,6 +152,7 @@ Go ahead and try some of these NGINX commands in your nginx-plus container now, 
     curl http://localhost
 
     ```
+
     You should see the Nginx Welcome page.
 
     Now also test with Chrome or a browser, go to http://localhost, you should see the same page.
@@ -161,6 +163,7 @@ Go ahead and try some of these NGINX commands in your nginx-plus container now, 
     curl -I http://localhost:9000/dashboard.html
 
     ```
+
     You should see the Nginx Plus Dashboard page with a 200 OK.
 
     Now also test with Chrome or a browser, go to http://localhost:9000/dashboard.html, you should see the same page.
@@ -1079,7 +1082,7 @@ Now that you have some hot cars in your garage to show off, you might want to le
 
 In the next exercise, you will pull the Nginx provided Plus container from the official Nginx Container Private Registry, using only your JWT Token file.  This is a safe, fast, and convenient way to download and run Nginx Plus, without needing to build your own Docker image.  There are several different containers available, see the References section.
 
-1. Make sure your `JWT` environment variable is still set, if not set using below command:
+1. Make sure your `JWT` environment variable is still set, if not, then set using below command:
 
 ```bash
 cd labs
