@@ -2,7 +2,7 @@
 
 ## Introduction
 
-You will build a Docker container running the Plus version of NGINX, which requires a subscription/license.  You will need a subscription license, using the TLS `nginx-repo.crt, nginx-repo.key and license.jwt` files.  These files provide access to the `NGINX Plus Repository` where the Plus binary files are located.  These are not publicly accessible, you must have a valid Certificate and Key for access. You also need the JWT license file to validate your subscription and automatically send usage reports to F5 licensing endpoint to be complaint with subscription agreement.  This new NGINX Plus container will be used for the rest of the Lab exercises, while you explore and add Plus features and options to your environment.
+You will build a Docker container running the Plus version of NGINX, which requires a subscription/license.  You will need a subscription license, using the TLS `nginx-repo.crt, nginx-repo.key and nginx-repo.jwt` files.  These files provide access to the `NGINX Plus Repository` where the Plus binary files are located.  These are not publicly accessible, you must have a valid Certificate and Key for access. You also need the JWT license file to validate your subscription and automatically send usage reports to F5 licensing endpoint to be complaint with subscription agreement.  This new NGINX Plus container will be used for the rest of the Lab exercises, while you explore and add Plus features and options to your environment.
 
 ## Learning Objectives
 
@@ -37,7 +37,7 @@ In the `NGINX Architectural` diagram below, you can see these different core com
 
 - In 2004, NGINX was released as open source software (OSS).  It rapidly gained popularity and has been adopted by millions of websites.
 
-- In 2013, NGINX Plus was released, providing additional features and Commercial Support for Enterprise customers. 
+- In 2013, NGINX Plus was released, providing additional features and Commercial Support for Enterprise customers.
 
 <br/>
 
