@@ -893,7 +893,8 @@ Network lab2_default         Removed
 
 <details>
    <summary><b>Optional Lab Exercise 1 - Create an Nginx DEBUG page</b></summary>
-    #### Optional Lab Exercise 1 - Create an Nginx DEBUG page
+
+#### Optional Lab Exercise 1 - Create an Nginx DEBUG page
 
 1. Update the file `cafe.example.com.conf` to add a new `location` block called `/debug`, open the file and type in below commands.  You don't need to type the comments.  Don't just copy/paste these lines, type them by hand so you learn.
 
@@ -1087,49 +1088,49 @@ In the next exercise, you will pull the Nginx provided Plus container from the o
 
 1. Make sure your `JWT` environment variable is still set, if not, then set using below command:
 
-```bash
-cd labs
-export JWT=$(cat nginx-repo.jwt)
-```
+    ```bash
+    cd labs
+    export JWT=$(cat nginx-repo.jwt)
+    ```
 
-Verify the $JWT is populated:
+    Verify the $JWT is populated:
 
-```bash
-echo $JWT
-```
+    ```bash
+    echo $JWT
+    ```
 
-```bash
-## Sample output
-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCI
-...snip
-d41BhtS4fGLzD985rk
+    ```bash
+    ## Sample output
+    eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCI
+    ...snip
+    d41BhtS4fGLzD985rk
 
-```
+    ```
 
 1. Login into the Nginx Private Registry, as shown:
 
-```bash
-docker login private-registry.nginx.com --username=$JWT --password=none
-```
+    ```bash
+    docker login private-registry.nginx.com --username=$JWT --password=none
+    ```
 
 1. Pull the Nginx Plus image, as shown:
 
-```bash
-docker pull private-registry.nginx.com/nginx-plus/base:nginx-plus-r32-debian-bookworm
-```
+    ```bash
+    docker pull private-registry.nginx.com/nginx-plus/base:nginx-plus-r32-debian-bookworm
+    ```
 
 1. Verify the image was pulled, as shown:
 
-```bash
-docker image list
-```
+    ```bash
+    docker image list
+    ```
 
-```bash
-## Sample output
-REPOSITORY                                               TAG                 IMAGE ID       CREATED             SIZE
-private-registry.nginx.com/nginx-plus/nginx-plus/base nginx-plus-r32-debian-bookworm  a947bb41179b   18 hours ago       239MB
+    ```bash
+    ## Sample output
+    REPOSITORY                                               TAG                 IMAGE ID       CREATED             SIZE
+    private-registry.nginx.com/nginx-plus/nginx-plus/base nginx-plus-r32-debian-bookworm  a947bb41179b   18 hours ago       239MB
 
-```
+    ```
 
 Now you can tag it and push it to a private Registry if needed.
 
