@@ -12,7 +12,7 @@ By the end of this Prerequisite instructions, you will be ready to do the Worksh
 
 1. You must have an NGINX Plus Commercial license/subscription for this Workshop.
 2. You must download the `nginx-repo.crt` and `nginx-repo.key` and `nginx-repo.jwt` files from your MyF5 account.
-3. If you do not have a current license, you can request a 30-Day Trial License for free, here: https://www.f5.com/trials/nginx-one . It takes several minutes for the F5 Licensing system to send you an email, with a `one-time download link` to the License files.  `Save the nginx-repo.* files to your local storage`, you will need them before you start the Workshop.  (NOTE: the nginx-repo.jwt file is not needed for this workshop, but download it for the Nginx Plus Ingress Workshop if you are interested in learning about Nginx Plus Ingress Controller for Kubernetes - your next NGINXperts Workshop!).
+3. If you do not have a current license, you can request a 30-Day Trial License for free, here: https://www.f5.com/trials/nginx-one . It takes several minutes for the F5 Licensing system to send you an email, with a `one-time download link` to the License files.  `Save the nginx-repo.* files to your local storage`, you will need them before you start the Workshop.  (NOTE: the nginx-repo.jwt file will be used to validate your subscription and automatically send usage reports to F5 licensing endpoint to be complaint with subscription agreement.).
 4. If you do not have access to Nginx Plus, you can still take the NGINX OSS Basics Workshop, and get familiar with NGINX Open Source.
 
 ## F5 Distributed Cloud Accout
