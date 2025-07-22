@@ -107,7 +107,7 @@ As part of your Dockerfile, your NGINX Plus container already has the added `NGI
 1. Start the WRK load generation tool.  This will provide some traffic to the nginx-plus container, so the statistics will be increasing.
 
     ```bash
-    docker run --name wrk --network=lab6_default --rm williamyeh/wrk -t4 -c200 -d20m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
+    docker run --name wrk --network=lab6_default --rm elswork/wrk -t4 -c200 -d20m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
 
     ```
 
@@ -275,4 +275,4 @@ Network lab6_default         Removed
 
 -------------
 
-Navigate to ([Lab7](../lab7/readme.md) | [Main Menu](../readme.md))
+Navigate to ([Main Menu](../readme.md))

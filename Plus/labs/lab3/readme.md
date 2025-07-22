@@ -70,7 +70,9 @@ In this exercise, you will use `openssl` to create a Self-signed certificate and
 
     ```bash
     cd nginx
+    ```
 
+    ```bash
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout cars.example.com.key -out cars.example.com.crt -subj "/CN=NginxPlusBasics"
 
     ```

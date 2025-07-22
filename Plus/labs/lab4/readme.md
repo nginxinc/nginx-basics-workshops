@@ -54,24 +54,22 @@ For this lab you will run 4 Docker containers.  The first one will be used as an
     ...
 
     services:
-    nginx-plus:                     # NGINX Plus Web / Load Balancer
+    nginx-plus:                  # NGINX Plus Web / Load Balancer
         hostname: nginx-plus
         container_name: nginx-plus
-        image: nginx-plus:workshop  # From Lab1
-        volumes:                    # Sync these folders to container
-            - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+        #build: ./nginx-plus          # Build new container, using /nginx-plus/Dockerfile
+        image: nginx-plus:workshop          # Run nginx-plus container
+        volumes:                      # Copy these files/folders to container 
             - ./nginx-plus/etc/nginx/conf.d:/etc/nginx/conf.d
             - ./nginx-plus/etc/nginx/includes:/etc/nginx/includes
             - ./nginx-plus/usr/share/nginx/html:/usr/share/nginx/html
-        links:
-            - web1:web1
-            - web2:web2
-            - web3:web3
+            - ./nginx-plus/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+            - ../nginx-repo.jwt:/etc/nginx/license.jwt      # Copy JWT Token to fulfill licensing requirement
         ports:
             - 80:80       # Open for HTTP
             - 443:443     # Open for HTTPS
-            - 9000:9000   # Open for API / dashboard page
-        restart: always
+            - 9000:9000   # Open for Plus Dashboard page / API
+        restart: always 
 
     ```
 
@@ -111,7 +109,7 @@ For this lab you will run 4 Docker containers.  The first one will be used as an
 1. Verify all four containers are running:
 
     ```bash
-    docker ps -a
+    docker ps
 
     ```
 
@@ -125,10 +123,12 @@ For this lab you will run 4 Docker containers.  The first one will be used as an
 
     ```
 
-1. Verify `all` of your three web backend servers are working.  Using a Terminal, Docker exec into each one, and verify you get a response to a curl request.  The `Name` should be `web1`, `web2`, and `web3` respectively for each container.
+1. Verify `all` of your three web backend servers are working.  Using a Terminal, run below commands and verify you get a response to each curl request.  The `Name` should be `web1`, `web2`, and `web3` respectively for each container.
 
     ```bash
-    docker exec -it web1 bin/sh   # log into web1 container, then web2, then web3
+    docker exec -it web1 curl -s http://localhost |grep Name
+    docker exec -it web2 curl -s http://localhost |grep Name
+    docker exec -it web3 curl -s http://localhost |grep Name
 
     ```
 
@@ -153,12 +153,7 @@ For this lab you will run 4 Docker containers.  The first one will be used as an
 1. Test the NGINX Plus container, verify it also sends back a response to a curl request:
 
     ```bash
-    docker exec -it nginx-plus bin/bash   # log into nginx-plus container
-
-    ```
-
-    ```bash
-    curl http://localhost
+    docker exec -it nginx-plus curl http://localhost   
 
     ```
 
@@ -644,7 +639,6 @@ Now that you have a working NGINX Proxy, and several backends, you will be addin
 1. Test your new log format.  Docker Exec into your nginx-plus container.  Tail the `/var/log/nginx/cafe.example.com.log` access log file, and you will see the new Extended Log Format.
 
     ```bash
-    docker exec -it nginx-plus bin/bash
     tail -f /var/log/nginx/cafe.example.com.log
 
     ```
@@ -930,13 +924,6 @@ Different backend applications may benefit from using different load balancing t
     `wrk` load generation tool is a docker container that will download and run, with 4 threads, at 200 connections, for 1 minute:
 
     ```bash
-    docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d1m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
-
-    ```
-
-    Or, if you have an ARM processor (Mac M1/2), try this:
-
-    ```bash
     docker run --name wrk --network=lab4_default --rm elswork/wrk -t4 -c200 -d1m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
 
     ```
@@ -1125,7 +1112,7 @@ Can NGINX go faster?   Yes, if you give it more resources.  Let's try `adding so
 1. Run the `wrk` load generator again for 1 minute.
 
    ```bash
-   docker run --name wrk --network=lab4_default --rm williamyeh/wrk -t4 -c200 -d1m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
+   docker run --name wrk --network=lab4_default --rm elswork/wrk -t4 -c200 -d1m -H 'Host: cafe.example.com' --timeout 2s http://nginx-plus/coffee
 
    ```
 
