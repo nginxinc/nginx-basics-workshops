@@ -330,8 +330,8 @@ What do you see in the Plus Dashboard?
 
 ### Authors
 
-- Chris Akker - Solutions Architect - Community and Alliances @ F5, Inc.
-- Shouvik Dutta - Solutions Architect - Community and Alliances @ F5, Inc.
+- Chris Akker - Solutions Architect - Modern Apps Team @ F5, Inc.
+- Shouvik Dutta - Solutions Architect - Modern Apps Team @ F5, Inc.
 
 -------------
 
