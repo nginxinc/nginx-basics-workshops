@@ -81,9 +81,10 @@ Visual Studio Code | Docker
 :-------------------------:|:-------------------------:
 ![VScode](media/vs-code-icon.png)  |![Docker](media/docker-icon.png)
 
-1. Open the Workshop folder with Visual Studio Code, or an IDE / text editor of your choice, so you can read and edit the files provided.
+<br/>
 
-    >**NOTE:** If you are using F5 provided UDF environment then jump to Step 5 and skip Step 2 - 4 as those steps cover downloading NGINX Plus license file which is already provided in the F5 UDF environment.
+<details>
+   <summary><b>Expand to see optional Steps if you are not using F5 provided UDF environment</b></summary>
 
 1. Download and copy your NGINX Plus license files to your computer.  There are 3 files provided, you will need all three files `.crt and .key and .jwt` files for this Workshop:
 
@@ -115,7 +116,16 @@ Visual Studio Code | Docker
 
     ```
 
-1. Using the Visual Studio Terminal, set the `JWT` environment variable with your nginx-repo.jwt license file. This is required to pull the NGINX Plus container images from the NGINX Private Registry referenced in the dockerfile.
+</details>
+
+<br/>
+
+1. Open the Workshop folder with Visual Studio Code, so you can read and edit the files provided.
+
+    >**NOTE:** If you are not using F5 provided UDF environment then please perform the optional steps mentioned above that covers downloading NGINX Plus license files before jumping to next Step. If you are using F5 provide UDF environment then the jumphost already has these license files placed in correct folders.
+
+
+1. Using the Visual Studio Terminal, set the `JWT` environment variable with your `labs/nginx-repo.jwt` license file. This is required to pull the NGINX Plus container images from the NGINX Private Registry referenced in the dockerfile.
 
     ```bash
     export JWT=$(cat nginx-repo.jwt)
@@ -165,10 +175,10 @@ Visual Studio Code | Docker
 
    >If you encounter any errors during the Nginx Plus build process, or starting the containers, you must fix them before proceeding.  The most common errors are related to the nginx-repo files missing or expired or invalid.
 
-1. Verify your `lab1-nginx-plus` container is up and running:
+1. Verify your `nginx-plus` container is up and running:
 
     ```bash
-    docker ps
+    docker ps | grep nginx-plus
     ```
 
     ```bash
