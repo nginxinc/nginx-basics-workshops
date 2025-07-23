@@ -109,7 +109,7 @@ For this lab you will run 4 Docker containers.  The first one will be used as an
 1. Verify all four containers are running:
 
     ```bash
-    docker ps
+    docker ps | grep -E 'nginx-plus|web'
 
     ```
 

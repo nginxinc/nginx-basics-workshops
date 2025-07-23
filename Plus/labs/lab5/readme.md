@@ -114,7 +114,7 @@ NGINX Plus is the `Commercial version of NGINX`, adding additional Enterprise fe
 1. Verify all four containers are running:
 
     ```bash
-    docker ps
+    docker ps | grep -E 'nginx-plus|web'
 
     ```
 

@@ -163,7 +163,7 @@ As part of your Dockerfile, your NGINX Plus container already has the added `NGI
 1. Verify these 2 containers are running.
 
     ```bash
-    docker ps -a
+    docker ps | grep -E 'prometheus|grafana'
 
     ```
 
@@ -172,8 +172,6 @@ As part of your Dockerfile, your NGINX Plus container already has the added `NGI
     CONTAINER ID   IMAGE                   COMMAND                  CREATED          STATUS          PORTS                                                                                      NAMES
     8a61c66fc511   prom/prometheus         "/bin/prometheus --c…"   36 minutes ago   Up 36 minutes   0.0.0.0:9090->9090/tcp                                                                     prometheus
     4d38710ed4ec   grafana/grafana         "/run.sh"                36 minutes ago   Up 36 minutes   0.0.0.0:3000->3000/tcp                                                                     grafana
-
-    ...snip
 
     ```
 

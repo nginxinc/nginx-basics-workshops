@@ -165,10 +165,10 @@ Visual Studio Code | Docker
 
    >If you encounter any errors during the Nginx Plus build process, or starting the containers, you must fix them before proceeding.  The most common errors are related to the nginx-repo files missing or expired or invalid.
 
-1. Verify your `lab1-nginx-plus` container is up and running:
+1. Verify your `nginx-plus` container is up and running:
 
     ```bash
-    docker ps
+    docker ps | grep nginx-plus
     ```
 
     ```bash

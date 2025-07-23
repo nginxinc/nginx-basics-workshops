@@ -135,7 +135,7 @@ Go ahead and try some of these NGINX commands in your nginx-plus container now, 
 1. Verify your `nginx-plus:workshop` container is up and running:
 
     ```bash
-    docker ps
+    docker ps | grep nginx-plus
 
     ```
 
