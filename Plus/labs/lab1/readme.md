@@ -81,6 +81,8 @@ Visual Studio Code | Docker
 :-------------------------:|:-------------------------:
 ![VScode](media/vs-code-icon.png)  |![Docker](media/docker-icon.png)
 
+<br/>
+
 <details>
    <summary><b>Expand to see optional Steps if you are not using F5 provided UDF environment</b></summary>
 
