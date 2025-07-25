@@ -895,7 +895,7 @@ As a Best Practice, you should not modify the `main` log format, but rather copy
 
 <br/>
 
-## Wrapup
+## Wrap Up
 
 >Don't forget - Save any Docker containers/images, docker compose, NGINX config files and Notes you may want for future reference.
 
@@ -911,7 +911,7 @@ docker compose down
 ##Sample output##
 Running 2/2
 Container nginx-plus          Removed                            
-Network lab3_default         Removed
+Network lab3_default          Removed
 
 ```
 

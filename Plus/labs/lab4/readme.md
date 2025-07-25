@@ -1253,11 +1253,9 @@ With NGINX, there are several configuration options for this, but in this next l
 
 <br/>
 
-If you need to find the `answers` to the lab exercises, you will find the final NGINX configuration files for all the exercises in the `labs/lab4/final` folder.  Use them for reference to compare how you completed the labs.
+## Wrap Up
 
->**Congratulations, you are now a member of Team NGINX !**
-
-![NGINX Logo](media/nginx-logo.png)
+>If you need to find the `answers` to the lab exercises, you will find the final NGINX configuration files for all the exercises in the `labs/lab4/final` folder.  Use them for reference to compare how you completed the labs.
 
 >If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab4` folder:
 
