@@ -485,12 +485,12 @@ In this exercise, you will add some additional NGINX TLS settings to control the
     <details>
         <summary><b>Optional Exercise 1 </b></summary>
 
-        Optional Exercise - Try with OpenSSL, using its built-in `s_client` SSL client feature.  After all, it is Security, two sources of info are better than one, right ?
+    Optional Exercise - Try with OpenSSL, using its built-in `s_client` SSL client feature.  After all, it is Security, two sources of info are better than one, right ?
 
-        ```bash
-        openssl s_client cars.example.com:443
+    ```bash
+    openssl s_client cars.example.com:443
 
-        ```
+    ```
 
         ```bash
         ##Sample output##,                             # Comments Added
