@@ -483,7 +483,7 @@ In this exercise, you will add some additional NGINX TLS settings to control the
     ```
 
     <details>
-        <summary><b>Optional Exercise 1 Using `s_client` SSL client feature </b></summary>
+        <summary><b>Optional Exercise 1 Use OpenSSL, built-in SSL client feature </b></summary>
 
     <br/>
 
@@ -598,9 +598,16 @@ In this exercise, you will add some additional NGINX TLS settings to control the
     closed
 
     ```
+
     </details>
 
-1. Optional Exercise - Try with OpenSSL, again with `TLS version set to 1.2`.  What do you expect ?
+
+    <details>
+        <summary><b>Optional Exercise 2 Use OpenSSL, built-in SSL client feature with tls 1.2 </b></summary>
+
+    <br/>
+
+    Optional Exercise - Try with OpenSSL, again with `TLS version set to 1.2`.  What do you expect ?
 
     ```bash
     openssl s_client --tls1_2 cars.example.com:443
@@ -646,6 +653,8 @@ In this exercise, you will add some additional NGINX TLS settings to control the
     As you can see, using the `ssl_strong.conf` file, with only TLS v1.3 enabled, will make any lower TLS version handshake FAIL.  If you like, try a couple other TLS versions, like 1.1 or 1.0 - you should expect the same results.  But NOTE, older versions are no longer supported with some testing tools, so double-check that your SSL client even works with lower versions of TLS itself.
 
     However, we all live in a messy Internet world, and not all apps and clients are capable of running the latest and greatest software, so being able to handle older, less secure TLS traffic is likely a requirement that you will run into.  In this next exercise, we will downgrade the TLS parameters to "Medium" security settings, so your website will accomodate older versions of TLS, namely 1.1 and 1.2.
+
+    </details>
 
 1. Inspect the `/includes/ssl/ssl_intermediate.conf` file, you will see that the TLS version is set to 1.0, 1.1, 1.2 on line #17 with the `ssl_protocols` directive.  You can modify this to meet your needs if you like.
 
