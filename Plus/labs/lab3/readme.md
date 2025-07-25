@@ -485,6 +485,8 @@ In this exercise, you will add some additional NGINX TLS settings to control the
     <details>
         <summary><b>Optional Exercise 1 </b></summary>
 
+    <br/>
+
     Optional Exercise - Try with OpenSSL, using its built-in `s_client` SSL client feature.  After all, it is Security, two sources of info are better than one, right ?
 
     ```bash
@@ -492,110 +494,110 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
     ```
 
-        ```bash
-        ##Sample output##,                             # Comments Added
-        CONNECTED(00000006)
-        depth=0 CN = NginxPlusBasics
-        verify error:num=18:self-signed certificate    # Here's our Self-signed Cert
-        verify return:1
-        depth=0 CN = NginxPlusBasics
-        verify return:1
-        ---
-        Certificate chain
-        0 s:CN = NginxPlusBasics
-        i:CN = NginxPlusBasics
-        a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
-        v:NotBefore: Feb  6 23:08:20 2024 GMT; NotAfter: Feb  5 23:08:20 2025 GMT
-        ---
-        Server certificate
-        -----BEGIN CERTIFICATE-----
-        MIIDDTCCAfWgAwIBAgIUPQE5kNK6wbnXQcT5Ksv6FOamWDQwDQYJKoZIhvcNAQEL
-        BQAwFjEUMBIGA1UEAwwLTmdpbnhCYXNpY3MwHhcNMjQwMjA2MjMwODIwWhcNMjUw
-        MjA1MjMwODIwWjAWMRQwEgYDVQQDDAtOZ2lueEJhc2ljczCCASIwDQYJKoZIhvcN
-        AQEBBQADggEPADCCAQoCggEBAPA+UGG3bwoo30OHaOGvQStbiiFnuc3wm/SDYnzR
-        gCaYB5nRJ+2qZMOEc989sFWxw4Drq93Z+m+9mMUQnjInONrf/qA+UOAvYYK9jBsN
-        wjFxZeMGIDOqXvp7I4tCf+dpxAD5rsMyUXXiU9ksjzNaUOFWLtCmfUQ9mgxTcKnS
-        NBt2LkNrAp6u72DQdbUyS+BAoOGEhj69rUuQfDLr7qpctjZ3mTzfIncbnnYzrXKW
-        u+Vh2tmZJAk0EAk+IcvcrYjCysH+Kn50Invf4NigHD9+yxT9t7DHhiB9/2xw93BJ
-        cyH+kc2N+w6ijgV994UXUzkSs5Q2X//oBHtkr3Xoi8rk95sCAwEAAaNTMFEwHQYD
-        VR0OBBYEFDepAa0rVUhD/uHYJKm1/8rDVHqNMB8GA1UdIwQYMBaAFDepAa0rVUhD
-        /uHYJKm1/8rDVHqNMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEB
-        ALAP4dpXOBht9O4aSMFAwkD3j7pupGZYjo/UXnsdQhv8rCAEBouHcTnlpkd2YB4x
-        VcPgm8P02C+uKqu93WRXeD49kvxh33pdwsp922X0ekfjb1sQ9yOnsGEZPYRbyFVp
-        bs+KSo/J+HerPDirX3xX8oQQ+CtAGpfzSK7Pp7vT6L1rxHyors8bTUfpzxyR8zoP
-        OSnfmZD9aIYfL/Qm9zN1X1YKKIZpWWMtKqMGzAQEDk/PKwdxfBnSzd5WeNKZze2t
-        VlM1vlSf04fUV/jATaYWVUDO5kA89Hj0Brde3OsFDTczsaRAoJb+FEqTXoQH0zKs
-        uMBDBpsCnwqjtB27MguwbAk=
-        -----END CERTIFICATE-----
-        subject=CN = NginxPlusBasics
-        issuer=CN = NginxPlusBasics
-        ---
-        No client certificate CA names sent
-        Peer signing digest: SHA256
-        Peer signature type: RSA-PSS
-        Server Temp Key: ECDH, secp384r1, 384 bits
-        ---
-        SSL handshake has read 1503 bytes and written 781 bytes
-        Verification error: self-signed certificate
-        ---
-        New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384                    # TLS Version and Cipher
-        Server public key is 2048 bit
-        This TLS version forbids renegotiation.
-        Compression: NONE
-        Expansion: NONE
-        No ALPN negotiated
-        Early data was not sent
+    ```bash
+    ##Sample output##,                             # Comments Added
+    CONNECTED(00000006)
+    depth=0 CN = NginxPlusBasics
+    verify error:num=18:self-signed certificate    # Here's our Self-signed Cert
+    verify return:1
+    depth=0 CN = NginxPlusBasics
+    verify return:1
+    ---
+    Certificate chain
+    0 s:CN = NginxPlusBasics
+    i:CN = NginxPlusBasics
+    a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
+    v:NotBefore: Feb  6 23:08:20 2024 GMT; NotAfter: Feb  5 23:08:20 2025 GMT
+    ---
+    Server certificate
+    -----BEGIN CERTIFICATE-----
+    MIIDDTCCAfWgAwIBAgIUPQE5kNK6wbnXQcT5Ksv6FOamWDQwDQYJKoZIhvcNAQEL
+    BQAwFjEUMBIGA1UEAwwLTmdpbnhCYXNpY3MwHhcNMjQwMjA2MjMwODIwWhcNMjUw
+    MjA1MjMwODIwWjAWMRQwEgYDVQQDDAtOZ2lueEJhc2ljczCCASIwDQYJKoZIhvcN
+    AQEBBQADggEPADCCAQoCggEBAPA+UGG3bwoo30OHaOGvQStbiiFnuc3wm/SDYnzR
+    gCaYB5nRJ+2qZMOEc989sFWxw4Drq93Z+m+9mMUQnjInONrf/qA+UOAvYYK9jBsN
+    wjFxZeMGIDOqXvp7I4tCf+dpxAD5rsMyUXXiU9ksjzNaUOFWLtCmfUQ9mgxTcKnS
+    NBt2LkNrAp6u72DQdbUyS+BAoOGEhj69rUuQfDLr7qpctjZ3mTzfIncbnnYzrXKW
+    u+Vh2tmZJAk0EAk+IcvcrYjCysH+Kn50Invf4NigHD9+yxT9t7DHhiB9/2xw93BJ
+    cyH+kc2N+w6ijgV994UXUzkSs5Q2X//oBHtkr3Xoi8rk95sCAwEAAaNTMFEwHQYD
+    VR0OBBYEFDepAa0rVUhD/uHYJKm1/8rDVHqNMB8GA1UdIwQYMBaAFDepAa0rVUhD
+    /uHYJKm1/8rDVHqNMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEB
+    ALAP4dpXOBht9O4aSMFAwkD3j7pupGZYjo/UXnsdQhv8rCAEBouHcTnlpkd2YB4x
+    VcPgm8P02C+uKqu93WRXeD49kvxh33pdwsp922X0ekfjb1sQ9yOnsGEZPYRbyFVp
+    bs+KSo/J+HerPDirX3xX8oQQ+CtAGpfzSK7Pp7vT6L1rxHyors8bTUfpzxyR8zoP
+    OSnfmZD9aIYfL/Qm9zN1X1YKKIZpWWMtKqMGzAQEDk/PKwdxfBnSzd5WeNKZze2t
+    VlM1vlSf04fUV/jATaYWVUDO5kA89Hj0Brde3OsFDTczsaRAoJb+FEqTXoQH0zKs
+    uMBDBpsCnwqjtB27MguwbAk=
+    -----END CERTIFICATE-----
+    subject=CN = NginxPlusBasics
+    issuer=CN = NginxPlusBasics
+    ---
+    No client certificate CA names sent
+    Peer signing digest: SHA256
+    Peer signature type: RSA-PSS
+    Server Temp Key: ECDH, secp384r1, 384 bits
+    ---
+    SSL handshake has read 1503 bytes and written 781 bytes
+    Verification error: self-signed certificate
+    ---
+    New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384                    # TLS Version and Cipher
+    Server public key is 2048 bit
+    This TLS version forbids renegotiation.
+    Compression: NONE
+    Expansion: NONE
+    No ALPN negotiated
+    Early data was not sent
+    Verify return code: 18 (self-signed certificate)
+    ---
+    ---
+    Post-Handshake New Session Ticket arrived:
+    SSL-Session:
+        Protocol  : TLSv1.3                                          # Session TLS Version and Cipher
+        Cipher    : TLS_AES_256_GCM_SHA384
+        Session-ID: DA3908C086B9930AFAB543538D1658188A94E8FEFA394CC8C2C0FE13740D63A9
+        Session-ID-ctx:
+        Resumption PSK: FB16F5F833A191CB184B162B82D2B07E1BEA491D7D153FEFF9748272CD424D40A6CF8A27B3CF37355883CA69E8A5F3F7
+        PSK identity: None
+        PSK identity hint: None
+        SRP username: None
+        TLS session ticket lifetime hint: 600 (seconds)
+        TLS session ticket:
+        0000 - 79 db ac 04 8a 2e b2 59-d6 18 b6 d4 2c 62 d2 0e   y......Y....,b..
+        0010 - 38 74 e8 7c 26 e4 d0 ec-fb a7 ee 56 1f f1 ea 6f   8t.|&......V...o
+
+        Start Time: 1707352054
+        Timeout   : 7200 (sec)
         Verify return code: 18 (self-signed certificate)
-        ---
-        ---
-        Post-Handshake New Session Ticket arrived:
-        SSL-Session:
-            Protocol  : TLSv1.3                                          # Session TLS Version and Cipher
-            Cipher    : TLS_AES_256_GCM_SHA384
-            Session-ID: DA3908C086B9930AFAB543538D1658188A94E8FEFA394CC8C2C0FE13740D63A9
-            Session-ID-ctx:
-            Resumption PSK: FB16F5F833A191CB184B162B82D2B07E1BEA491D7D153FEFF9748272CD424D40A6CF8A27B3CF37355883CA69E8A5F3F7
-            PSK identity: None
-            PSK identity hint: None
-            SRP username: None
-            TLS session ticket lifetime hint: 600 (seconds)
-            TLS session ticket:
-            0000 - 79 db ac 04 8a 2e b2 59-d6 18 b6 d4 2c 62 d2 0e   y......Y....,b..
-            0010 - 38 74 e8 7c 26 e4 d0 ec-fb a7 ee 56 1f f1 ea 6f   8t.|&......V...o
+        Extended master secret: no
+        Max Early Data: 0
+    ---
+    read R BLOCK
+    ---
+    Post-Handshake New Session Ticket arrived:
+    SSL-Session:                                                   # Session TLS Version and Cipher
+        Protocol  : TLSv1.3
+        Cipher    : TLS_AES_256_GCM_SHA384
+        Session-ID: 1C2FB400E5C083A72F0A89FD193C0DC3D3F56A1378168611E7598260E030D53F
+        Session-ID-ctx:
+        Resumption PSK: 21B18DAC31528E7494B569588353909DEA0FE18893E98368DE51E7003EB04C8D86129670E2939B034F2A00BA7201262D
+        PSK identity: None
+        PSK identity hint: None
+        SRP username: None
+        TLS session ticket lifetime hint: 600 (seconds)
+        TLS session ticket:
+        0000 - 5e 5d 84 c8 74 cb 6c 18-24 dc 6e d8 b3 4e 6d d8   ^]..t.l.$.n..Nm.
+        0010 - 40 7b 4b fd 3f 1d d7 39-9b 31 61 00 d9 4b 59 45   @{K.?..9.1a..KYE
 
-            Start Time: 1707352054
-            Timeout   : 7200 (sec)
-            Verify return code: 18 (self-signed certificate)
-            Extended master secret: no
-            Max Early Data: 0
-        ---
-        read R BLOCK
-        ---
-        Post-Handshake New Session Ticket arrived:
-        SSL-Session:                                                   # Session TLS Version and Cipher
-            Protocol  : TLSv1.3
-            Cipher    : TLS_AES_256_GCM_SHA384
-            Session-ID: 1C2FB400E5C083A72F0A89FD193C0DC3D3F56A1378168611E7598260E030D53F
-            Session-ID-ctx:
-            Resumption PSK: 21B18DAC31528E7494B569588353909DEA0FE18893E98368DE51E7003EB04C8D86129670E2939B034F2A00BA7201262D
-            PSK identity: None
-            PSK identity hint: None
-            SRP username: None
-            TLS session ticket lifetime hint: 600 (seconds)
-            TLS session ticket:
-            0000 - 5e 5d 84 c8 74 cb 6c 18-24 dc 6e d8 b3 4e 6d d8   ^]..t.l.$.n..Nm.
-            0010 - 40 7b 4b fd 3f 1d d7 39-9b 31 61 00 d9 4b 59 45   @{K.?..9.1a..KYE
+        Start Time: 1707352054
+        Timeout   : 7200 (sec)
+        Verify return code: 18 (self-signed certificate)
+        Extended master secret: no
+        Max Early Data: 0
+    ---
+    read R BLOCK
+    closed
 
-            Start Time: 1707352054
-            Timeout   : 7200 (sec)
-            Verify return code: 18 (self-signed certificate)
-            Extended master secret: no
-            Max Early Data: 0
-        ---
-        read R BLOCK
-        closed
-
-        ```
+    ```
     </details>
 
 1. Optional Exercise - Try with OpenSSL, again with `TLS version set to 1.2`.  What do you expect ?
