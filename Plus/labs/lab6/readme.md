@@ -209,20 +209,25 @@ Grafana is a data visualization tool, which contains a time series database and 
 
 1. Scroll to the bottom and click `Save and Test`. You should see a green `Successfully queried the Prometheus API` message.  Click the Home page link to return the main menu.
 
-1. Import the provided `labs/lab6/NGINX-Basics.json` file to see statistics like the NGINX Plus HTTP Requests Per Second and Upstream Response Times.  
-- Click on Create New Dashboard from Home page and then `Import dashboard`.  
-- Copy and Paste the `labs/lab6/NGINX-Basics.json` file provided. 
-- Click on the `Load` button. 
-- Set the data source to `prometheus` and then click on the `Import` button.
-- Sometimes you have change the datasource, Dashboard ID, Name, or other settings for it to Import properly. 
+1. Import the provided `labs/lab6/NGINX-Basics.json` file to see statistics like the NGINX Plus HTTP Requests Per Second and Upstream Response Times.
 
-You should see a Grafana Dashboard like this one:
+    - Click on Create New Dashboard from Home page and then `Import dashboard`.  
+    - Copy and Paste the `labs/lab6/NGINX-Basics.json` file provided.
+    - Click on the `Load` button.
+    - Set the data source to `prometheus` and then click on the `Import` button.
+    - Sometimes you have to change the datasource, Dashboard ID, Name, or other settings for it to Import properly.
+
+    You should see a Grafana Dashboard like this one:
 
     ![Grafana Dashboard](media/lab6_grafana-dashboard.png)
 
     There are many different Grafana Dashboards available, and you have the option to create and build dashboards to suite your needs.  NGINX Plus provides over 240 metrics for TCP, HTTP, SSL, Virtual Servers, Locations, Rate Limits, and Upstreams.
 
     Take a few minutes to explore Grafana, and you can also import Dashboards that other people have created, by exploring the Grafana website and searching for "nginx".
+
+<br/>
+
+## Wrap Up
 
 > If the `wrk` load generation tool is still running, then you can stop it by pressing `Ctrl + C`.
 

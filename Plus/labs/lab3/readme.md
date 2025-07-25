@@ -482,7 +482,12 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
     ```
 
-1. Optional Exercise - Try with OpenSSL, using its built-in `s_client` SSL client feature.  After all, it is Security, two sources of info are better than one, right ?
+    <details>
+        <summary><b>Optional Exercise 1: Use OpenSSL, built-in SSL client feature </b></summary>
+
+    <br/>
+
+    Optional Exercise 1 - Try with OpenSSL, using its built-in `s_client` SSL client feature.  After all, it is Security, two sources of info are better than one, right ?
 
     ```bash
     openssl s_client cars.example.com:443
@@ -594,7 +599,15 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
     ```
 
-1. Optional Exercise - Try with OpenSSL, again with `TLS version set to 1.2`.  What do you expect ?
+    </details>
+
+
+    <details>
+        <summary><b>Optional Exercise 2: Use OpenSSL, built-in SSL client feature with tls 1.2 </b></summary>
+
+    <br/>
+
+    Optional Exercise 2 - Try with OpenSSL, again with `TLS version set to 1.2`.  What do you expect ?
 
     ```bash
     openssl s_client --tls1_2 cars.example.com:443
@@ -640,6 +653,8 @@ In this exercise, you will add some additional NGINX TLS settings to control the
     As you can see, using the `ssl_strong.conf` file, with only TLS v1.3 enabled, will make any lower TLS version handshake FAIL.  If you like, try a couple other TLS versions, like 1.1 or 1.0 - you should expect the same results.  But NOTE, older versions are no longer supported with some testing tools, so double-check that your SSL client even works with lower versions of TLS itself.
 
     However, we all live in a messy Internet world, and not all apps and clients are capable of running the latest and greatest software, so being able to handle older, less secure TLS traffic is likely a requirement that you will run into.  In this next exercise, we will downgrade the TLS parameters to "Medium" security settings, so your website will accomodate older versions of TLS, namely 1.1 and 1.2.
+
+    </details>
 
 1. Inspect the `/includes/ssl/ssl_intermediate.conf` file, you will see that the TLS version is set to 1.0, 1.1, 1.2 on line #17 with the `ssl_protocols` directive.  You can modify this to meet your needs if you like.
 
@@ -777,6 +792,11 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
 <br/>
 
+<details>
+    <summary><b>Optional Lab Exercise - NGINX with TLS Ciphers </b></summary>
+
+<br/>
+
 ### Optional Lab Exercise - NGINX with TLS Ciphers
 
 Not all TLS Ciphers are the same, and not all Ciphers work with all versions of TLS.  They often go hand-in-hand, they must match correctly to work as expected.  In this exercise, you will test a couple different TLS Ciphers against your `Modern TLS Settings` from the previous exercise.
@@ -802,6 +822,7 @@ Not all TLS Ciphers are the same, and not all Ciphers work with all versions of 
 >CAUTION: Security Warning !!
 >> It should also be noted, a very old SSL config file is provided for your review, `labs/lab3/nginx-plus/etc/nginx/includes/ssl/ssl_old.conf`, for clients older than TLS v1.0.  Hopefully you will never have to use these Legacy settings, but if you do, please consult with your Security team, perform extensive testing, and use other security measures before using it.
 
+</details>
 <br/>
 
 ### NGINX TLS/SSL Logging
@@ -895,7 +916,7 @@ As a Best Practice, you should not modify the `main` log format, but rather copy
 
 <br/>
 
-## Wrapup
+## Wrap Up
 
 >Don't forget - Save any Docker containers/images, docker compose, NGINX config files and Notes you may want for future reference.
 
@@ -911,7 +932,7 @@ docker compose down
 ##Sample output##
 Running 2/2
 Container nginx-plus          Removed                            
-Network lab3_default         Removed
+Network lab3_default          Removed
 
 ```
 

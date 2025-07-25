@@ -579,6 +579,10 @@ In this section, you will make use of NGINX Plus API to get current statistics r
 
     ```
 
+<br/>
+
+## Wrap Up
+
 > If `wrk` load generation tool is still running, then you can stop it by pressing `Ctrl + C`.
 
 >If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab5` folder:

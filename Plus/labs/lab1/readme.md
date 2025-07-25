@@ -124,7 +124,6 @@ Visual Studio Code | Docker
 
     >**NOTE:** If you are not using F5 provided UDF environment then please perform the optional steps mentioned above that covers downloading NGINX Plus license files before jumping to next Step. If you are using F5 provide UDF environment then the jumphost already has these license files placed in correct folders.
 
-
 1. Using the Visual Studio Terminal, set the `JWT` environment variable with your `labs/nginx-repo.jwt` license file. This is required to pull the NGINX Plus container images from the NGINX Private Registry referenced in the dockerfile.
 
     ```bash

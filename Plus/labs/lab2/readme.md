@@ -649,7 +649,7 @@ server {
     location /coffee {
         
         default_type text/html;
-        return 200 "Caffiene relief from cafe.example.com, path $uri\n";
+        return 200 "Caffeine relief from cafe.example.com, path $uri\n";
     }
     
     location /tea {
@@ -871,23 +871,6 @@ In this exercise, you will learn about NGINX logging.  There are only 2 logs tha
     ```
 
     You see the GET request for the coffee page, with metadata from the Nginx $variables.
-
-<br/>
-
->If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab2` folder:
-
-```bash
-cd lab2
-docker compose down
-```
-
-```bash
-##Sample output##
-Running 2/2
-Container nginx-plus          Removed                            
-Network lab2_default         Removed
-
-```
 
 <br/>
 
@@ -1135,6 +1118,25 @@ In the next exercise, you will pull the Nginx provided Plus container from the o
 Now you can tag it and push it to a private Registry if needed.
 
 </details>
+
+<br/>
+
+## Wrap Up
+
+>If you are finished with this lab, you can use Docker Compose to shut down your test environment. Make sure you are in the `lab2` folder:
+
+```bash
+cd lab2
+docker compose down
+```
+
+```bash
+##Sample output##
+Running 2/2
+Container nginx-plus          Removed                            
+Network lab2_default         Removed
+
+```
 
 <br/>
 
