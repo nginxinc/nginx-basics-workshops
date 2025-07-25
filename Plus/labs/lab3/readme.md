@@ -483,7 +483,7 @@ In this exercise, you will add some additional NGINX TLS settings to control the
     ```
 
     <details>
-        <summary><b>Optional Exercise 1 Use OpenSSL, built-in SSL client feature </b></summary>
+        <summary><b>Optional Exercise 1: Use OpenSSL, built-in SSL client feature </b></summary>
 
     <br/>
 
@@ -603,11 +603,11 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
 
     <details>
-        <summary><b>Optional Exercise 2 Use OpenSSL, built-in SSL client feature with tls 1.2 </b></summary>
+        <summary><b>Optional Exercise 2: Use OpenSSL, built-in SSL client feature with tls 1.2 </b></summary>
 
     <br/>
 
-    Optional Exercise - Try with OpenSSL, again with `TLS version set to 1.2`.  What do you expect ?
+    Optional Exercise 2 - Try with OpenSSL, again with `TLS version set to 1.2`.  What do you expect ?
 
     ```bash
     openssl s_client --tls1_2 cars.example.com:443
@@ -792,6 +792,11 @@ In this exercise, you will add some additional NGINX TLS settings to control the
 
 <br/>
 
+<details>
+    <summary><b>Optional Lab Exercise - NGINX with TLS Ciphers </b></summary>
+
+<br/>
+
 ### Optional Lab Exercise - NGINX with TLS Ciphers
 
 Not all TLS Ciphers are the same, and not all Ciphers work with all versions of TLS.  They often go hand-in-hand, they must match correctly to work as expected.  In this exercise, you will test a couple different TLS Ciphers against your `Modern TLS Settings` from the previous exercise.
@@ -817,6 +822,7 @@ Not all TLS Ciphers are the same, and not all Ciphers work with all versions of 
 >CAUTION: Security Warning !!
 >> It should also be noted, a very old SSL config file is provided for your review, `labs/lab3/nginx-plus/etc/nginx/includes/ssl/ssl_old.conf`, for clients older than TLS v1.0.  Hopefully you will never have to use these Legacy settings, but if you do, please consult with your Security team, perform extensive testing, and use other security measures before using it.
 
+</details>
 <br/>
 
 ### NGINX TLS/SSL Logging
