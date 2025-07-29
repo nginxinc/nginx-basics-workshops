@@ -133,11 +133,6 @@ For this lab you will run 4 Docker containers.  The first one will be used as an
     ```
 
     ```bash
-    curl -s http://localhost |grep Name
-
-    ```
-
-    ```bash
     ## Sample outputs ##
 
     <p class="smaller"><span>Server Name:</span> <span>web1</span></p>   # web1
